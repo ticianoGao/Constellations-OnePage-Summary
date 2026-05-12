@@ -1,31 +1,12 @@
 const menuButton = document.getElementById("menuButton");
-const navLinks = document.getElementById("navLinks");
+const mainNav = document.getElementById("mainNav");
 
 menuButton.addEventListener("click", () => {
-  navLinks.classList.toggle("active");
+  mainNav.classList.toggle("active");
 
-  if (navLinks.classList.contains("active")) {
-    menuButton.textContent = "×";
+  if (mainNav.classList.contains("active")) {
+    menuButton.textContent = "Close";
   } else {
-    menuButton.textContent = "☰";
+    menuButton.textContent = "Menu";
   }
-});
-
-const revealElements = document.querySelectorAll(".reveal");
-
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-      }
-    });
-  },
-  {
-    threshold: 0.15,
-  },
-);
-
-revealElements.forEach((element) => {
-  observer.observe(element);
 });

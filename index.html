@@ -1,294 +1,130 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Constellations Center One Page Summary Generator</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+  <title>Constellations Explorer</title>
 
-  <body>
-    <header class="navbar">
-      <div class="container nav-inner">
-        <a href="#" class="brand" aria-label="Constellations home">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span>Constellations</span>
-        </a>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-        <button
-          class="menu-button"
-          id="menuButton"
-          aria-label="Open navigation menu"
-        >
-          ☰
-        </button>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="logo">
+        <span class="logo-mark">CCEC</span>
+        <span>Constellations Center for Education in Computing</span>
+      </a>
 
-        <nav class="nav-links" id="navLinks">
-          <a href="#dashboard">Dashboard</a>
-          <a href="#reports">Reports</a>
-          <a href="#about">About</a>
-          <a href="#methodology">Methodology</a>
-          <a href="#contact">Contact</a>
-          <a href="#dashboard" class="nav-cta">Explore Dashboard</a>
-        </nav>
-      </div>
-    </header>
+      <button class="menu-button" id="menuButton">Menu</button>
 
-    <main>
-      <section class="hero" id="dashboard">
-        <div class="container hero-grid">
-          <div class="hero-text reveal">
-            <p class="eyebrow">K–12 Computer Science</p>
-            <h1>From Access to Participation.</h1>
-            <p>
-              A geospatial view of K–12 computer science pathways across
-              Georgia, designed to reveal where access exists and where
-              participation gaps remain.
-            </p>
+      <nav class="main-nav" id="mainNav">
+        <a href="#">About</a>
+        <a href="#">FAQ</a>
+      </nav>
+    </div>
+  </header>
 
-            <div class="hero-actions">
-              <a class="button-primary" href="#">Explore Dashboard</a>
-              <a class="button-secondary" href="#reports"
-                >View Summary Reports <span>→</span></a
-              >
-            </div>
-          </div>
+  <main>
+    <section class="hero-section">
+      <div class="container narrow">
+        <h1>The Constellations Report Generator</h1>
+        <h2>A K–12 Computer Science Resource Tool</h2>
 
-          <div class="hero-visual reveal">
-            <div class="device" aria-label="Dashboard mockup">
-              <div class="screen">
-                <div class="sidebar" aria-hidden="true">
-                  <span class="side-dot"></span>
-                  <span class="side-dot"></span>
-                  <span class="side-dot"></span>
-                  <span class="side-dot"></span>
-                  <span class="side-dot"></span>
-                </div>
+        <div class="text-example">Text Example</div>
 
-                <div class="dashboard-content">
-                  <div class="dashboard-title">
-                    K–12 Computer Science Access in Georgia
-                  </div>
+        <p>
+          Welcome to the Constellations Report Generator, a tool that allows users to examine
+          how schools, districts, and communities across Georgia intersect with K–12
+          computer science access, course availability, and student participation.
+          Once you access the dashboard or create the type of report you are interested in,
+          you can review, download, export, and share your findings with others.
+          Get started exploring below!
+        </p>
 
-                  <div class="dashboard-grid">
-                    <div class="metric-column">
-                      <div class="metric-card">
-                        <div class="metric-label">
-                          Schools with CS Resources
-                        </div>
-                        <div class="metric-number">1,248</div>
-                      </div>
+        <p class="desktop-note">
+          For optimal performance, the Constellations Report Generator is best viewed on a desktop
+          or laptop.
+        </p>
 
-                      <div class="metric-card">
-                        <div class="metric-label">Districts Represented</div>
-                        <div class="metric-number">181</div>
-                      </div>
-
-                      <div class="metric-card">
-                        <div class="metric-label">Students Reached</div>
-                        <div class="metric-number">523K</div>
-                      </div>
-                    </div>
-
-                    <div class="map-card">
-                      <div class="map-title">Schools with CS Resources</div>
-
-                      <div class="georgia-map">
-                        <span class="map-point point-1"></span>
-                        <span class="map-point point-2"></span>
-                        <span class="map-point point-3"></span>
-                        <span class="map-point point-4"></span>
-                        <span class="map-point point-5"></span>
-                        <span class="map-point point-6"></span>
-                        <span class="map-point point-7"></span>
-                        <span class="map-point point-8"></span>
-                        <span class="map-point point-9"></span>
-                        <span class="map-point point-10"></span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="lower-dashboard-grid">
-                    <div class="chart-card">
-                      <div class="map-title">Access vs. Participation</div>
-
-                      <div class="bars">
-                        <div class="bar" style="height: 58%"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                      </div>
-                    </div>
-
-                    <div class="chart-card">
-                      <div class="map-title">
-                        Participation by Student Group
-                      </div>
-
-                      <div class="horizontal-bars">
-                        <div class="hbar-row">
-                          <span>White</span>
-                          <div class="hbar-track">
-                            <div class="hbar-fill" style="width: 72%"></div>
-                          </div>
-                          <span>22%</span>
-                        </div>
-
-                        <div class="hbar-row">
-                          <span>Hispanic</span>
-                          <div class="hbar-track">
-                            <div class="hbar-fill" style="width: 54%"></div>
-                          </div>
-                          <span>16%</span>
-                        </div>
-
-                        <div class="hbar-row">
-                          <span>Black</span>
-                          <div class="hbar-track">
-                            <div class="hbar-fill" style="width: 46%"></div>
-                          </div>
-                          <span>13%</span>
-                        </div>
-
-                        <div class="hbar-row">
-                          <span>Asian</span>
-                          <div class="hbar-track">
-                            <div class="hbar-fill" style="width: 82%"></div>
-                          </div>
-                          <span>25%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="quick-links">
+          <a href="#">Data and Methodology</a>
+          <span>|</span>
+          <a href="#">FAQ</a>
+          <span>|</span>
+          <a href="#">Glossary</a>
+          <span>|</span>
+          <a href="#">Tutorials</a>
         </div>
-      </section>
 
-      <section class="features" id="reports">
-        <div class="container">
-          <div class="section-heading reveal">
-            <p class="eyebrow">The Big Picture</p>
-            <h2>See the full picture.</h2>
-            <p>
-              Computer science opportunities are growing, but participation is
-              not always reaching every community equally.
-            </p>
-          </div>
-
-          <div class="feature-grid">
-            <article class="feature-card reveal">
-              <div class="feature-icon">⌂</div>
-              <h3>Schools with CS Resources</h3>
-              <p>
-                Explore where computer science courses, teachers, and programs
-                are available across Georgia.
-              </p>
-              <a href="#">Explore Access →</a>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon">▥</div>
-              <h3>District-Level Comparisons</h3>
-              <p>
-                Compare access and participation across Georgia's school
-                districts and local communities.
-              </p>
-              <a href="#">Compare Districts →</a>
-            </article>
-
-            <article class="feature-card reveal">
-              <div class="feature-icon">◌</div>
-              <h3>Demographic Participation</h3>
-              <p>
-                Understand participation patterns across student groups,
-                schools, and regions.
-              </p>
-              <a href="#">Explore Demographics →</a>
-            </article>
-          </div>
+        <div class="action-box">
+          <a href="#" class="primary-button">Open Explorer Dashboard</a>
+          <a href="#" class="secondary-button">View Summary Reports</a>
         </div>
-      </section>
 
-      <section class="about" id="about">
-        <div class="container about-grid">
-          <div class="about-text reveal">
-            <div class="georgia-pattern" aria-hidden="true"></div>
-            <p class="eyebrow">About the Project</p>
-            <h2>Data to support equitable decisions.</h2>
-            <p>
-              Constellations is a Georgia Tech-led initiative providing open,
-              interactive data to help educators, policymakers, researchers, and
-              communities strengthen K–12 computer science pathways.
-            </p>
-
-            <a class="button-secondary" href="#methodology"
-              >Learn More About Constellations →</a
-            >
-          </div>
-
-          <div class="stats-grid reveal">
-            <div class="stat-card">
-              <div class="stat-number">1,248</div>
-              <div class="stat-label">Schools with CS Resources</div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-number">181</div>
-              <div class="stat-label">Districts Represented</div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-number">523K</div>
-              <div class="stat-label">Students Reached</div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-number">2023–2024</div>
-              <div class="stat-label">School Year Data</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="cta" id="contact">
-        <div class="container">
-          <div class="cta-inner reveal">
-            <h2>Explore the data. Drive change.</h2>
-            <p>
-              Dive into the dashboard or explore summary reports to understand
-              K–12 CS access and participation across Georgia.
-            </p>
-
-            <div class="hero-actions">
-              <a class="button-primary" href="#dashboard">Explore Dashboard</a>
-              <a class="button-secondary" href="#reports"
-                >View Summary Reports →</a
-              >
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <div class="container footer-inner">
-        <p>© 2026 Constellations. Georgia Tech.</p>
-
-        <div class="footer-links">
-          <a href="#">Privacy</a>
-          <a href="#">Accessibility</a>
-          <a href="#">Contact</a>
+        <div class="citation-box">
+          <strong>Preferred citation:</strong>
+          <p>
+            Constellations Center for Education in Computing. (2026).
+            <em>The Constellations Explorer.</em> Georgia Institute of Technology.
+          </p>
         </div>
       </div>
-    </footer>
+    </section>
 
-    <script src="script.js"></script>
-  </body>
+    <section class="info-section">
+      <div class="container card-grid">
+        <article class="info-card">
+          <h3>Explore School Access</h3>
+          <p>
+            View schools with computer science resources, including courses, programs,
+            and school-level information.
+          </p>
+        </article>
+
+        <article class="info-card">
+          <h3>Compare Districts</h3>
+          <p>
+            Review district-level patterns in access and participation across Georgia.
+          </p>
+        </article>
+
+        <article class="info-card">
+          <h3>Understand Participation</h3>
+          <p>
+            Compare overall school demographics with CS-enrolled student demographics.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+  <div class="container footer-content">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <span class="footer-logo-mark">CCEC</span>
+      </div>
+
+      <h3>Constellations Center for Education in Computing</h3>
+
+      <div class="footer-line"></div>
+
+      <p>
+        Georgia Institute of Technology<br />
+        College of Computing
+      </p>
+
+      <p>
+        Atlanta, GA
+      </p>
+    </div>
+  </div>
+
+  <div class="footer-bottom-bar"></div>
+</footer>
+
+  <script src="script.js"></script>
+</body>
 </html>
