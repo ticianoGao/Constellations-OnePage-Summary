@@ -59,7 +59,60 @@
         </div>
       </div>
     </section>
+</section>
 
+<section class="explorer-steps">
+  <div class="container explorer-container">
+
+    <div class="step-block">
+      <div class="step-title">
+        <span class="step-icon">★</span>
+        <h2>
+          <strong>Step 1:</strong>
+          Choose a <strong>school district</strong>, <strong>county</strong>, or <strong>region</strong> to explore:
+        </h2>
+      </div>
+
+      <p class="step-tip">
+        Tip: If you're not sure where to start, begin with one of the Metro Atlanta school districts.
+      </p>
+
+      <div class="custom-select" id="districtSelect">
+        <button class="select-trigger" type="button" id="selectTrigger">
+          <span id="selectedValue">Georgia Statewide</span>
+          <span class="select-arrow">⌄</span>
+        </button>
+        
+        <!-- This is the options parts for step 1, choosing the district -->
+        <div class="select-menu" id="selectMenu">
+          <input
+            type="text"
+            class="select-search"
+            id="selectSearch"
+            placeholder="Search district, county, or region..."
+          />
+          <ul class="select-options" id="selectOptions">
+            <li data-value="Georgia Statewide" class="selected">Georgia Statewide</li>
+            <li data-value="Atlanta Public Schools">Atlanta Public Schools</li>
+            <li data-value="Fulton County Schools">Fulton County Schools</li>
+            <li data-value="DeKalb County Schools">DeKalb County Schools</li>
+            <li data-value="Decatur City Schools">Decatur City Schools</li>
+            <li data-value="Cobb County Schools">Cobb County Schools</li>
+            <li data-value="Marietta City Schools">Marietta City Schools</li>
+            <li data-value="Clayton County Schools">Clayton County Schools</li>
+            <li data-value="Gwinnett County Schools">Gwinnett County Schools</li>
+            <li data-value="Savannah-Chatham County Schools">Savannah-Chatham County Schools</li>
+            <li data-value="Muscogee County Schools">Muscogee County Schools</li>
+            <li data-value="Richmond County Schools">Richmond County Schools</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="info-section">
     <section class="info-section">
       <div class="container card-grid">
         <article class="info-card">
