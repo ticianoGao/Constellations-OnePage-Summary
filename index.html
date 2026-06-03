@@ -1,170 +1,213 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Constellations Explorer</title>
+    <title>Constellations Explorer</title>
 
-  <link rel="stylesheet" href="styles.css" />
-</head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="#" class="logo">
-        <span class="logo-mark">CCEC</span>
-        <span>Constellations Center for Education in Computing</span>
-      </a>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="#" class="logo">
+          <span class="logo-mark">CCEC</span>
+          <span>Constellations Center for Education in Computing</span>
+        </a>
 
-      <button class="menu-button" id="menuButton">Menu</button>
+        <button class="menu-button" id="menuButton">Menu</button>
 
-      <nav class="main-nav" id="mainNav">
-        <a href="#">About</a>
-        <a href="#">FAQ</a>
-      </nav>
-    </div>
-  </header>
+        <nav class="main-nav" id="mainNav">
+          <a href="#">About</a>
+          <a href="#">FAQ</a>
+        </nav>
+      </div>
+    </header>
 
-  <main>
-    <section class="hero-section">
-      <div class="container narrow">
-        <h1>The Constellations Report Generator</h1>
-        <h2>A K–12 Computer Science Resource Tool</h2>
+    <main>
+      <section class="hero-section">
+        <div class="container narrow">
+          <h1>The Constellations Report Generator</h1>
+          <h2>A K–12 Computer Science Resource Tool</h2>
 
-        <p>
-          Welcome to the Constellations Center Report Generator, a tool that allows users to examine
-          schools, districts, and communities across the state of Georgia of their K–12
-          computer science resources.
-          Once you access the dashboard or create the type of report you are interested in,
-          you can review, download, export, and share your findings with others!
-        </p>
+          <p>
+            Welcome to the Constellations Center Report Generator, a tool that
+            allows users to examine schools, districts, and communities across
+            the state of Georgia of their K–12 computer science resources. Once
+            you access the dashboard or create the type of report you are
+            interested in, you can review, download, export, and share your
+            findings with others!
+          </p>
 
-        <p class="desktop-note">
-          For optimal performance, the Constellations Report Generator is best viewed on a desktop
-          or laptop.
-        </p>
+          <p class="desktop-note">
+            For optimal performance, the Constellations Report Generator is best
+            viewed on a desktop or laptop.
+          </p>
 
-        <div class="action-box">
-          <a href="#" class="primary-button">Open Explorer Dashboard</a>
-          <a href="#" class="secondary-button">View Summary Reports</a>
+          <div class="action-box">
+            <a href="#" class="primary-button">Open Explorer Dashboard</a>
+            <a href="#" class="secondary-button">View Summary Reports</a>
+          </div>
+
+          <div class="citation-box">
+            <strong>Preferred citation:</strong>
+            <p>
+              Constellations Center for Education in Computing. (2026).
+              <em>The Constellations Explorer.</em> Georgia Institute of
+              Technology.
+            </p>
+          </div>
         </div>
+      </section>
 
-        <div class="citation-box">
-          <strong>Preferred citation:</strong>
+      <section class="explorer-steps">
+        <div class="container explorer-container">
+          <div class="step-block">
+            <div class="step-title">
+              <span class="step-icon">★</span>
+              <h2>
+                <strong>Step 1:</strong>
+                Choose a <strong>school district</strong>,
+                <strong>county</strong>, or <strong>region</strong> to explore:
+              </h2>
+            </div>
+
+            <p class="step-tip">
+              Tip: If you're not sure where to start, begin with one of the
+              Metro Atlanta school districts.
+            </p>
+
+            <div class="custom-select" id="districtSelect">
+              <button class="select-trigger" type="button" id="selectTrigger">
+                <span id="selectedValue">Georgia Statewide</span>
+                <span class="select-arrow">⌄</span>
+              </button>
+
+              <!-- This is the options parts for step 1, choosing the district -->
+              <div class="select-menu" id="selectMenu">
+                <input
+                  type="text"
+                  class="select-search"
+                  id="selectSearch"
+                  placeholder="Search district, county, or region..."
+                />
+                <ul class="select-options" id="selectOptions">
+                  <li data-value="Georgia Statewide" class="selected">
+                    Georgia Statewide
+                  </li>
+                  <li data-value="Atlanta Public Schools">
+                    Atlanta Public Schools
+                  </li>
+                  <li data-value="Fulton County Schools">
+                    Fulton County Schools
+                  </li>
+                  <li data-value="DeKalb County Schools">
+                    DeKalb County Schools
+                  </li>
+                  <li data-value="Decatur City Schools">
+                    Decatur City Schools
+                  </li>
+                  <li data-value="Cobb County Schools">Cobb County Schools</li>
+                  <li data-value="Marietta City Schools">
+                    Marietta City Schools
+                  </li>
+                  <li data-value="Clayton County Schools">
+                    Clayton County Schools
+                  </li>
+                  <li data-value="Gwinnett County Schools">
+                    Gwinnett County Schools
+                  </li>
+                  <li data-value="Savannah-Chatham County Schools">
+                    Savannah-Chatham County Schools
+                  </li>
+                  <li data-value="Muscogee County Schools">
+                    Muscogee County Schools
+                  </li>
+                  <li data-value="Richmond County Schools">
+                    Richmond County Schools
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="report-grid">
+              <article class="report-card">
+                <h3>School Report</h3>
+                <p>Generate a summary for one selected school.</p>
+              </article>
+
+              <article class="report-card">
+                <h3>District Report</h3>
+                <p>Compare CS access and participation across a district.</p>
+              </article>
+
+              <article class="report-card">
+                <h3>County Report</h3>
+                <p>View county-level patterns and community context.</p>
+              </article>
+
+              <article class="report-card">
+                <h3>Statewide Report</h3>
+                <p>Explore computer science resources across Georgia.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="info-section">
+        <div class="container card-grid">
+          <article class="info-card">
+            <h3>Explore School Access</h3>
+            <p>
+              View schools with computer science resources, including courses,
+              programs, and school-level information.
+            </p>
+          </article>
+
+          <article class="info-card">
+            <h3>Compare Districts</h3>
+            <p>
+              Review district-level patterns in access and participation across
+              Georgia.
+            </p>
+          </article>
+
+          <article class="info-card">
+            <h3>Understand Participation</h3>
+            <p>
+              Compare overall school demographics with CS-enrolled student
+              demographics.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="footer-logo-mark">CCEC</span>
+          </div>
+
+          <h3>Constellations Center for Education in Computing</h3>
+
+          <div class="footer-line"></div>
+
           <p>
-            Constellations Center for Education in Computing. (2026).
-            <em>The Constellations Explorer.</em> Georgia Institute of Technology.
+            Georgia Institute of Technology<br />
+            College of Computing
           </p>
+
+          <p>Atlanta, GA</p>
         </div>
       </div>
-    </section>
-</section>
 
-<section class="explorer-steps">
-  <div class="container explorer-container">
+      <div class="footer-bottom-bar"></div>
+    </footer>
 
-    <div class="step-block">
-      <div class="step-title">
-        <span class="step-icon">★</span>
-        <h2>
-          <strong>Step 1:</strong>
-          Choose a <strong>school district</strong>, <strong>county</strong>, or <strong>region</strong> to explore:
-        </h2>
-      </div>
-
-      <p class="step-tip">
-        Tip: If you're not sure where to start, begin with one of the Metro Atlanta school districts.
-      </p>
-
-      <div class="custom-select" id="districtSelect">
-        <button class="select-trigger" type="button" id="selectTrigger">
-          <span id="selectedValue">Georgia Statewide</span>
-          <span class="select-arrow">⌄</span>
-        </button>
-        
-        <!-- This is the options parts for step 1, choosing the district -->
-        <div class="select-menu" id="selectMenu">
-          <input
-            type="text"
-            class="select-search"
-            id="selectSearch"
-            placeholder="Search district, county, or region..."
-          />
-          <ul class="select-options" id="selectOptions">
-            <li data-value="Georgia Statewide" class="selected">Georgia Statewide</li>
-            <li data-value="Atlanta Public Schools">Atlanta Public Schools</li>
-            <li data-value="Fulton County Schools">Fulton County Schools</li>
-            <li data-value="DeKalb County Schools">DeKalb County Schools</li>
-            <li data-value="Decatur City Schools">Decatur City Schools</li>
-            <li data-value="Cobb County Schools">Cobb County Schools</li>
-            <li data-value="Marietta City Schools">Marietta City Schools</li>
-            <li data-value="Clayton County Schools">Clayton County Schools</li>
-            <li data-value="Gwinnett County Schools">Gwinnett County Schools</li>
-            <li data-value="Savannah-Chatham County Schools">Savannah-Chatham County Schools</li>
-            <li data-value="Muscogee County Schools">Muscogee County Schools</li>
-            <li data-value="Richmond County Schools">Richmond County Schools</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section class="info-section">
-    <section class="info-section">
-      <div class="container card-grid">
-        <article class="info-card">
-          <h3>Explore School Access</h3>
-          <p>
-            View schools with computer science resources, including courses, programs,
-            and school-level information.
-          </p>
-        </article>
-
-        <article class="info-card">
-          <h3>Compare Districts</h3>
-          <p>
-            Review district-level patterns in access and participation across Georgia.
-          </p>
-        </article>
-
-        <article class="info-card">
-          <h3>Understand Participation</h3>
-          <p>
-            Compare overall school demographics with CS-enrolled student demographics.
-          </p>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-  <div class="container footer-content">
-    <div class="footer-brand">
-      <div class="footer-logo">
-        <span class="footer-logo-mark">CCEC</span>
-      </div>
-
-      <h3>Constellations Center for Education in Computing</h3>
-
-      <div class="footer-line"></div>
-
-      <p>
-        Georgia Institute of Technology<br />
-        College of Computing
-      </p>
-
-      <p>
-        Atlanta, GA
-      </p>
-    </div>
-  </div>
-
-  <div class="footer-bottom-bar"></div>
-</footer>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>

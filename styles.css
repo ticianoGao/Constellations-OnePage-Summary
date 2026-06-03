@@ -180,7 +180,9 @@ a:hover {
   border-radius: 3px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 700;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .primary-button {
@@ -345,7 +347,9 @@ a:hover {
   font-size: 1.45rem;
   font-weight: 700;
   text-decoration: none;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .social-icon:hover {
@@ -439,6 +443,10 @@ a:hover {
   .footer-bottom-bar {
     margin-top: 64px;
   }
+
+  .report-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 520px) {
@@ -478,6 +486,9 @@ a:hover {
   .social-icon {
     width: 46px;
     height: 46px;
+  }
+  .report-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -635,4 +646,45 @@ a:hover {
 
 .select-options li.hidden {
   display: none;
+}
+
+/* Report Grid Below Step 1 */
+
+.report-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.report-card {
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  padding: 24px;
+  min-height: 170px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.report-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.1);
+}
+
+.report-card h3 {
+  color: #1f4e79;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.15rem;
+  margin-bottom: 10px;
+}
+
+.report-card p {
+  color: #666666;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
