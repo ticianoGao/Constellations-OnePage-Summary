@@ -13,15 +13,20 @@
     <header class="site-header">
       <div class="container header-inner">
         <a href="#" class="logo">
-          <span class="logo-mark">CCEC</span>
+          <img
+            src="pics/GTLogo.png"
+            alt="Constellations Center for Education in Computing logo"
+            class="logo-image"
+          />
           <span>Constellations Center for Education in Computing</span>
         </a>
 
         <button class="menu-button" id="menuButton">Menu</button>
 
         <nav class="main-nav" id="mainNav">
-          <a href="#">About</a>
-          <a href="#">FAQ</a>
+          <a href="https://constellations.gatech.edu/computing-community"
+            >Homepage</a
+          >
         </nav>
       </div>
     </header>
@@ -42,23 +47,9 @@
           </p>
 
           <p class="desktop-note">
-            For optimal performance, the Constellations Report Generator is best
-            viewed on a desktop or laptop.
+            For optimal layout, the Constellations Report Generator is currently
+            best viewed on a desktop/laptop.
           </p>
-
-          <div class="action-box">
-            <a href="#" class="primary-button">Open Explorer Dashboard</a>
-            <a href="#" class="secondary-button">View Summary Reports</a>
-          </div>
-
-          <div class="citation-box">
-            <strong>Preferred citation:</strong>
-            <p>
-              Constellations Center for Education in Computing. (2026).
-              <em>The Constellations Explorer.</em> Georgia Institute of
-              Technology.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -94,104 +85,303 @@
                   placeholder="Search district, county, or region..."
                 />
                 <ul class="select-options" id="selectOptions">
-                  <li data-value="Georgia Statewide" class="selected">
+                  <li
+                    data-value="Georgia Statewide"
+                    data-type="state"
+                    class="selected"
+                  >
                     Georgia Statewide
                   </li>
-                  <li data-value="Atlanta Public Schools">
+                  <li data-value="Atlanta Public Schools" data-type="district">
                     Atlanta Public Schools
                   </li>
-                  <li data-value="Fulton County Schools">
+                  <li data-value="Fulton County Schools" data-type="district">
                     Fulton County Schools
                   </li>
-                  <li data-value="DeKalb County Schools">
+                  <li data-value="DeKalb County Schools" data-type="district">
                     DeKalb County Schools
                   </li>
-                  <li data-value="Decatur City Schools">
+                  <li data-value="Decatur City Schools" data-type="district">
                     Decatur City Schools
                   </li>
-                  <li data-value="Cobb County Schools">Cobb County Schools</li>
-                  <li data-value="Marietta City Schools">
+                  <li data-value="Cobb County Schools" data-type="district">
+                    Cobb County Schools
+                  </li>
+                  <li data-value="Marietta City Schools" data-type="district">
                     Marietta City Schools
                   </li>
-                  <li data-value="Clayton County Schools">
+                  <li data-value="Clayton County Schools" data-type="district">
                     Clayton County Schools
                   </li>
-                  <li data-value="Gwinnett County Schools">
+                  <li data-value="Gwinnett County Schools" data-type="district">
                     Gwinnett County Schools
                   </li>
-                  <li data-value="Savannah-Chatham County Schools">
+                  <li
+                    data-value="Savannah-Chatham County Schools"
+                    data-type="district"
+                  >
                     Savannah-Chatham County Schools
                   </li>
-                  <li data-value="Muscogee County Schools">
+                  <li data-value="Muscogee County Schools" data-type="district">
                     Muscogee County Schools
                   </li>
-                  <li data-value="Richmond County Schools">
+                  <li data-value="Richmond County Schools" data-type="district">
                     Richmond County Schools
+                  </li>
+                  <li
+                    data-value="Appling County High School"
+                    data-type="school"
+                  >
+                    Appling County High School
                   </li>
                 </ul>
               </div>
             </div>
-            <div class="report-grid">
+            <!-- School grid: shows when a school option is selected -->
+            <div class="option-grid school-grid" id="schoolGrid">
+              <div class="grid-column">
+                <article class="report-card school-summary-card">
+                  <h3>School Summary</h3>
+
+                  <div class="summary-metrics">
+                    <div class="metric-box">
+                      <span class="metric-number">28</span>
+                      <span class="metric-label">CS Enrollments</span>
+                    </div>
+
+                    <div class="metric-box">
+                      <span class="metric-number">1</span>
+                      <span class="metric-label">CS Teachers</span>
+                    </div>
+
+                    <div class="metric-box">
+                      <span class="metric-number">1049</span>
+                      <span class="metric-label">Total Students</span>
+                    </div>
+
+                    <div class="metric-box">
+                      <span class="metric-number">2</span>
+                      <span class="metric-label">CS Courses</span>
+                    </div>
+                  </div>
+
+                  <div class="summary-text">
+                    <p>
+                      By the end of the 2025 school year, this school has
+                      <strong>1049</strong> total students.
+                    </p>
+
+                    <p>
+                      It provides <strong>2</strong> computer science courses
+                      out of the total approved Georgia CS course list. This is
+                      <strong>NULL%</strong> higher/lower than the state average
+                      for high school.
+                    </p>
+
+                    <ul>
+                      <li>
+                        CS courses available in this school are:
+                        <strong
+                          >Introduction to Digital Technology, Advanced
+                          Placement Computer Science Principles C</strong
+                        >.
+                      </li>
+
+                      <li>
+                        AP CS A / AP CS Principles availability:
+                        <strong>Available</strong>.
+                      </li>
+                    </ul>
+
+                    <p>
+                      Total CS enrollments, counting students who take multiple
+                      CS courses, is
+                      <strong>28</strong>. This is <strong>2.67%</strong> of the
+                      entire student enrollment, which is
+                      <strong>NULL%</strong> higher/lower than Georgia's
+                      average.
+                    </p>
+
+                    <p>
+                      Out of the total CS enrollment, <strong>15</strong> are
+                      Category 1, <strong>0</strong> are Category 2, and
+                      <strong>13</strong> are Category 3/4.
+                    </p>
+
+                    <p>
+                      The total number of CS teachers is <strong>1</strong>,
+                      giving the school a teacher-student ratio of
+                      <strong>0.04</strong>, compared to the state/district
+                      average of <strong>NULL</strong>.
+                    </p>
+                  </div>
+                </article>
+                <article class="report-card image-card">
+                  <h3>Academic Proficiency</h3>
+
+                  <div class="card-image-wrap">
+                    <img
+                      src="pics/Appling County High School Proficiency Pic.png"
+                      alt="Academic proficiency chart"
+                      class="card-image"
+                    />
+                  </div>
+                </article>
+                <article class="report-card two-image-card">
+                  <h3>
+                    Internet Access and Median Household Income Information
+                  </h3>
+
+                  <div class="two-image-grid">
+                    <div class="image-panel">
+                      <img
+                        src="pics/Appling County High School Proficiency Pic.png"
+                        alt="First school chart"
+                        class="card-image"
+                      />
+                    </div>
+
+                    <div class="image-panel">
+                      <img
+                        src="pics/Appling County High School Median Household Income Pic.png"
+                        alt="Second school chart"
+                        class="card-image"
+                      />
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div class="grid-column">
+                <article class="report-card participation-card">
+                  <h3>Demographic Participation</h3>
+
+                  <p class="chart-note">
+                    Compare total school enrollment with CS enrollment by
+                    student group.
+                  </p>
+
+                  <div class="participation-chart">
+                    <div class="group-block">
+                      <h4>Asian</h4>
+                      <div class="comparison-row">
+                        <div class="comparison-track">
+                          <div
+                            class="comparison-bar cs-bar"
+                            style="width: 1%"
+                          ></div>
+                        </div>
+                        <span class="comparison-value">1%</span>
+                      </div>
+                    </div>
+
+                    <div class="group-block">
+                      <h4>Black</h4>
+
+                      <div class="comparison-row">
+                        <div class="comparison-track">
+                          <div
+                            class="comparison-bar cs-bar"
+                            style="width: 24%"
+                          ></div>
+                        </div>
+                        <span class="comparison-value">24%</span>
+                      </div>
+                    </div>
+
+                    <div class="group-block">
+                      <h4>Hispanic</h4>
+
+                      <div class="comparison-row">
+                        <div class="comparison-track">
+                          <div
+                            class="comparison-bar cs-bar"
+                            style="width: 19%"
+                          ></div>
+                        </div>
+                        <span class="comparison-value">19%</span>
+                      </div>
+                    </div>
+
+                    <div class="group-block">
+                      <h4>White</h4>
+
+                      <div class="comparison-row">
+                        <div class="comparison-track">
+                          <div
+                            class="comparison-bar cs-bar"
+                            style="width: 52%"
+                          ></div>
+                        </div>
+                        <span class="comparison-value">52%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="chart-js-section">
+                    <div class="chart-box">
+                      <canvas id="demographicChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="chart-js-section">
+                    <h4>Race/Ethnicity Comparison</h4>
+
+                    <div class="chart-box double-chart-box">
+                      <canvas id="raceEthnicityChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="chart-js-section">
+                    <h4>Gender Comparison</h4>
+
+                    <div class="chart-box gender-chart-box">
+                      <canvas id="genderChart"></canvas>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <!-- District grid: shows when a district option is selected -->
+            <div class="option-grid district-grid" id="districtGrid">
               <article class="report-card">
-                <h3>School Report</h3>
-                <p>Generate a summary for one selected school.</p>
+                <h3>School Overview</h3>
+                <p>View basic information for the selected school.</p>
               </article>
 
               <article class="report-card">
-                <h3>District Report</h3>
-                <p>Compare CS access and participation across a district.</p>
+                <h3>CS Course Access</h3>
+                <p>Review computer science courses offered at this school.</p>
               </article>
 
               <article class="report-card">
-                <h3>County Report</h3>
-                <p>View county-level patterns and community context.</p>
+                <h3>Student Participation</h3>
+                <p>
+                  Compare school demographics with CS enrollment demographics.
+                </p>
               </article>
 
               <article class="report-card">
-                <h3>Statewide Report</h3>
-                <p>Explore computer science resources across Georgia.</p>
+                <h3>Download School Report</h3>
+                <p>Generate a school-level summary report.</p>
               </article>
             </div>
           </div>
         </div>
       </section>
-
-      <section class="info-section">
-        <div class="container card-grid">
-          <article class="info-card">
-            <h3>Explore School Access</h3>
-            <p>
-              View schools with computer science resources, including courses,
-              programs, and school-level information.
-            </p>
-          </article>
-
-          <article class="info-card">
-            <h3>Compare Districts</h3>
-            <p>
-              Review district-level patterns in access and participation across
-              Georgia.
-            </p>
-          </article>
-
-          <article class="info-card">
-            <h3>Understand Participation</h3>
-            <p>
-              Compare overall school demographics with CS-enrolled student
-              demographics.
-            </p>
-          </article>
-        </div>
-      </section>
     </main>
-
+    <section class="bottom-citation-section">
+      <div class="container narrow">
+        <div class="citation-box">
+          <strong>Preferred citation:</strong>
+          <p>
+            Constellations Center for Education in Computing. (2026).
+            <em>The Constellations Explorer.</em> Georgia Institute of
+            Technology.
+          </p>
+        </div>
+      </div>
+    </section>
     <footer class="site-footer">
       <div class="container footer-content">
         <div class="footer-brand">
-          <div class="footer-logo">
-            <span class="footer-logo-mark">CCEC</span>
-          </div>
-
           <h3>Constellations Center for Education in Computing</h3>
 
           <div class="footer-line"></div>
@@ -208,6 +398,7 @@
       <div class="footer-bottom-bar"></div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

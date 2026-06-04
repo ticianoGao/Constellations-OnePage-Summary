@@ -15,13 +15,21 @@ if (menuButton && mainNav) {
 
 /* Step 1 searchable dropdown */
 
+const schoolGrid = document.getElementById("schoolGrid");
+const districtGrid = document.getElementById("districtGrid");
 const customSelect = document.getElementById("districtSelect");
 const selectTrigger = document.getElementById("selectTrigger");
 const selectedValue = document.getElementById("selectedValue");
 const selectSearch = document.getElementById("selectSearch");
 const selectOptions = document.querySelectorAll("#selectOptions li");
 
-if (customSelect && selectTrigger && selectedValue && selectSearch && selectOptions.length > 0) {
+if (
+  customSelect &&
+  selectTrigger &&
+  selectedValue &&
+  selectSearch &&
+  selectOptions.length > 0
+) {
   selectTrigger.addEventListener("click", () => {
     customSelect.classList.toggle("open");
 
@@ -30,13 +38,30 @@ if (customSelect && selectTrigger && selectedValue && selectSearch && selectOpti
     }
   });
 
-  selectOptions.forEach(option => {
+  selectOptions.forEach((option) => {
     option.addEventListener("click", () => {
       const value = option.dataset.value;
+      const type = option.dataset.type;
+
+      if (schoolGrid) {
+        schoolGrid.classList.remove("show");
+      }
+
+      if (districtGrid) {
+        districtGrid.classList.remove("show");
+      }
+
+      if (type === "school" && schoolGrid) {
+        schoolGrid.classList.add("show");
+      }
+
+      if (type === "district" && districtGrid) {
+        districtGrid.classList.add("show");
+      }
 
       selectedValue.textContent = value;
 
-      selectOptions.forEach(item => {
+      selectOptions.forEach((item) => {
         item.classList.remove("selected");
       });
 
@@ -44,7 +69,7 @@ if (customSelect && selectTrigger && selectedValue && selectSearch && selectOpti
       customSelect.classList.remove("open");
       selectSearch.value = "";
 
-      selectOptions.forEach(item => {
+      selectOptions.forEach((item) => {
         item.classList.remove("hidden");
       });
     });
@@ -53,7 +78,7 @@ if (customSelect && selectTrigger && selectedValue && selectSearch && selectOpti
   selectSearch.addEventListener("input", () => {
     const searchValue = selectSearch.value.toLowerCase();
 
-    selectOptions.forEach(option => {
+    selectOptions.forEach((option) => {
       const optionText = option.textContent.toLowerCase();
 
       if (optionText.includes(searchValue)) {
@@ -64,9 +89,240 @@ if (customSelect && selectTrigger && selectedValue && selectSearch && selectOpti
     });
   });
 
-  document.addEventListener("click", event => {
+  document.addEventListener("click", (event) => {
     if (!customSelect.contains(event.target)) {
       customSelect.classList.remove("open");
     }
+  });
+}
+
+/* Demographic Participation Chart.js chart */
+
+const demographicChartCanvas = document.getElementById("demographicChart");
+
+if (demographicChartCanvas && typeof Chart !== "undefined") {
+  new Chart(demographicChartCanvas, {
+    type: "bar",
+    data: {
+      labels: ["Asian", "Black", "Hispanic", "White"],
+      datasets: [
+        {
+          label: "CS Enrollment",
+          data: [1, 24, 19, 52],
+          backgroundColor: "#003057",
+          borderRadius: 8,
+          barThickness: 14,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return context.raw + "%";
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+          ticks: {
+            callback: function (value) {
+              return value + "%";
+            },
+          },
+          grid: {
+            color: "#eeeeee",
+          },
+        },
+        y: {
+          grid: {
+            display: false,
+          },
+        },
+      },
+    },
+  });
+}
+
+/* Race/Ethnicity double bar chart */
+
+const raceEthnicityChartCanvas = document.getElementById("raceEthnicityChart");
+
+if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
+  new Chart(raceEthnicityChartCanvas, {
+    type: "bar",
+    data: {
+      labels: [
+        "Asian and Pacific Islander",
+        "Black",
+        "Hispanic",
+        "Native American",
+        "White",
+        "Two or More Races",
+      ],
+      datasets: [
+        {
+          label: "School",
+          // 0.5 is used to represent <1% for the Native American category
+          data: [1, 24, 19, 0.5, 52, 4],
+          backgroundColor: "#B3A369",
+          borderRadius: 8,
+          barThickness: 10,
+        },
+        {
+          label: "CS",
+          data: [0, 32, 25, 0, 39, 4],
+          backgroundColor: "#003057",
+          borderRadius: 8,
+          barThickness: 10,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            boxWidth: 12,
+            boxHeight: 12,
+            font: {
+              family: "Arial",
+              size: 12,
+            },
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const label = context.dataset.label;
+              const value = context.raw;
+
+              if (value === 0.5 && label === "School") {
+                return label + ": <1%";
+              }
+
+              return label + ": " + value + "%";
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 60,
+          ticks: {
+            callback: function (value) {
+              return value + "%";
+            },
+          },
+          grid: {
+            color: "#eeeeee",
+          },
+        },
+        y: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            font: {
+              family: "Arial",
+              size: 11,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+/* Gender double bar chart */
+
+const genderChartCanvas = document.getElementById("genderChart");
+
+if (genderChartCanvas && typeof Chart !== "undefined") {
+  new Chart(genderChartCanvas, {
+    type: "bar",
+    data: {
+      labels: ["Male", "Female"],
+      datasets: [
+        {
+          label: "School",
+          data: [52, 48],
+          backgroundColor: "#B3A369",
+          borderRadius: 8,
+          barThickness: 12,
+        },
+        {
+          label: "CS",
+          data: [75, 25],
+          backgroundColor: "#003057",
+          borderRadius: 8,
+          barThickness: 12,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            boxWidth: 12,
+            boxHeight: 12,
+            font: {
+              family: "Arial",
+              size: 12,
+            },
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return context.dataset.label + ": " + context.raw + "%";
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+          ticks: {
+            callback: function (value) {
+              return value + "%";
+            },
+          },
+          grid: {
+            color: "#eeeeee",
+          },
+        },
+        y: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            font: {
+              family: "Arial",
+              size: 12,
+            },
+          },
+        },
+      },
+    },
   });
 }
