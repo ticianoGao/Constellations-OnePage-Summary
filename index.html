@@ -60,8 +60,9 @@
               <span class="step-icon">★</span>
               <h2>
                 <strong>Step 1:</strong>
-                Choose a <strong>school district</strong>,
-                <strong>county</strong>, or <strong>region</strong> to explore:
+                Choose a <strong>School district</strong>,
+                <strong>School</strong>, or <strong>Statewide</strong> to
+                explore:
               </h2>
             </div>
 
@@ -139,51 +140,60 @@
             </div>
             <!-- School grid: shows when a school option is selected -->
             <div class="option-grid school-grid" id="schoolGrid">
+              <div class="report-card snapshot-title-card">
+                <h2>2025-26 Computing Education Resources</h2>
+                <h2>Snapshot Report</h2>
+
+                <p>
+                  Appling County
+                  <span>–</span>
+                  Appling County High School
+                  <span>–</span>
+                  Grade 9 -12
+                </p>
+              </div>
               <div class="grid-column">
                 <article class="report-card school-summary-card">
-                  <h3>School Summary</h3>
+                  <h3>Summary</h3>
 
                   <div class="summary-metrics">
-                    <div class="metric-box">
-                      <span class="metric-number">28</span>
-                      <span class="metric-label">CS Enrollments</span>
-                    </div>
-
-                    <div class="metric-box">
-                      <span class="metric-number">1</span>
-                      <span class="metric-label">CS Teachers</span>
-                    </div>
-
                     <div class="metric-box">
                       <span class="metric-number">1049</span>
                       <span class="metric-label">Total Students</span>
                     </div>
-
                     <div class="metric-box">
                       <span class="metric-number">2</span>
                       <span class="metric-label">CS Courses</span>
                     </div>
+                    <div class="metric-box">
+                      <span class="metric-number">1</span>
+                      <span class="metric-label">CS Teachers</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-number">28</span>
+                      <span class="metric-label">CS Enrollments</span>
+                    </div>
                   </div>
 
                   <div class="summary-text">
-                    <p>
-                      By the end of the 2025 school year, this school has
-                      <strong>1049</strong> total students.
-                    </p>
+                    <ol class="summary-list">
+                      <li>
+                        By the end of the 2025-26 school year, this school has
+                        <strong>1049</strong> total students.
+                      </li>
 
-                    <p>
-                      It provides <strong>2</strong> computer science courses
-                      out of the total approved Georgia CS course list. This is
-                      <strong>NULL%</strong> higher/lower than the state average
-                      for high school.
-                    </p>
+                      <li>
+                        It provides <strong>2</strong> computer science courses
+                        out of the total approved Georgia CS course list. This
+                        is <strong>NULL%</strong>
+                        higher/lower than the state average for high school.
+                      </li>
 
-                    <ul>
                       <li>
                         CS courses available in this school are:
-                        <strong
-                          >Introduction to Digital Technology, Advanced
-                          Placement Computer Science Principles C</strong
+                        <strong>
+                          Introduction to Digital Technology, Advanced Placement
+                          Computer Science Principles C </strong
                         >.
                       </li>
 
@@ -191,29 +201,29 @@
                         AP CS A / AP CS Principles availability:
                         <strong>Available</strong>.
                       </li>
-                    </ul>
 
-                    <p>
-                      Total CS enrollments, counting students who take multiple
-                      CS courses, is
-                      <strong>28</strong>. This is <strong>2.67%</strong> of the
-                      entire student enrollment, which is
-                      <strong>NULL%</strong> higher/lower than Georgia's
-                      average.
-                    </p>
+                      <li>
+                        Total CS enrollments, counting students who take
+                        multiple CS courses, is
+                        <strong>28</strong>. This is <strong>2.67%</strong> of
+                        the entire student enrollment, which is
+                        <strong>NULL%</strong> higher/lower than Georgia's
+                        average.
+                      </li>
 
-                    <p>
-                      Out of the total CS enrollment, <strong>15</strong> are
-                      Category 1, <strong>0</strong> are Category 2, and
-                      <strong>13</strong> are Category 3/4.
-                    </p>
+                      <li>
+                        Out of the total CS enrollment, <strong>15</strong> are
+                        Category 1, <strong>0</strong> are Category 2, and
+                        <strong>13</strong> are Category 3/4.
+                      </li>
 
-                    <p>
-                      The total number of CS teachers is <strong>1</strong>,
-                      giving the school a teacher-student ratio of
-                      <strong>0.04</strong>, compared to the state/district
-                      average of <strong>NULL</strong>.
-                    </p>
+                      <li>
+                        The total number of CS teachers is <strong>1</strong>,
+                        giving the school a teacher-student ratio of
+                        <strong>0.04</strong>, compared to the state/district
+                        average of <strong>NULL</strong>.
+                      </li>
+                    </ol>
                   </div>
                 </article>
                 <article class="report-card image-card">
@@ -225,6 +235,25 @@
                       alt="Academic proficiency chart"
                       class="card-image"
                     />
+                  </div>
+                </article>
+              </div>
+              <div class="grid-column">
+                <article class="report-card participation-card">
+                  <h3>Demographic Participation</h3>
+                  <div class="chart-js-section">
+                    <h4>Race/Ethnicity Comparison</h4>
+
+                    <div class="chart-box double-chart-box">
+                      <canvas id="raceEthnicityChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="chart-js-section">
+                    <h4>Gender Comparison</h4>
+
+                    <div class="chart-box gender-chart-box">
+                      <canvas id="genderChart"></canvas>
+                    </div>
                   </div>
                 </article>
                 <article class="report-card two-image-card">
@@ -247,92 +276,6 @@
                         alt="Second school chart"
                         class="card-image"
                       />
-                    </div>
-                  </div>
-                </article>
-              </div>
-              <div class="grid-column">
-                <article class="report-card participation-card">
-                  <h3>Demographic Participation</h3>
-
-                  <p class="chart-note">
-                    Compare total school enrollment with CS enrollment by
-                    student group.
-                  </p>
-
-                  <div class="participation-chart">
-                    <div class="group-block">
-                      <h4>Asian</h4>
-                      <div class="comparison-row">
-                        <div class="comparison-track">
-                          <div
-                            class="comparison-bar cs-bar"
-                            style="width: 1%"
-                          ></div>
-                        </div>
-                        <span class="comparison-value">1%</span>
-                      </div>
-                    </div>
-
-                    <div class="group-block">
-                      <h4>Black</h4>
-
-                      <div class="comparison-row">
-                        <div class="comparison-track">
-                          <div
-                            class="comparison-bar cs-bar"
-                            style="width: 24%"
-                          ></div>
-                        </div>
-                        <span class="comparison-value">24%</span>
-                      </div>
-                    </div>
-
-                    <div class="group-block">
-                      <h4>Hispanic</h4>
-
-                      <div class="comparison-row">
-                        <div class="comparison-track">
-                          <div
-                            class="comparison-bar cs-bar"
-                            style="width: 19%"
-                          ></div>
-                        </div>
-                        <span class="comparison-value">19%</span>
-                      </div>
-                    </div>
-
-                    <div class="group-block">
-                      <h4>White</h4>
-
-                      <div class="comparison-row">
-                        <div class="comparison-track">
-                          <div
-                            class="comparison-bar cs-bar"
-                            style="width: 52%"
-                          ></div>
-                        </div>
-                        <span class="comparison-value">52%</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="chart-js-section">
-                    <div class="chart-box">
-                      <canvas id="demographicChart"></canvas>
-                    </div>
-                  </div>
-                  <div class="chart-js-section">
-                    <h4>Race/Ethnicity Comparison</h4>
-
-                    <div class="chart-box double-chart-box">
-                      <canvas id="raceEthnicityChart"></canvas>
-                    </div>
-                  </div>
-                  <div class="chart-js-section">
-                    <h4>Gender Comparison</h4>
-
-                    <div class="chart-box gender-chart-box">
-                      <canvas id="genderChart"></canvas>
                     </div>
                   </div>
                 </article>

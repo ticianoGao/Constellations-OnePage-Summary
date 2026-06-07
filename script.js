@@ -51,7 +51,7 @@ if (
         districtGrid.classList.remove("show");
       }
 
-      if (type === "school" && schoolGrid) {
+      if ((type === "school" || type === "state") && schoolGrid) {
         schoolGrid.classList.add("show");
       }
 
@@ -74,6 +74,32 @@ if (
       });
     });
   });
+  const defaultSelectedOption = document.querySelector(
+    "#selectOptions li.selected",
+  );
+
+  if (defaultSelectedOption) {
+    const defaultType = defaultSelectedOption.dataset.type;
+    const defaultValue = defaultSelectedOption.dataset.value;
+
+    selectedValue.textContent = defaultValue;
+
+    if (schoolGrid) {
+      schoolGrid.classList.remove("show");
+    }
+
+    if (districtGrid) {
+      districtGrid.classList.remove("show");
+    }
+
+    if ((defaultType === "school" || defaultType === "state") && schoolGrid) {
+      schoolGrid.classList.add("show");
+    }
+
+    if (defaultType === "district" && districtGrid) {
+      districtGrid.classList.add("show");
+    }
+  }
 
   selectSearch.addEventListener("input", () => {
     const searchValue = selectSearch.value.toLowerCase();
@@ -206,6 +232,9 @@ if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
         },
         tooltip: {
           callbacks: {
+            title: function () {
+              return "";
+            },
             label: function (context) {
               const label = context.dataset.label;
               const value = context.raw;
