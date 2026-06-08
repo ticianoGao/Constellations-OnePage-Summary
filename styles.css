@@ -755,7 +755,7 @@ a:hover {
 }
 
 .small-card-map {
-  height: 220px;
+  height: 270px;
 }
 
 .bottom-citation-section {
@@ -953,12 +953,11 @@ a:hover {
 
 .card-map .esri-legend {
   max-width: 135px;
-  max-height: 105px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.62rem;
 }
-
 .card-map .esri-widget {
   font-size: 0.62rem;
 }
@@ -987,4 +986,80 @@ a:hover {
 .card-map .esri-legend__symbol {
   width: 18px;
   height: 12px;
+}
+
+/* Simple show/hide legend button */
+
+.card-map .legend-wrapper {
+  width: 135px;
+  max-height: none;
+  background: #ffffff;
+  padding: 4px;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card-map .legend-toggle-button {
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  background: #f5f7fa;
+  color: var(--blue);
+  padding: 3px 4px;
+  margin-bottom: 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.card-map .legend-toggle-button:hover {
+  background: #eeeeee;
+}
+
+.card-map .legend-content {
+  display: block;
+}
+
+.card-map .legend-content-hidden {
+  display: none;
+}
+
+/* Force ArcGIS legend to show fully without scrollbars */
+
+.card-map .legend-wrapper {
+  width: 165px;
+  max-height: none;
+  overflow: visible;
+}
+
+.card-map .legend-content {
+  max-height: none;
+  overflow: visible;
+}
+
+.card-map .legend-content .esri-legend,
+.card-map .legend-content .esri-widget,
+.card-map .legend-content .esri-legend__service,
+.card-map .legend-content .esri-legend__layer,
+.card-map .legend-content .esri-legend__layer-table {
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+}
+
+.card-map .legend-content .esri-legend {
+  width: 155px;
+}
+
+.card-map .legend-content .esri-legend__layer-table {
+  width: 100%;
+}
+
+.card-map .legend-content .esri-legend__layer-cell {
+  white-space: nowrap;
+}
+
+.card-map .legend-content .esri-legend__layer-caption {
+  white-space: normal;
 }

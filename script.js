@@ -567,7 +567,7 @@ if (typeof require !== "undefined") {
         center: schoolLocation
           ? [schoolLocation.longitude, schoolLocation.latitude]
           : [-83.5, 32.7],
-        zoom: schoolLocation ? 8 : 7,
+        zoom: schoolLocation ? 7 : 6,
         constraints: {
           rotationEnabled: false,
         },
@@ -576,8 +576,23 @@ if (typeof require !== "undefined") {
         },
       });
 
+      const legendWrapper = document.createElement("div");
+      legendWrapper.className = "legend-wrapper esri-widget";
+
+      const legendToggleButton = document.createElement("button");
+      legendToggleButton.className = "legend-toggle-button";
+      legendToggleButton.type = "button";
+      legendToggleButton.textContent = "Hide Legend";
+
+      const legendContent = document.createElement("div");
+      legendContent.className = "legend-content";
+
+      legendWrapper.appendChild(legendToggleButton);
+      legendWrapper.appendChild(legendContent);
+
       const legend = new Legend({
         view: view,
+        container: legendContent,
         layerInfos: [
           {
             layer: proficiencyLayer,
@@ -586,7 +601,21 @@ if (typeof require !== "undefined") {
         ],
       });
 
-      view.ui.add(legend, "bottom-right");
+      let legendVisible = true;
+
+      legendToggleButton.addEventListener("click", () => {
+        legendVisible = !legendVisible;
+
+        if (legendVisible) {
+          legendContent.classList.remove("legend-content-hidden");
+          legendToggleButton.textContent = "Hide Legend";
+        } else {
+          legendContent.classList.add("legend-content-hidden");
+          legendToggleButton.textContent = "Show Legend";
+        }
+      });
+
+      view.ui.add(legendWrapper, "bottom-right");
 
       return view;
     }
