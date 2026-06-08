@@ -785,17 +785,32 @@ a:hover {
   height: 48px;
   border: none;
   border-radius: 10px;
-  background: #d9d9d9;
+  background: transparent;
   color: #111111;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
   cursor: pointer;
   z-index: 5;
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
 .info-button:hover {
-  background: #cfcfcf;
+  background: #d9d9d9;
+  transform: scale(1.04);
 }
 
 .card-info-popup {
@@ -804,16 +819,30 @@ a:hover {
   left: 6px;
   right: 6px;
   z-index: 20;
-  display: none;
+
   background: #ffffff;
   border: 1px solid #d9d9d9;
   border-radius: 10px;
   padding: 54px 24px 24px;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.98);
+  transform-origin: center;
+  pointer-events: none;
+
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    visibility 0.22s ease;
 }
 
 .card-info-popup.show {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  pointer-events: auto;
 }
 
 .card-info-popup p {
@@ -844,4 +873,39 @@ a:hover {
   font-weight: 700;
   line-height: 20px;
   cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.card-info-close:hover {
+  background: #f2f2f2;
+  transform: scale(1.08);
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-list li {
+  color: #222222;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-list li {
+  color: #222222;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  margin-bottom: 10px;
 }

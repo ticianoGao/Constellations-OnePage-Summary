@@ -159,16 +159,67 @@
                     type="button"
                     aria-label="Open information"
                   >
-                    i
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
                   </button>
                   <div class="card-info-popup">
                     <button class="card-info-close" type="button">×</button>
 
-                    <p>
-                      This section summarizes student enrollment, CS course
-                      availability, CS enrollment, and CS teacher information
-                      for the selected school.
-                    </p>
+                    <ul class="info-list">
+                      <li>
+                        This section summarizes student enrollment, CS course
+                        availability, CS enrollment, and CS teacher information
+                        for the selected school.
+                      </li>
+                      <li>
+                        Student Enrollment means the number of enrollments in
+                        the school. CS course availability is the number of CS
+                        courses offered at the school. CS enrollment is the
+                        number of students enrolled in CS courses at the school.
+                        CS teacher information includes the number of CS
+                        teachers at the school.
+                      </li>
+
+                      <li>
+                        The enrollment number is double counted. This means that
+                        students who are enrolled in multiple CS courses are
+                        counted multiple times.
+                      </li>
+                      <li>
+                        High school CS courses are categorized into 4
+                        categories: Introduction, Foundational, Advanced, and
+                        AP. Similarly, CS enrollments can exceed the total
+                        number of students if students are enrolled in multiple
+                        CS courses.
+                      </li>
+                    </ul>
                   </div>
                   <h3>Summary</h3>
 
@@ -204,18 +255,17 @@
                         is <strong>NULL%</strong>
                         higher/lower than the state average for high school.
                       </li>
-
                       <li>
-                        CS courses available in this school are:
-                        <strong>
-                          Introduction to Digital Technology, Advanced Placement
-                          Computer Science Principles C </strong
-                        >.
+                        AP CS A:
+                        <strong>Unavailable</strong>.
                       </li>
-
                       <li>
-                        AP CS A / AP CS Principles availability:
+                        AP CS Principles availability:
                         <strong>Available</strong>.
+                      </li>
+                      <li>
+                        Other CS courses available:
+                        <strong> Introduction to Digital Technology</strong>.
                       </li>
 
                       <li>
@@ -248,16 +298,45 @@
                     type="button"
                     aria-label="Open information"
                   >
-                    i
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
                   </button>
                   <div class="card-info-popup">
                     <button class="card-info-close" type="button">×</button>
 
-                    <p>
-                      This section summarizes student enrollment, CS course
-                      availability, CS enrollment, and CS teacher information
-                      for the selected school.
-                    </p>
+                    <ul class="info-list">
+                      <li>
+                        This section provides academic proficiency context for
+                        the selected school.
+                      </li>
+                    </ul>
                   </div>
                   <h3>Academic Proficiency</h3>
 
@@ -277,16 +356,65 @@
                     type="button"
                     aria-label="Open information"
                   >
-                    i
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
                   </button>
                   <div class="card-info-popup">
                     <button class="card-info-close" type="button">×</button>
 
-                    <p>
-                      This section summarizes student enrollment, CS course
-                      availability, CS enrollment, and CS teacher information
-                      for the selected school.
-                    </p>
+                    <ul class="info-list">
+                      <li>
+                        This section compares the overall student population
+                        with students enrolled in computer science courses.
+                      </li>
+                      <li>
+                        The Race/Ethnicity Comparison shows whether CS
+                        enrollment reflects the racial and ethnic composition of
+                        the school.
+                      </li>
+                      <li>
+                        The Gender Comparison shows whether male and female
+                        students are represented similarly in overall enrollment
+                        and CS enrollment.
+                      </li>
+                      <li>
+                        Differences between school demographics and CS
+                        demographics may suggest participation gaps or areas for
+                        further investigation.
+                      </li>
+                      <li>
+                        CS percentages are based on CS enrollments, which may
+                        count a student more than once if they take multiple CS
+                        courses.
+                      </li>
+                    </ul>
                   </div>
                   <h3>Demographic Participation</h3>
                   <div class="chart-js-section">
@@ -310,17 +438,61 @@
                     type="button"
                     aria-label="Open information"
                   >
-                    i
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
                   </button>
 
                   <div class="card-info-popup">
                     <button class="card-info-close" type="button">×</button>
 
-                    <p>
-                      This section summarizes student enrollment, CS course
-                      availability, CS enrollment, and CS teacher information
-                      for the selected school.
-                    </p>
+                    <ul class="info-list">
+                      <li>
+                        This section provides community context related to
+                        internet access and household income around the selected
+                        school.
+                      </li>
+                      <li>
+                        Internet access can affect students' ability to
+                        participate in computing activities outside of the
+                        classroom.
+                      </li>
+                      <li>
+                        Median household income provides additional
+                        socioeconomic context for interpreting school-level
+                        computing resources.
+                      </li>
+                      <li>
+                        These measures should be used as contextual indicators
+                        rather than direct explanations of student outcomes.
+                      </li>
+                    </ul>
                   </div>
                   <h3>
                     Internet Access and Median Household Income Information
