@@ -1146,3 +1146,31 @@ a:hover {
   display: block;
   object-fit: cover;
 }
+
+.card-map.exporting-map {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-map.exporting-map .map-export-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: block;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.card-map.exporting-map .esri-ui {
+  z-index: 2;
+}
+
+.card-map.exporting-map.legend-is-hidden .legend-wrapper {
+  display: none !important;
+}
+
+.exporting-report .report-export-button {
+  display: none !important;
+}

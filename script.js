@@ -615,15 +615,19 @@ if (typeof require !== "undefined") {
 
       let legendVisible = true;
 
+      container.classList.remove("legend-is-hidden");
+
       legendToggleButton.addEventListener("click", () => {
         legendVisible = !legendVisible;
 
         if (legendVisible) {
           legendContent.classList.remove("legend-content-hidden");
           legendToggleButton.textContent = "Hide Legend";
+          container.classList.remove("legend-is-hidden");
         } else {
           legendContent.classList.add("legend-content-hidden");
           legendToggleButton.textContent = "Show Legend";
+          container.classList.add("legend-is-hidden");
         }
       });
 
@@ -769,15 +773,19 @@ if (typeof require !== "undefined") {
 
       let legendVisible = true;
 
+      container.classList.remove("legend-is-hidden");
+
       legendToggleButton.addEventListener("click", () => {
         legendVisible = !legendVisible;
 
         if (legendVisible) {
           legendContent.classList.remove("legend-content-hidden");
           legendToggleButton.textContent = "Hide Legend";
+          container.classList.remove("legend-is-hidden");
         } else {
           legendContent.classList.add("legend-content-hidden");
           legendToggleButton.textContent = "Show Legend";
+          container.classList.add("legend-is-hidden");
         }
       });
 
@@ -800,80 +808,7 @@ if (typeof require !== "undefined") {
         "English Language Arts Proficiency Percentage",
         schoolLocation,
       );
-      createContextMap(
-        "internetAccessMap",
-        censusLayerUrl,
-        internetAccessField,
-        "Percent Households with Broadband Internet",
-        [
-          {
-            minValue: 0,
-            maxValue: 20,
-            symbol: {
-              type: "simple-fill",
-              color: "#8a5f1a",
-              outline: {
-                color: "#777777",
-                width: 0.35,
-              },
-            },
-            label: "0 - 20",
-          },
-          {
-            minValue: 20,
-            maxValue: 40,
-            symbol: {
-              type: "simple-fill",
-              color: "#a7792d",
-              outline: {
-                color: "#777777",
-                width: 0.35,
-              },
-            },
-            label: "> 20 - 40",
-          },
-          {
-            minValue: 40,
-            maxValue: 60,
-            symbol: {
-              type: "simple-fill",
-              color: "#c6aa7f",
-              outline: {
-                color: "#777777",
-                width: 0.35,
-              },
-            },
-            label: "> 40 - 60",
-          },
-          {
-            minValue: 60,
-            maxValue: 80,
-            symbol: {
-              type: "simple-fill",
-              color: "#e1cda8",
-              outline: {
-                color: "#777777",
-                width: 0.35,
-              },
-            },
-            label: "> 60 - 80",
-          },
-          {
-            minValue: 80,
-            maxValue: 100,
-            symbol: {
-              type: "simple-fill",
-              color: "#f3e4c7",
-              outline: {
-                color: "#777777",
-                width: 0.35,
-              },
-            },
-            label: "> 80 - 100",
-          },
-        ],
-        schoolLocation,
-      );
+
       createContextMap(
         "internetAccessMap",
         censusLayerUrl,
@@ -1091,14 +1026,13 @@ async function replaceMapsWithScreenshots() {
     img.src = screenshot.dataUrl;
     img.className = "map-export-image";
 
+    mapDiv.classList.add("exporting-map");
+    mapDiv.appendChild(img);
+
     replacements.push({
       mapDiv: mapDiv,
       image: img,
-      originalDisplay: mapDiv.style.display,
     });
-
-    mapDiv.style.display = "none";
-    mapDiv.parentNode.insertBefore(img, mapDiv);
   }
 
   return replacements;
@@ -1107,7 +1041,7 @@ async function replaceMapsWithScreenshots() {
 function restoreLiveMaps(replacements) {
   replacements.forEach((item) => {
     item.image.remove();
-    item.mapDiv.style.display = item.originalDisplay;
+    item.mapDiv.classList.remove("exporting-map");
   });
 }
 const exportReportButton = document.getElementById("exportReportButton");
@@ -1146,45 +1080,21 @@ if (exportReportButton) {
 
       const { jsPDF } = window.jspdf;
 
+      const margin = 24;
+
+      // Use A4 width, but custom height based on the report image
+      const pageWidth = 595.28;
+      const usableWidth = pageWidth - margin * 2;
+      const imageHeight = (canvas.height * usableWidth) / canvas.width;
+      const pageHeight = imageHeight + margin * 2;
+
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "pt",
-        format: "a4",
+        format: [pageWidth, pageHeight],
       });
 
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const margin = 24;
-      const usableWidth = pageWidth - margin * 2;
-      const imageHeight = (canvas.height * usableWidth) / canvas.width;
-
-      let heightLeft = imageHeight;
-      let position = margin;
-
-      pdf.addImage(
-        imageData,
-        "PNG",
-        margin,
-        position,
-        usableWidth,
-        imageHeight,
-      );
-      heightLeft -= pageHeight - margin * 2;
-
-      while (heightLeft > 0) {
-        pdf.addPage();
-        position = heightLeft - imageHeight + margin;
-        pdf.addImage(
-          imageData,
-          "PNG",
-          margin,
-          position,
-          usableWidth,
-          imageHeight,
-        );
-        heightLeft -= pageHeight - margin * 2;
-      }
+      pdf.addImage(imageData, "PNG", margin, margin, usableWidth, imageHeight);
 
       pdf.save("constellations-report.pdf");
     } catch (error) {
