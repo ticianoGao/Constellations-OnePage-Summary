@@ -385,6 +385,12 @@ if (typeof require !== "undefined") {
     const schoolLayerUrl =
       "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/All_GA_2_18/FeatureServer/0";
 
+    const censusLayerUrl =
+      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/Georgia_Census_Tracts_CIC/FeatureServer/9";
+
+    const internetAccessField = "percent_broadband";
+    const incomeField = "median_hh_income";
+
     const selectedSchoolName = "Appling County High School";
     const schoolNameField = "SchoolName";
 
@@ -619,6 +625,160 @@ if (typeof require !== "undefined") {
 
       return view;
     }
+    function createContextMap(
+      containerId,
+      layerUrl,
+      valueField,
+      valueLabel,
+      classBreakInfos,
+      schoolLocation,
+    ) {
+      const container = document.getElementById(containerId);
+
+      if (!container) {
+        return;
+      }
+
+      const layerOptions = {
+        url: layerUrl,
+        title: valueLabel,
+        outFields: ["*"],
+
+        popupTemplate: {
+          title: "{NAME}",
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: valueField,
+                  label: valueLabel,
+                },
+              ],
+            },
+          ],
+        },
+      };
+
+      if (classBreakInfos) {
+        layerOptions.renderer = {
+          type: "class-breaks",
+          field: valueField,
+          defaultSymbol: {
+            type: "simple-fill",
+            color: [220, 220, 220, 0.25],
+            outline: {
+              color: "#999999",
+              width: 0.3,
+            },
+          },
+          defaultLabel: "No data",
+          classBreakInfos: classBreakInfos,
+        };
+      }
+
+      const contextLayer = new FeatureLayer(layerOptions);
+
+      const schoolMarkerLayer = new GraphicsLayer();
+
+      if (schoolLocation) {
+        const schoolPoint = new Point({
+          longitude: Number(schoolLocation.longitude),
+          latitude: Number(schoolLocation.latitude),
+          spatialReference: {
+            wkid: 4326,
+          },
+        });
+
+        const schoolCircleGeometry = new Circle({
+          center: schoolPoint,
+          radius: 5,
+          radiusUnit: "kilometers",
+          geodesic: true,
+        });
+
+        const schoolCircle = new Graphic({
+          geometry: schoolCircleGeometry,
+          symbol: {
+            type: "simple-fill",
+            color: [179, 163, 105, 0.28],
+            outline: {
+              color: [0, 48, 87, 1],
+              width: 2,
+            },
+          },
+          popupTemplate: {
+            title: selectedSchoolName,
+            content: "Selected school area highlight",
+          },
+        });
+
+        schoolMarkerLayer.add(schoolCircle);
+      }
+
+      const map = new Map({
+        basemap: "gray-vector",
+        layers: [contextLayer, schoolMarkerLayer],
+      });
+
+      const view = new MapView({
+        container: containerId,
+        map: map,
+        center: schoolLocation
+          ? [schoolLocation.longitude, schoolLocation.latitude]
+          : [-83.5, 32.7],
+        zoom: schoolLocation ? 7 : 6,
+        constraints: {
+          rotationEnabled: false,
+        },
+        ui: {
+          components: ["zoom"],
+        },
+      });
+
+      const legendWrapper = document.createElement("div");
+      legendWrapper.className = "legend-wrapper esri-widget";
+
+      const legendToggleButton = document.createElement("button");
+      legendToggleButton.className = "legend-toggle-button";
+      legendToggleButton.type = "button";
+      legendToggleButton.textContent = "Hide Legend";
+
+      const legendContent = document.createElement("div");
+      legendContent.className = "legend-content";
+
+      legendWrapper.appendChild(legendToggleButton);
+      legendWrapper.appendChild(legendContent);
+
+      const legend = new Legend({
+        view: view,
+        container: legendContent,
+        layerInfos: [
+          {
+            layer: contextLayer,
+            title: valueLabel,
+          },
+        ],
+      });
+
+      let legendVisible = true;
+
+      legendToggleButton.addEventListener("click", () => {
+        legendVisible = !legendVisible;
+
+        if (legendVisible) {
+          legendContent.classList.remove("legend-content-hidden");
+          legendToggleButton.textContent = "Hide Legend";
+        } else {
+          legendContent.classList.add("legend-content-hidden");
+          legendToggleButton.textContent = "Show Legend";
+        }
+      });
+
+      view.ui.add(legendWrapper, "bottom-right");
+
+      return view;
+    }
 
     getSchoolLocationByName(selectedSchoolName).then((schoolLocation) => {
       createProficiencyMap(
@@ -632,6 +792,215 @@ if (typeof require !== "undefined") {
         "englishProficiencyMap",
         "EngProf",
         "English Language Arts Proficiency Percentage",
+        schoolLocation,
+      );
+      createContextMap(
+        "internetAccessMap",
+        censusLayerUrl,
+        internetAccessField,
+        "Percent Households with Broadband Internet",
+        [
+          {
+            minValue: 0,
+            maxValue: 20,
+            symbol: {
+              type: "simple-fill",
+              color: "#8a5f1a",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "0 - 20",
+          },
+          {
+            minValue: 20,
+            maxValue: 40,
+            symbol: {
+              type: "simple-fill",
+              color: "#a7792d",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 20 - 40",
+          },
+          {
+            minValue: 40,
+            maxValue: 60,
+            symbol: {
+              type: "simple-fill",
+              color: "#c6aa7f",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 40 - 60",
+          },
+          {
+            minValue: 60,
+            maxValue: 80,
+            symbol: {
+              type: "simple-fill",
+              color: "#e1cda8",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 60 - 80",
+          },
+          {
+            minValue: 80,
+            maxValue: 100,
+            symbol: {
+              type: "simple-fill",
+              color: "#f3e4c7",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 80 - 100",
+          },
+        ],
+        schoolLocation,
+      );
+      createContextMap(
+        "internetAccessMap",
+        censusLayerUrl,
+        internetAccessField,
+        "Percent Households with Broadband Internet",
+        [
+          {
+            minValue: 0,
+            maxValue: 20,
+            symbol: {
+              type: "simple-fill",
+              color: "#8a5f1a",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "0 - 20",
+          },
+          {
+            minValue: 20,
+            maxValue: 40,
+            symbol: {
+              type: "simple-fill",
+              color: "#a7792d",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 20 - 40",
+          },
+          {
+            minValue: 40,
+            maxValue: 60,
+            symbol: {
+              type: "simple-fill",
+              color: "#c6aa7f",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 40 - 60",
+          },
+          {
+            minValue: 60,
+            maxValue: 80,
+            symbol: {
+              type: "simple-fill",
+              color: "#e1cda8",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 60 - 80",
+          },
+          {
+            minValue: 80,
+            maxValue: 100,
+            symbol: {
+              type: "simple-fill",
+              color: "#f3e4c7",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 80 - 100",
+          },
+        ],
+        schoolLocation,
+      );
+      createContextMap(
+        "incomeMap",
+        censusLayerUrl,
+        incomeField,
+        "Median Household Income",
+        [
+          {
+            minValue: 8354,
+            maxValue: 64111,
+            symbol: {
+              type: "simple-fill",
+              color: "#f4e3dc",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "8,354 - 64,111",
+          },
+          {
+            minValue: 64111,
+            maxValue: 100705,
+            symbol: {
+              type: "simple-fill",
+              color: "#f6a08d",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 64,111 - 100,705",
+          },
+          {
+            minValue: 100705,
+            maxValue: 156389,
+            symbol: {
+              type: "simple-fill",
+              color: "#fb5a43",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 100,705 - 156,389",
+          },
+          {
+            minValue: 156389,
+            maxValue: 250001,
+            symbol: {
+              type: "simple-fill",
+              color: "#d7191c",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 156,389 - 250,001",
+          },
+        ],
         schoolLocation,
       );
     });
