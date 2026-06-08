@@ -321,6 +321,9 @@ if (genderChartCanvas && typeof Chart !== "undefined") {
         },
         tooltip: {
           callbacks: {
+            title: function () {
+              return "";
+            },
             label: function (context) {
               return context.dataset.label + ": " + context.raw + "%";
             },
