@@ -771,3 +771,77 @@ a:hover {
   border-top: none;
   padding-top: 0;
 }
+
+.report-card {
+  position: relative;
+}
+
+/* This part is for information overlay */
+.info-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 10px;
+  background: #d9d9d9;
+  color: #111111;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.info-button:hover {
+  background: #cfcfcf;
+}
+
+.card-info-popup {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  z-index: 20;
+  display: none;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  padding: 54px 24px 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+.card-info-popup.show {
+  display: block;
+}
+
+.card-info-popup p {
+  color: #222222;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.card-info-popup a {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.card-info-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #2d2d5f;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #2d2d5f;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 20px;
+  cursor: pointer;
+}

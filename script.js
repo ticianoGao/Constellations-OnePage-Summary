@@ -355,3 +355,51 @@ if (genderChartCanvas && typeof Chart !== "undefined") {
     },
   });
 }
+
+/* Card info popup */
+
+const cardInfoButtons = document.querySelectorAll(".info-button");
+const cardInfoCloseButtons = document.querySelectorAll(".card-info-close");
+
+cardInfoButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    const card = button.closest(".report-card");
+    const popup = card.querySelector(".card-info-popup");
+
+    document.querySelectorAll(".card-info-popup").forEach((item) => {
+      if (item !== popup) {
+        item.classList.remove("show");
+      }
+    });
+
+    if (popup) {
+      popup.classList.toggle("show");
+    }
+  });
+});
+
+cardInfoCloseButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    const popup = button.closest(".card-info-popup");
+
+    if (popup) {
+      popup.classList.remove("show");
+    }
+  });
+});
+
+document.addEventListener("click", () => {
+  document.querySelectorAll(".card-info-popup").forEach((popup) => {
+    popup.classList.remove("show");
+  });
+});
+
+document.querySelectorAll(".card-info-popup").forEach((popup) => {
+  popup.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+});
