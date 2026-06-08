@@ -7,6 +7,11 @@
     <title>Constellations Explorer</title>
 
     <link rel="stylesheet" href="styles.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.30/esri/themes/light/main.css"
+    />
   </head>
 
   <body>
@@ -340,12 +345,22 @@
                   </div>
                   <h3>Academic Proficiency</h3>
 
-                  <div class="card-image-wrap">
-                    <img
-                      src="pics/Appling County High School Proficiency Pic.png"
-                      alt="Academic proficiency chart"
-                      class="card-image"
-                    />
+                  <div class="two-map-grid">
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">Math Proficiency</h4>
+                      <div
+                        id="mathProficiencyMap"
+                        class="card-map small-card-map"
+                      ></div>
+                    </div>
+
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">English Proficiency</h4>
+                      <div
+                        id="englishProficiencyMap"
+                        class="card-map small-card-map"
+                      ></div>
+                    </div>
                   </div>
                 </article>
               </div>
@@ -498,21 +513,18 @@
                     Internet Access and Median Household Income Information
                   </h3>
 
-                  <div class="two-image-grid">
-                    <div class="image-panel">
-                      <img
-                        src="pics/Appling County High School Proficiency Pic.png"
-                        alt="First school chart"
-                        class="card-image"
-                      />
+                  <div class="two-map-grid">
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">Internet Access</h4>
+                      <div
+                        id="internetAccessMap"
+                        class="card-map small-card-map"
+                      ></div>
                     </div>
 
-                    <div class="image-panel">
-                      <img
-                        src="pics/Appling County High School Median Household Income Pic.png"
-                        alt="Second school chart"
-                        class="card-image"
-                      />
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">Median Household Income</h4>
+                      <div id="incomeMap" class="card-map small-card-map"></div>
                     </div>
                   </div>
                 </article>
@@ -579,6 +591,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.arcgis.com/4.30/"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -355,7 +355,259 @@ if (genderChartCanvas && typeof Chart !== "undefined") {
     },
   });
 }
+/* ArcGIS maps inside report cards */
 
+if (typeof require !== "undefined") {
+  require([
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/layers/FeatureLayer",
+    "esri/layers/GraphicsLayer",
+    "esri/Graphic",
+    "esri/rest/support/Query",
+    "esri/geometry/Point",
+    "esri/geometry/Circle",
+    "esri/widgets/Legend",
+  ], function (
+    Map,
+    MapView,
+    FeatureLayer,
+    GraphicsLayer,
+    Graphic,
+    Query,
+    Point,
+    Circle,
+    Legend,
+  ) {
+    const districtLayerUrl =
+      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/GADistrictSum/FeatureServer/6";
+
+    const schoolLayerUrl =
+      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/All_GA_2_18/FeatureServer/0";
+
+    const selectedSchoolName = "Appling County High School";
+    const schoolNameField = "SchoolName";
+
+    async function getSchoolLocationByName(schoolName) {
+      const schoolLayer = new FeatureLayer({
+        url: schoolLayerUrl,
+        outFields: ["SchoolName", "Latitude", "Longitude"],
+      });
+
+      const query = new Query();
+      query.where = `${schoolNameField} = '${schoolName.replace(/'/g, "''")}'`;
+      query.returnGeometry = true;
+      query.outFields = ["SchoolName", "Latitude", "Longitude"];
+
+      const result = await schoolLayer.queryFeatures(query);
+
+      if (result.features.length === 0) {
+        console.warn("No school found for:", schoolName);
+        return null;
+      }
+
+      const feature = result.features[0];
+
+      return {
+        longitude: feature.attributes.Longitude,
+        latitude: feature.attributes.Latitude,
+      };
+    }
+
+    function createProficiencyMap(
+      containerId,
+      valueField,
+      valueLabel,
+      schoolLocation,
+    ) {
+      const container = document.getElementById(containerId);
+
+      if (!container) {
+        return;
+      }
+
+      const proficiencyLayer = new FeatureLayer({
+        url: districtLayerUrl,
+        title: valueLabel,
+        outFields: ["*"],
+
+        renderer: {
+          type: "class-breaks",
+          field: valueField,
+          classBreakInfos: [
+            {
+              minValue: 5.8,
+              maxValue: 22.7,
+              symbol: {
+                type: "simple-fill",
+                color: "#4f7f7b",
+                outline: {
+                  color: "#666666",
+                  width: 0.5,
+                },
+              },
+              label: "5.8 - 22.7",
+            },
+            {
+              minValue: 22.7,
+              maxValue: 38,
+              symbol: {
+                type: "simple-fill",
+                color: "#6f9992",
+                outline: {
+                  color: "#666666",
+                  width: 0.5,
+                },
+              },
+              label: "> 22.7 - 38",
+            },
+            {
+              minValue: 38,
+              maxValue: 52.7,
+              symbol: {
+                type: "simple-fill",
+                color: "#9fbbb0",
+                outline: {
+                  color: "#666666",
+                  width: 0.5,
+                },
+              },
+              label: "> 38 - 52.7",
+            },
+            {
+              minValue: 52.7,
+              maxValue: 67,
+              symbol: {
+                type: "simple-fill",
+                color: "#cbdcad",
+                outline: {
+                  color: "#666666",
+                  width: 0.5,
+                },
+              },
+              label: "> 52.7 - 67",
+            },
+            {
+              minValue: 67,
+              maxValue: 88,
+              symbol: {
+                type: "simple-fill",
+                color: "#eef4c2",
+                outline: {
+                  color: "#666666",
+                  width: 0.5,
+                },
+              },
+              label: "> 67 - 88",
+            },
+          ],
+        },
+
+        popupTemplate: {
+          title: "{NAME}",
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: valueField,
+                  label: valueLabel,
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      const schoolMarkerLayer = new GraphicsLayer();
+
+      if (schoolLocation) {
+        const schoolPoint = new Point({
+          longitude: Number(schoolLocation.longitude),
+          latitude: Number(schoolLocation.latitude),
+          spatialReference: {
+            wkid: 4326,
+          },
+        });
+
+        const schoolCircleGeometry = new Circle({
+          center: schoolPoint,
+          radius: 5,
+          radiusUnit: "kilometers",
+          geodesic: true,
+        });
+
+        const schoolCircle = new Graphic({
+          geometry: schoolCircleGeometry,
+          symbol: {
+            type: "simple-fill",
+            color: [179, 163, 105, 0.28],
+            outline: {
+              color: [0, 48, 87, 1],
+              width: 2,
+            },
+          },
+          popupTemplate: {
+            title: selectedSchoolName,
+            content: "Selected school area highlight",
+          },
+        });
+
+        schoolMarkerLayer.add(schoolCircle);
+      }
+
+      const map = new Map({
+        basemap: "gray-vector",
+        layers: [proficiencyLayer, schoolMarkerLayer],
+      });
+
+      const view = new MapView({
+        container: containerId,
+        map: map,
+        center: schoolLocation
+          ? [schoolLocation.longitude, schoolLocation.latitude]
+          : [-83.5, 32.7],
+        zoom: schoolLocation ? 8 : 7,
+        constraints: {
+          rotationEnabled: false,
+        },
+        ui: {
+          components: ["zoom"],
+        },
+      });
+
+      const legend = new Legend({
+        view: view,
+        layerInfos: [
+          {
+            layer: proficiencyLayer,
+            title: valueLabel,
+          },
+        ],
+      });
+
+      view.ui.add(legend, "bottom-right");
+
+      return view;
+    }
+
+    getSchoolLocationByName(selectedSchoolName).then((schoolLocation) => {
+      createProficiencyMap(
+        "mathProficiencyMap",
+        "MathProf",
+        "Mathematics Proficiency Percentage",
+        schoolLocation,
+      );
+
+      createProficiencyMap(
+        "englishProficiencyMap",
+        "EngProf",
+        "English Language Arts Proficiency Percentage",
+        schoolLocation,
+      );
+    });
+  });
+}
 /* Card info popup */
 
 const cardInfoButtons = document.querySelectorAll(".info-button");

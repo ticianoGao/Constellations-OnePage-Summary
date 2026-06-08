@@ -719,6 +719,45 @@ a:hover {
   background: #f5f7fa;
 }
 
+.card-map-wrap {
+  margin-top: 18px;
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f5f7fa;
+}
+
+.card-map {
+  width: 100%;
+  height: 260px;
+}
+
+.two-map-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.map-panel {
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f5f7fa;
+}
+
+.map-panel-title {
+  color: var(--blue);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  margin: 12px 14px 8px;
+}
+
+.small-card-map {
+  height: 220px;
+}
+
 .bottom-citation-section {
   padding: 48px 0;
   background: #ffffff;
@@ -908,4 +947,44 @@ a:hover {
   font-size: 1rem;
   line-height: 1.55;
   margin-bottom: 10px;
+}
+
+/* Smaller ArcGIS legend inside card maps */
+
+.card-map .esri-legend {
+  max-width: 135px;
+  max-height: 105px;
+  overflow-y: auto;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.62rem;
+}
+
+.card-map .esri-widget {
+  font-size: 0.62rem;
+}
+
+.card-map .esri-legend__service {
+  padding: 4px;
+}
+
+.card-map .esri-legend__layer {
+  margin-bottom: 2px;
+}
+
+.card-map .esri-legend__layer-caption {
+  font-size: 0.6rem;
+  margin-bottom: 2px;
+}
+
+.card-map .esri-legend__layer-table {
+  margin-bottom: 0;
+}
+
+.card-map .esri-legend__layer-cell {
+  padding: 1px 3px;
+}
+
+.card-map .esri-legend__symbol {
+  width: 18px;
+  height: 12px;
 }
