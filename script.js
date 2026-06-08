@@ -18,6 +18,9 @@ if (menuButton && mainNav) {
 const schoolGrid = document.getElementById("schoolGrid");
 const districtGrid = document.getElementById("districtGrid");
 const customSelect = document.getElementById("districtSelect");
+
+const reportMapViews = {};
+
 const selectTrigger = document.getElementById("selectTrigger");
 const selectedValue = document.getElementById("selectedValue");
 const selectSearch = document.getElementById("selectSearch");
@@ -625,7 +628,7 @@ if (typeof require !== "undefined") {
       });
 
       view.ui.add(legendWrapper, "bottom-right");
-
+      reportMapViews[containerId] = view;
       return view;
     }
     function createContextMap(
@@ -779,7 +782,7 @@ if (typeof require !== "undefined") {
       });
 
       view.ui.add(legendWrapper, "bottom-right");
-
+      reportMapViews[containerId] = view;
       return view;
     }
 
@@ -1056,3 +1059,143 @@ document.querySelectorAll(".card-info-popup").forEach((popup) => {
     event.stopPropagation();
   });
 });
+
+/* Export report as PDF */
+async function replaceMapsWithScreenshots() {
+  const replacements = [];
+
+  const mapIds = [
+    "mathProficiencyMap",
+    "englishProficiencyMap",
+    "internetAccessMap",
+    "incomeMap",
+  ];
+
+  for (const mapId of mapIds) {
+    const mapDiv = document.getElementById(mapId);
+    const view = reportMapViews[mapId];
+
+    if (!mapDiv || !view) {
+      continue;
+    }
+
+    await view.when();
+
+    const screenshot = await view.takeScreenshot({
+      width: mapDiv.offsetWidth,
+      height: mapDiv.offsetHeight,
+      format: "png",
+    });
+
+    const img = document.createElement("img");
+    img.src = screenshot.dataUrl;
+    img.className = "map-export-image";
+
+    replacements.push({
+      mapDiv: mapDiv,
+      image: img,
+      originalDisplay: mapDiv.style.display,
+    });
+
+    mapDiv.style.display = "none";
+    mapDiv.parentNode.insertBefore(img, mapDiv);
+  }
+
+  return replacements;
+}
+
+function restoreLiveMaps(replacements) {
+  replacements.forEach((item) => {
+    item.image.remove();
+    item.mapDiv.style.display = item.originalDisplay;
+  });
+}
+const exportReportButton = document.getElementById("exportReportButton");
+
+if (exportReportButton) {
+  exportReportButton.addEventListener("click", async () => {
+    const reportElement = document.getElementById("schoolGrid");
+
+    if (!reportElement || !reportElement.classList.contains("show")) {
+      alert("Please select a report before exporting.");
+      return;
+    }
+
+    exportReportButton.disabled = true;
+    exportReportButton.textContent = "Generating...";
+
+    let mapReplacements = [];
+
+    try {
+      reportElement.classList.add("exporting-report");
+
+      mapReplacements = await replaceMapsWithScreenshots();
+
+      const canvas = await html2canvas(reportElement, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#eeeeee",
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+      });
+
+      const imageData = canvas.toDataURL("image/png");
+
+      const { jsPDF } = window.jspdf;
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const margin = 24;
+      const usableWidth = pageWidth - margin * 2;
+      const imageHeight = (canvas.height * usableWidth) / canvas.width;
+
+      let heightLeft = imageHeight;
+      let position = margin;
+
+      pdf.addImage(
+        imageData,
+        "PNG",
+        margin,
+        position,
+        usableWidth,
+        imageHeight,
+      );
+      heightLeft -= pageHeight - margin * 2;
+
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position = heightLeft - imageHeight + margin;
+        pdf.addImage(
+          imageData,
+          "PNG",
+          margin,
+          position,
+          usableWidth,
+          imageHeight,
+        );
+        heightLeft -= pageHeight - margin * 2;
+      }
+
+      pdf.save("constellations-report.pdf");
+    } catch (error) {
+      console.error("PDF export failed:", error);
+      alert("The PDF could not be generated. Please try again.");
+    } finally {
+      restoreLiveMaps(mapReplacements);
+
+      reportElement.classList.remove("exporting-report");
+      exportReportButton.disabled = false;
+      exportReportButton.textContent = "Export";
+    }
+  });
+}

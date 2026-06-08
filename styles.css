@@ -488,6 +488,16 @@ a:hover {
 .district-grid {
   grid-template-columns: 1fr 1fr;
 }
+
+/* Shaded shell around the full school report */
+.school-grid.show {
+  background: #eeeeee;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
 .grid-column {
   display: flex;
   flex-direction: column;
@@ -1088,4 +1098,51 @@ a:hover {
 
 .category-definition-list li::marker {
   color: #222222;
+}
+
+.report-export-row {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+
+.report-export-button {
+  border: 2px solid var(--blue);
+  background: var(--blue);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 48, 87, 0.18);
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.report-export-button:hover {
+  background: var(--blue-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 48, 87, 0.24);
+}
+
+.exporting-report .report-card:hover {
+  transform: none;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.report-export-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
+
+.map-export-image {
+  width: 100%;
+  height: 270px;
+  display: block;
+  object-fit: cover;
 }
