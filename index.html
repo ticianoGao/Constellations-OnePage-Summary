@@ -508,28 +508,381 @@
             </div>
 
             <!-- District grid: shows when a district option is selected -->
-            <div class="option-grid district-grid" id="districtGrid">
-              <article class="report-card">
-                <h3>School Overview</h3>
-                <p>View basic information for the selected school.</p>
-              </article>
+            <div
+              class="option-grid school-grid district-report-grid"
+              id="districtReportGrid"
+            >
+              <div class="report-card snapshot-title-card">
+                <div class="snapshot-title-text">
+                  <h2>
+                    2025-26 Computing Education Resources District Snapshot
+                    Report
+                  </h2>
 
-              <article class="report-card">
-                <h3>CS Course Access</h3>
-                <p>Review computer science courses offered at this school.</p>
-              </article>
+                  <p>
+                    Atlanta Public Schools
+                    <span>–</span>
+                    District Report
+                    <span>–</span>
+                    K–12
+                  </p>
+                </div>
 
-              <article class="report-card">
-                <h3>Student Participation</h3>
-                <p>
-                  Compare school demographics with CS enrollment demographics.
-                </p>
-              </article>
+                <span class="snapshot-title-logo-text">CCEC</span>
+              </div>
+              <div class="grid-column">
+                <article class="report-card school-summary-card">
+                  <button
+                    class="info-button"
+                    type="button"
+                    aria-label="Open information"
+                  >
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
+                  </button>
+                  <div class="card-info-popup">
+                    <button class="card-info-close" type="button">×</button>
 
-              <article class="report-card">
-                <h3>Download School Report</h3>
-                <p>Generate a school-level summary report.</p>
-              </article>
+                    <ul class="info-list">
+                      <li>
+                        The enrollment number is double counted. This means that
+                        students who are enrolled in multiple CS courses are
+                        counted multiple times.
+                      </li>
+                      <li>
+                        <strong>Category Definition</strong>
+
+                        <ul class="category-definition-list">
+                          <li>
+                            <strong>Category 1:</strong> College level CS
+                            courses, including AP and IB classes.
+                          </li>
+                          <li>
+                            <strong>Category 2:</strong> CTAE IT Pathway
+                            Capstone courses, excluding APs.
+                          </li>
+                          <li>
+                            <strong>Category 3:</strong> All high school CS
+                            courses excluding Category 1 and Category 2.
+                          </li>
+                          <li>
+                            <strong>Category 4:</strong> All CS courses
+                            excluding Category 1, Category 2, and Category 3.
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                  <h3>Summary</h3>
+
+                  <div class="summary-metrics">
+                    <div class="metric-box">
+                      <span class="metric-number">1049</span>
+                      <span class="metric-label">Total Students</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-number">2</span>
+                      <span class="metric-label">CS Courses</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-number">1</span>
+                      <span class="metric-label">CS Teachers</span>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-number">28</span>
+                      <span class="metric-label">CS Enrollments</span>
+                    </div>
+                  </div>
+
+                  <div class="summary-text">
+                    <ol class="summary-list">
+                      <li>
+                        By the end of the 2025-26 school year, this school has
+                        <strong>1049</strong> total students.
+                      </li>
+
+                      <li>
+                        It provides <strong>2</strong> computer science courses
+                        out of the total approved Georgia CS course list. This
+                        is <strong>NULL%</strong>
+                        higher/lower than the state average for high school.
+                        <ul class="summary-sublist">
+                          <li>
+                            AP CS A:
+                            <strong>Unavailable</strong>.
+                          </li>
+                          <li>
+                            AP CS Principles availability:
+                            <strong>Available</strong>.
+                          </li>
+                          <li>
+                            Other CS courses available:
+                            <strong>Introduction to Digital Technology</strong>.
+                          </li>
+                        </ul>
+                      </li>
+
+                      <li>
+                        Total CS enrollments, counting students who take
+                        multiple CS courses, is
+                        <strong>28</strong>. This is <strong>2.67%</strong> of
+                        the entire student enrollment, which is
+                        <strong>NULL%</strong> higher/lower than Georgia's
+                        average.
+                      </li>
+
+                      <li>
+                        Out of the total CS enrollment, <strong>15</strong> are
+                        Category 1, <strong>0</strong> are Category 2, and
+                        <strong>13</strong> are Category 3/4.
+                      </li>
+
+                      <li>
+                        The total number of CS teachers is <strong>1</strong>,
+                        giving the school a teacher-student ratio of
+                        <strong>0.04</strong>, compared to the state/district
+                        average of <strong>NULL</strong>.
+                      </li>
+                    </ol>
+                  </div>
+                </article>
+                <article class="report-card image-card">
+                  <button
+                    class="info-button"
+                    type="button"
+                    aria-label="Open information"
+                  >
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
+                  </button>
+                  <div class="card-info-popup">
+                    <button class="card-info-close" type="button">×</button>
+
+                    <ul class="info-list">
+                      <li>
+                        This section provides academic proficiency context for
+                        the selected school.
+                      </li>
+                    </ul>
+                  </div>
+                  <h3>Academic Proficiency</h3>
+
+                  <div class="two-map-grid">
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">Math Proficiency</h4>
+                      <div
+                        id="districtMathProficiencyMap"
+                        class="card-map small-card-map"
+                      ></div>
+                    </div>
+
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">English Proficiency</h4>
+                      <div
+                        id="districtEnglishProficiencyMap"
+                        class="card-map small-card-map"
+                      ></div>
+                    </div>
+                  </div>
+                </article>
+                <div class="report-export-row">
+                  <button
+                    class="report-export-button"
+                    type="button"
+                    id="exportDistrictReportButton"
+                  >
+                    Export
+                  </button>
+                </div>
+              </div>
+              <div class="grid-column">
+                <article class="report-card participation-card">
+                  <button
+                    class="info-button"
+                    type="button"
+                    aria-label="Open information"
+                  >
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
+                  </button>
+                  <div class="card-info-popup">
+                    <button class="card-info-close" type="button">×</button>
+
+                    <ul class="info-list">
+                      <li>
+                        This section compares the overall student population
+                        with students enrolled in computer science courses.
+                      </li>
+                    </ul>
+                  </div>
+                  <h3>Demographic Participation</h3>
+                  <div class="chart-js-section">
+                    <h4>Race/Ethnicity Comparison</h4>
+
+                    <div class="chart-box double-chart-box">
+                      <canvas id="districtRaceEthnicityChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="chart-js-section">
+                    <h4>Gender Comparison</h4>
+
+                    <div class="chart-box gender-chart-box">
+                      <canvas id="districtGenderChart"></canvas>
+                    </div>
+                  </div>
+                </article>
+                <article class="report-card two-image-card">
+                  <button
+                    class="info-button"
+                    type="button"
+                    aria-label="Open information"
+                  >
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
+                  </button>
+
+                  <div class="card-info-popup">
+                    <button class="card-info-close" type="button">×</button>
+
+                    <ul class="info-list">
+                      <li>
+                        This section provides community context related to
+                        internet access and household income around the selected
+                        school.
+                      </li>
+                    </ul>
+                  </div>
+                  <h3>
+                    Internet Access and Median Household Income Information
+                  </h3>
+
+                  <div class="two-map-grid">
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">Internet Access</h4>
+                      <div
+                        id="districtInternetAccessMap"
+                        class="card-map small-card-map"
+                      ></div>
+                    </div>
+
+                    <div class="map-panel">
+                      <h4 class="map-panel-title">Median Household Income</h4>
+                      <div
+                        id="districtIncomeMap"
+                        class="card-map small-card-map"
+                      ></div>
+                    </div>
+                  </div>
+                </article>
+              </div>
             </div>
           </div>
         </div>

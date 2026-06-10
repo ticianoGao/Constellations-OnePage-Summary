@@ -17,6 +17,7 @@ if (menuButton && mainNav) {
 
 const schoolGrid = document.getElementById("schoolGrid");
 const districtGrid = document.getElementById("districtGrid");
+const districtReportGrid = document.getElementById("districtReportGrid");
 const customSelect = document.getElementById("districtSelect");
 
 const reportMapViews = {};
@@ -54,12 +55,16 @@ if (
         districtGrid.classList.remove("show");
       }
 
+      if (districtReportGrid) {
+        districtReportGrid.classList.remove("show");
+      }
+
       if ((type === "school" || type === "state") && schoolGrid) {
         schoolGrid.classList.add("show");
       }
 
-      if (type === "district" && districtGrid) {
-        districtGrid.classList.add("show");
+      if (type === "district" && districtReportGrid) {
+        districtReportGrid.classList.add("show");
       }
 
       selectedValue.textContent = value;
@@ -95,12 +100,16 @@ if (
       districtGrid.classList.remove("show");
     }
 
+    if (districtReportGrid) {
+      districtReportGrid.classList.remove("show");
+    }
+
     if ((defaultType === "school" || defaultType === "state") && schoolGrid) {
       schoolGrid.classList.add("show");
     }
 
-    if (defaultType === "district" && districtGrid) {
-      districtGrid.classList.add("show");
+    if (defaultType === "district" && districtReportGrid) {
+      districtReportGrid.classList.add("show");
     }
   }
 
