@@ -289,12 +289,195 @@ if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
   });
 }
 
+/* This is for district reports */
+
+const districtRaceEthnicityChartCanvas = document.getElementById(
+  "districtRaceEthnicityChart",
+);
+
+if (districtRaceEthnicityChartCanvas && typeof Chart !== "undefined") {
+  new Chart(districtRaceEthnicityChartCanvas, {
+    type: "bar",
+    data: {
+      labels: [
+        "Asian and Pacific Islander",
+        "Black",
+        "Hispanic",
+        "Native American",
+        "White",
+        "Two or More Races",
+      ],
+      datasets: [
+        {
+          label: "School",
+          // 0.5 is used to represent <1% for the Native American category
+          data: [1, 24, 19, 0.5, 52, 4],
+          backgroundColor: "#B3A369",
+          borderRadius: 8,
+          barThickness: 10,
+        },
+        {
+          label: "CS",
+          data: [0, 32, 25, 0, 39, 4],
+          backgroundColor: "#003057",
+          borderRadius: 8,
+          barThickness: 10,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            boxWidth: 12,
+            boxHeight: 12,
+            font: {
+              family: "Arial",
+              size: 12,
+            },
+          },
+        },
+        tooltip: {
+          callbacks: {
+            title: function () {
+              return "";
+            },
+            label: function (context) {
+              const label = context.dataset.label;
+              const value = context.raw;
+
+              if (value === 0.5 && label === "School") {
+                return label + ": <1%";
+              }
+
+              return label + ": " + value + "%";
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 60,
+          ticks: {
+            callback: function (value) {
+              return value + "%";
+            },
+          },
+          grid: {
+            color: "#eeeeee",
+          },
+        },
+        y: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            font: {
+              family: "Arial",
+              size: 11,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 /* Gender double bar chart */
 
 const genderChartCanvas = document.getElementById("genderChart");
 
 if (genderChartCanvas && typeof Chart !== "undefined") {
   new Chart(genderChartCanvas, {
+    type: "bar",
+    data: {
+      labels: ["Male", "Female"],
+      datasets: [
+        {
+          label: "School",
+          data: [52, 48],
+          backgroundColor: "#B3A369",
+          borderRadius: 8,
+          barThickness: 12,
+        },
+        {
+          label: "CS",
+          data: [75, 25],
+          backgroundColor: "#003057",
+          borderRadius: 8,
+          barThickness: 12,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            boxWidth: 12,
+            boxHeight: 12,
+            font: {
+              family: "Arial",
+              size: 12,
+            },
+          },
+        },
+        tooltip: {
+          callbacks: {
+            title: function () {
+              return "";
+            },
+            label: function (context) {
+              return context.dataset.label + ": " + context.raw + "%";
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+          ticks: {
+            callback: function (value) {
+              return value + "%";
+            },
+          },
+          grid: {
+            color: "#eeeeee",
+          },
+        },
+        y: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            font: {
+              family: "Arial",
+              size: 12,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+/* Gender double bar chart for district reports */
+
+const districtGenderChartCanvas = document.getElementById(
+  "districtGenderChart",
+);
+
+if (districtGenderChartCanvas && typeof Chart !== "undefined") {
+  new Chart(districtGenderChartCanvas, {
     type: "bar",
     data: {
       labels: ["Male", "Female"],
@@ -818,6 +1001,20 @@ if (typeof require !== "undefined") {
         schoolLocation,
       );
 
+      createProficiencyMap(
+        "districtMathProficiencyMap",
+        "MathProf",
+        "Mathematics Proficiency Percentage",
+        schoolLocation,
+      );
+
+      createProficiencyMap(
+        "districtEnglishProficiencyMap",
+        "EngProf",
+        "English Language Arts Proficiency Percentage",
+        schoolLocation,
+      );
+
       createContextMap(
         "internetAccessMap",
         censusLayerUrl,
@@ -894,6 +1091,141 @@ if (typeof require !== "undefined") {
       );
       createContextMap(
         "incomeMap",
+        censusLayerUrl,
+        incomeField,
+        "Median Household Income",
+        [
+          {
+            minValue: 8354,
+            maxValue: 64111,
+            symbol: {
+              type: "simple-fill",
+              color: "#f4e3dc",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "8,354 - 64,111",
+          },
+          {
+            minValue: 64111,
+            maxValue: 100705,
+            symbol: {
+              type: "simple-fill",
+              color: "#f6a08d",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 64,111 - 100,705",
+          },
+          {
+            minValue: 100705,
+            maxValue: 156389,
+            symbol: {
+              type: "simple-fill",
+              color: "#fb5a43",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 100,705 - 156,389",
+          },
+          {
+            minValue: 156389,
+            maxValue: 250001,
+            symbol: {
+              type: "simple-fill",
+              color: "#d7191c",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 156,389 - 250,001",
+          },
+        ],
+        schoolLocation,
+      );
+      createContextMap(
+        "districtInternetAccessMap",
+        censusLayerUrl,
+        internetAccessField,
+        "Percent Households with Broadband Internet",
+        [
+          {
+            minValue: 0,
+            maxValue: 20,
+            symbol: {
+              type: "simple-fill",
+              color: "#8a5f1a",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "0 - 20",
+          },
+          {
+            minValue: 20,
+            maxValue: 40,
+            symbol: {
+              type: "simple-fill",
+              color: "#a7792d",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 20 - 40",
+          },
+          {
+            minValue: 40,
+            maxValue: 60,
+            symbol: {
+              type: "simple-fill",
+              color: "#c6aa7f",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 40 - 60",
+          },
+          {
+            minValue: 60,
+            maxValue: 80,
+            symbol: {
+              type: "simple-fill",
+              color: "#e1cda8",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 60 - 80",
+          },
+          {
+            minValue: 80,
+            maxValue: 100,
+            symbol: {
+              type: "simple-fill",
+              color: "#f3e4c7",
+              outline: {
+                color: "#777777",
+                width: 0.35,
+              },
+            },
+            label: "> 80 - 100",
+          },
+        ],
+        schoolLocation,
+      );
+      createContextMap(
+        "districtIncomeMap",
         censusLayerUrl,
         incomeField,
         "Median Household Income",
