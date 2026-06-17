@@ -1203,3 +1203,59 @@ a:hover {
 .exporting-report .report-export-button {
   display: none !important;
 }
+
+/* Move legend Hide/Show button to top-right corner */
+.card-map .legend-wrapper {
+  position: relative;
+  min-height: 24px;
+}
+
+.card-map .legend-toggle-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+
+  width: auto;
+  min-width: 36px;
+  padding: 2px 6px;
+  margin-bottom: 0;
+
+  font-size: 0.6rem;
+  line-height: 1.1;
+  z-index: 5;
+}
+
+/* Give the legend title room so the button does not cover it */
+.card-map .legend-content .esri-legend__service-label {
+  padding-right: 44px;
+}
+
+/* Shrink legend box when legend is hidden */
+.card-map.legend-is-hidden .legend-wrapper {
+  width: auto !important;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* Let the Show button size itself instead of staying inside a wide bar */
+.card-map.legend-is-hidden .legend-toggle-button {
+  position: static;
+  width: auto;
+  min-width: 42px;
+  padding: 3px 8px;
+  margin: 0;
+  display: block;
+}
+
+/* Remove the repeated top title inside ArcGIS legends */
+.card-map .legend-content .esri-legend__service-label {
+  display: none;
+}
+
+/* Remove extra space left by the hidden title */
+.card-map .legend-content .esri-legend__service {
+  padding-top: 2px;
+}

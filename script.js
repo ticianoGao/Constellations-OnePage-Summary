@@ -786,7 +786,7 @@ if (typeof require !== "undefined") {
       const legendToggleButton = document.createElement("button");
       legendToggleButton.className = "legend-toggle-button";
       legendToggleButton.type = "button";
-      legendToggleButton.textContent = "Hide Legend";
+      legendToggleButton.textContent = "Hide";
 
       const legendContent = document.createElement("div");
       legendContent.className = "legend-content";
@@ -814,11 +814,11 @@ if (typeof require !== "undefined") {
 
         if (legendVisible) {
           legendContent.classList.remove("legend-content-hidden");
-          legendToggleButton.textContent = "Hide Legend";
+          legendToggleButton.textContent = "Hide";
           container.classList.remove("legend-is-hidden");
         } else {
           legendContent.classList.add("legend-content-hidden");
-          legendToggleButton.textContent = "Show Legend";
+          legendToggleButton.textContent = "Show";
           container.classList.add("legend-is-hidden");
         }
       });
@@ -944,7 +944,7 @@ if (typeof require !== "undefined") {
       const legendToggleButton = document.createElement("button");
       legendToggleButton.className = "legend-toggle-button";
       legendToggleButton.type = "button";
-      legendToggleButton.textContent = "Hide Legend";
+      legendToggleButton.textContent = "Hide";
 
       const legendContent = document.createElement("div");
       legendContent.className = "legend-content";
@@ -972,11 +972,11 @@ if (typeof require !== "undefined") {
 
         if (legendVisible) {
           legendContent.classList.remove("legend-content-hidden");
-          legendToggleButton.textContent = "Hide Legend";
+          legendToggleButton.textContent = "Hide";
           container.classList.remove("legend-is-hidden");
         } else {
           legendContent.classList.add("legend-content-hidden");
-          legendToggleButton.textContent = "Show Legend";
+          legendToggleButton.textContent = "Show";
           container.classList.add("legend-is-hidden");
         }
       });
@@ -990,28 +990,28 @@ if (typeof require !== "undefined") {
       createProficiencyMap(
         "mathProficiencyMap",
         "MathProf",
-        "Mathematics Proficiency Percentage",
+        "Math Proficiency",
         schoolLocation,
       );
 
       createProficiencyMap(
         "englishProficiencyMap",
         "EngProf",
-        "English Language Arts Proficiency Percentage",
+        "English Language Arts Proficiency",
         schoolLocation,
       );
 
       createProficiencyMap(
         "districtMathProficiencyMap",
         "MathProf",
-        "Mathematics Proficiency Percentage",
+        "Math Proficiency",
         schoolLocation,
       );
 
       createProficiencyMap(
         "districtEnglishProficiencyMap",
         "EngProf",
-        "English Language Arts Proficiency Percentage",
+        "English Language Arts Proficiency",
         schoolLocation,
       );
 
