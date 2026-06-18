@@ -1259,3 +1259,40 @@ a:hover {
 .card-map .legend-content .esri-legend__service {
   padding-top: 2px;
 }
+
+/* Make ArcGIS polygon legend patches look more like the ArcGIS website */
+.card-map .legend-content .esri-legend__symbol {
+  width: 28px !important;
+  height: 18px !important;
+}
+
+.card-map .legend-content .esri-legend__layer-cell {
+  padding: 2px 4px;
+  vertical-align: middle;
+}
+
+.card-map .legend-content .esri-legend__layer-caption {
+  font-size: 0.68rem;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.card-map .legend-content .esri-legend {
+  font-size: 0.68rem;
+}
+
+/* Keep the small Hide/Show button from covering legend titles */
+.card-map .legend-content .esri-legend__layer-caption {
+  padding-right: 48px;
+  box-sizing: border-box;
+  line-height: 1.15;
+}
+
+/* Give the legend a little more room for long titles */
+.card-map .legend-wrapper {
+  width: 180px;
+}
+
+.card-map .legend-content .esri-legend {
+  width: 170px;
+}
