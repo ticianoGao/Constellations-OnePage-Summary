@@ -93,63 +93,60 @@
                   >
                     Georgia Statewide
                   </li>
-                  <li data-value="Atlanta Public Schools" data-type="district">
-                    Atlanta Public Schools
-                  </li>
-                  <li data-value="Fulton County Schools" data-type="district">
-                    Fulton County Schools
-                  </li>
-                  <li data-value="DeKalb County Schools" data-type="district">
-                    DeKalb County Schools
-                  </li>
-                  <li data-value="Decatur City Schools" data-type="district">
-                    Decatur City Schools
-                  </li>
-                  <li data-value="Cobb County Schools" data-type="district">
-                    Cobb County Schools
-                  </li>
-                  <li data-value="Marietta City Schools" data-type="district">
-                    Marietta City Schools
-                  </li>
-                  <li data-value="Clayton County Schools" data-type="district">
-                    Clayton County Schools
-                  </li>
-                  <li data-value="Gwinnett County Schools" data-type="district">
-                    Gwinnett County Schools
-                  </li>
-                  <li
-                    data-value="Savannah-Chatham County Schools"
-                    data-type="district"
-                  >
-                    Savannah-Chatham County Schools
-                  </li>
-                  <li data-value="Muscogee County Schools" data-type="district">
-                    Muscogee County Schools
-                  </li>
-                  <li data-value="Richmond County Schools" data-type="district">
-                    Richmond County Schools
-                  </li>
-                  <li
-                    data-value="Appling County High School"
-                    data-type="school"
-                  >
-                    Appling County High School
-                  </li>
                 </ul>
               </div>
             </div>
+
+            <!-- Statewide grid: shows when Georgia Statewide is selected -->
+            <div
+              class="option-grid school-grid state-report-grid"
+              id="stateReportGrid"
+            >
+              <div class="report-card snapshot-title-card">
+                <div class="snapshot-title-text">
+                  <h2 id="stateSnapshotHeading">
+                    2024-25 Computing Education Resources Statewide Report
+                  </h2>
+
+                  <p id="stateSnapshotSubtitle">
+                    Georgia Statewide
+                    <span>–</span>
+                    State Report
+                  </p>
+                </div>
+
+                <span class="snapshot-title-logo-text">CCEC</span>
+              </div>
+
+              <div class="grid-column">
+                <article class="report-card school-summary-card">
+                  <h3>Statewide Summary</h3>
+                  <p>Statewide report content will go here.</p>
+                </article>
+              </div>
+
+              <div class="grid-column">
+                <article class="report-card participation-card">
+                  <h3>Statewide Demographic Participation</h3>
+                  <p>Statewide chart content will go here.</p>
+                </article>
+              </div>
+            </div>
+
             <!-- School grid: shows when a school option is selected -->
             <div class="option-grid school-grid" id="schoolGrid">
               <div class="report-card snapshot-title-card">
                 <div class="snapshot-title-text">
-                  <h2>2025-26 Computing Education Resources Snapshot Report</h2>
+                  <h2 id="schoolSnapshotHeading">
+                    2024-25 Computing Education Resources School Report
+                  </h2>
 
-                  <p>
-                    Appling County
+                  <p id="schoolSnapshotSubtitle">
+                    Select a school
                     <span>–</span>
-                    Appling County High School
+                    School Report
                     <span>–</span>
-                    Grade 9 -12
+                    Grade range unavailable
                   </p>
                 </div>
 
@@ -249,7 +246,7 @@
                   <div class="summary-text">
                     <ol class="summary-list">
                       <li>
-                        By the end of the 2025-26 school year, this school has
+                        By the end of the 2024-25 school year, this school has
                         <strong>1049</strong> total students.
                       </li>
 
@@ -514,17 +511,14 @@
             >
               <div class="report-card snapshot-title-card">
                 <div class="snapshot-title-text">
-                  <h2>
-                    2025-26 Computing Education Resources District Snapshot
-                    Report
+                  <h2 id="districtSnapshotHeading">
+                    2024-25 Computing Education Resources District Report
                   </h2>
 
-                  <p>
-                    Atlanta Public Schools
+                  <p id="districtSnapshotSubtitle">
+                    Select a district
                     <span>–</span>
                     District Report
-                    <span>–</span>
-                    K–12
                   </p>
                 </div>
 
@@ -624,7 +618,7 @@
                   <div class="summary-text">
                     <ol class="summary-list">
                       <li>
-                        By the end of the 2025-26 school year, this school has
+                        By the end of the 2024-25 school year, this school has
                         <strong>1049</strong> total students.
                       </li>
 
@@ -924,6 +918,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <script src="https://js.arcgis.com/4.30/"></script>
     <script src="script.js"></script>

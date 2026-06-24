@@ -15,6 +15,7 @@ if (menuButton && mainNav) {
 
 /* Step 1 searchable dropdown */
 
+const stateReportGrid = document.getElementById("stateReportGrid");
 const schoolGrid = document.getElementById("schoolGrid");
 const districtGrid = document.getElementById("districtGrid");
 const districtReportGrid = document.getElementById("districtReportGrid");
@@ -25,15 +26,361 @@ const reportMapViews = {};
 const selectTrigger = document.getElementById("selectTrigger");
 const selectedValue = document.getElementById("selectedValue");
 const selectSearch = document.getElementById("selectSearch");
-const selectOptions = document.querySelectorAll("#selectOptions li");
+const selectOptionsList = document.getElementById("selectOptions");
 
-if (
-  customSelect &&
-  selectTrigger &&
-  selectedValue &&
-  selectSearch &&
-  selectOptions.length > 0
-) {
+const reportSchoolYearLabel = "2024–25";
+
+let selectedReportValue = "Georgia Statewide";
+let selectedReportType = "state";
+let selectedSchoolId = null;
+let selectedDistrictName = null;
+let selectedGradeRange = null;
+let selectedLatitude = null;
+let selectedLongitude = null;
+
+let schoolLookupData = [];
+
+window.currentReportSelection = {
+  type: selectedReportType,
+  value: selectedReportValue,
+  schoolId: selectedSchoolId,
+  districtName: selectedDistrictName,
+  gradeRange: selectedGradeRange,
+  latitude: selectedLatitude,
+  longitude: selectedLongitude,
+};
+
+function updateCurrentReportSelection() {
+  window.currentReportSelection = {
+    type: selectedReportType,
+    value: selectedReportValue,
+    schoolId: selectedSchoolId,
+    districtName: selectedDistrictName,
+    gradeRange: selectedGradeRange,
+    latitude: selectedLatitude,
+    longitude: selectedLongitude,
+  };
+}
+
+function formatGradeRange(gradeRange) {
+  if (!gradeRange) {
+    return "Grade range unavailable";
+  }
+
+  const formatted = gradeRange
+    .replaceAll("PK", "Pre-K")
+    .replaceAll("KK", "Kindergarten")
+    .replace(/\b0(\d)\b/g, "$1")
+    .replaceAll("-", "–")
+    .replaceAll(",", ", ");
+
+  return `Grades ${formatted}`;
+}
+
+function updateSnapshotTitles() {
+  const stateSnapshotHeading = document.getElementById("stateSnapshotHeading");
+  const stateSnapshotSubtitle = document.getElementById(
+    "stateSnapshotSubtitle",
+  );
+
+  const schoolSnapshotHeading = document.getElementById(
+    "schoolSnapshotHeading",
+  );
+  const schoolSnapshotSubtitle = document.getElementById(
+    "schoolSnapshotSubtitle",
+  );
+
+  const districtSnapshotHeading = document.getElementById(
+    "districtSnapshotHeading",
+  );
+  const districtSnapshotSubtitle = document.getElementById(
+    "districtSnapshotSubtitle",
+  );
+
+  if (selectedReportType === "state") {
+    if (stateSnapshotHeading) {
+      stateSnapshotHeading.textContent = `${reportSchoolYearLabel} Computing Education Resources Statewide Report`;
+    }
+
+    if (stateSnapshotSubtitle) {
+      stateSnapshotSubtitle.innerHTML = `
+        Georgia Statewide
+        <span>–</span>
+        State Report
+      `;
+    }
+  }
+
+  if (selectedReportType === "school") {
+    if (schoolSnapshotHeading) {
+      schoolSnapshotHeading.textContent = `${reportSchoolYearLabel} Computing Education Resources School Report`;
+    }
+
+    if (schoolSnapshotSubtitle) {
+      schoolSnapshotSubtitle.innerHTML = `
+        ${selectedDistrictName || "District unavailable"}
+        <span>–</span>
+        ${selectedReportValue}
+        <span>–</span>
+        ${formatGradeRange(selectedGradeRange)}
+      `;
+    }
+  }
+
+  if (selectedReportType === "district") {
+    if (districtSnapshotHeading) {
+      districtSnapshotHeading.textContent = `${reportSchoolYearLabel} Computing Education Resources District Report`;
+    }
+
+    if (districtSnapshotSubtitle) {
+      districtSnapshotSubtitle.innerHTML = `
+        ${selectedDistrictName || selectedReportValue}
+        <span>–</span>
+        District Report
+      `;
+    }
+  }
+}
+
+function hideAllReportGrids() {
+  if (stateReportGrid) {
+    stateReportGrid.classList.remove("show");
+  }
+
+  if (schoolGrid) {
+    schoolGrid.classList.remove("show");
+  }
+
+  if (districtGrid) {
+    districtGrid.classList.remove("show");
+  }
+
+  if (districtReportGrid) {
+    districtReportGrid.classList.remove("show");
+  }
+}
+
+function showReportByType(type) {
+  hideAllReportGrids();
+
+  if (type === "state" && stateReportGrid) {
+    stateReportGrid.classList.add("show");
+  }
+
+  if (type === "school" && schoolGrid) {
+    schoolGrid.classList.add("show");
+  }
+
+  if (type === "district" && districtReportGrid) {
+    districtReportGrid.classList.add("show");
+  }
+}
+
+function clearDropdownSearch() {
+  if (selectSearch) {
+    selectSearch.value = "";
+  }
+
+  document.querySelectorAll("#selectOptions li").forEach((item) => {
+    item.classList.remove("hidden");
+  });
+}
+
+function selectDropdownOption(option) {
+  const value = option.dataset.value;
+  const type = option.dataset.type;
+
+  selectedReportValue = value;
+  selectedReportType = type;
+  selectedSchoolId = option.dataset.schoolId || null;
+  selectedDistrictName = option.dataset.district || null;
+  selectedGradeRange = option.dataset.gradeRange || null;
+  selectedLatitude = option.dataset.lat || null;
+  selectedLongitude = option.dataset.lon || null;
+
+  selectedValue.textContent = option.dataset.label || value;
+
+  document.querySelectorAll("#selectOptions li").forEach((item) => {
+    item.classList.remove("selected");
+  });
+
+  option.classList.add("selected");
+
+  showReportByType(type);
+
+  customSelect.classList.remove("open");
+  clearDropdownSearch();
+  updateCurrentReportSelection();
+  updateSnapshotTitles();
+
+  console.log("Selected report option:", window.currentReportSelection);
+}
+
+function createDropdownOption({
+  label,
+  displayText,
+  type,
+  value,
+  schoolId = "",
+  district = "",
+  gradeRange = "",
+  lat = "",
+  lon = "",
+  systemId = "",
+}) {
+  const option = document.createElement("li");
+
+  option.dataset.label = label;
+  option.dataset.value = value || label;
+  option.dataset.type = type;
+  option.dataset.schoolId = schoolId;
+  option.dataset.district = district;
+  option.dataset.gradeRange = gradeRange;
+  option.dataset.lat = lat;
+  option.dataset.lon = lon;
+  option.dataset.systemId = systemId;
+
+  option.textContent = displayText || label;
+
+  option.addEventListener("click", () => {
+    selectDropdownOption(option);
+  });
+
+  return option;
+}
+
+function cleanSchoolRows(rows) {
+  return rows
+    .map((row) => {
+      return {
+        schoolId: row.ga_full_id || "",
+        schoolName: row.SCHOOL_NAME || "",
+        districtName: row.SYSTEM_NAME || "",
+        systemId: row.SYSTEM_ID || "",
+        gradeRange: row.GRADE_RANGE || "",
+        schoolType: row.FAC_SCHTYPE || "",
+        lat: row.LAT || "",
+        lon: row.LON || "",
+      };
+    })
+    .filter((row) => row.schoolName.trim() !== "");
+}
+
+function buildDropdownFromCsvRows(rows) {
+  if (!selectOptionsList) {
+    return;
+  }
+
+  schoolLookupData = cleanSchoolRows(rows);
+
+  selectOptionsList.innerHTML = "";
+
+  const statewideOption = createDropdownOption({
+    label: "Georgia Statewide",
+    value: "Georgia Statewide",
+    type: "state",
+  });
+
+  statewideOption.classList.add("selected");
+  selectOptionsList.appendChild(statewideOption);
+
+  const districtMap = new Map();
+
+  schoolLookupData.forEach((school) => {
+    if (!school.districtName) {
+      return;
+    }
+
+    if (!districtMap.has(school.districtName)) {
+      districtMap.set(school.districtName, {
+        districtName: school.districtName,
+        systemId: school.systemId,
+        schoolCount: 0,
+      });
+    }
+
+    districtMap.get(school.districtName).schoolCount += 1;
+  });
+
+  const districts = Array.from(districtMap.values()).sort((a, b) => {
+    return a.districtName.localeCompare(b.districtName);
+  });
+
+  districts.forEach((district) => {
+    const districtOption = createDropdownOption({
+      label: district.districtName,
+      displayText: `${district.districtName} — ${district.schoolCount} schools`,
+      value: district.districtName,
+      type: "district",
+      district: district.districtName,
+      systemId: district.systemId,
+    });
+
+    selectOptionsList.appendChild(districtOption);
+  });
+
+  const schools = [...schoolLookupData].sort((a, b) => {
+    return a.schoolName.localeCompare(b.schoolName);
+  });
+
+  schools.forEach((school) => {
+    const schoolOption = createDropdownOption({
+      label: school.schoolName,
+      displayText: `${school.schoolName} — ${school.districtName}`,
+      value: school.schoolName,
+      type: "school",
+      schoolId: school.schoolId,
+      district: school.districtName,
+      gradeRange: school.gradeRange,
+      lat: school.lat,
+      lon: school.lon,
+      systemId: school.systemId,
+    });
+
+    selectOptionsList.appendChild(schoolOption);
+  });
+
+  selectedReportValue = "Georgia Statewide";
+  selectedReportType = "state";
+  selectedSchoolId = null;
+  selectedDistrictName = null;
+  selectedGradeRange = null;
+  selectedLatitude = null;
+  selectedLongitude = null;
+
+  selectedValue.textContent = "Georgia Statewide";
+  showReportByType("state");
+  updateCurrentReportSelection();
+  updateSnapshotTitles();
+
+  console.log("School lookup loaded:", {
+    schoolCount: schoolLookupData.length,
+    districtCount: districts.length,
+  });
+}
+
+function loadSchoolLookupCsv() {
+  if (typeof Papa === "undefined") {
+    console.error(
+      "PapaParse is not loaded. Check the script tag in index.html.",
+    );
+    return;
+  }
+
+  Papa.parse("data/lookup_version_.csv", {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      buildDropdownFromCsvRows(results.data);
+    },
+    error: function (error) {
+      console.error("Could not load lookup_version_.csv:", error);
+    },
+  });
+}
+
+if (customSelect && selectTrigger && selectedValue && selectSearch) {
   selectTrigger.addEventListener("click", () => {
     customSelect.classList.toggle("open");
 
@@ -42,81 +389,10 @@ if (
     }
   });
 
-  selectOptions.forEach((option) => {
-    option.addEventListener("click", () => {
-      const value = option.dataset.value;
-      const type = option.dataset.type;
-
-      if (schoolGrid) {
-        schoolGrid.classList.remove("show");
-      }
-
-      if (districtGrid) {
-        districtGrid.classList.remove("show");
-      }
-
-      if (districtReportGrid) {
-        districtReportGrid.classList.remove("show");
-      }
-
-      if ((type === "school" || type === "state") && schoolGrid) {
-        schoolGrid.classList.add("show");
-      }
-
-      if (type === "district" && districtReportGrid) {
-        districtReportGrid.classList.add("show");
-      }
-
-      selectedValue.textContent = value;
-
-      selectOptions.forEach((item) => {
-        item.classList.remove("selected");
-      });
-
-      option.classList.add("selected");
-      customSelect.classList.remove("open");
-      selectSearch.value = "";
-
-      selectOptions.forEach((item) => {
-        item.classList.remove("hidden");
-      });
-    });
-  });
-  const defaultSelectedOption = document.querySelector(
-    "#selectOptions li.selected",
-  );
-
-  if (defaultSelectedOption) {
-    const defaultType = defaultSelectedOption.dataset.type;
-    const defaultValue = defaultSelectedOption.dataset.value;
-
-    selectedValue.textContent = defaultValue;
-
-    if (schoolGrid) {
-      schoolGrid.classList.remove("show");
-    }
-
-    if (districtGrid) {
-      districtGrid.classList.remove("show");
-    }
-
-    if (districtReportGrid) {
-      districtReportGrid.classList.remove("show");
-    }
-
-    if ((defaultType === "school" || defaultType === "state") && schoolGrid) {
-      schoolGrid.classList.add("show");
-    }
-
-    if (defaultType === "district" && districtReportGrid) {
-      districtReportGrid.classList.add("show");
-    }
-  }
-
   selectSearch.addEventListener("input", () => {
     const searchValue = selectSearch.value.toLowerCase();
 
-    selectOptions.forEach((option) => {
+    document.querySelectorAll("#selectOptions li").forEach((option) => {
       const optionText = option.textContent.toLowerCase();
 
       if (optionText.includes(searchValue)) {
@@ -132,6 +408,8 @@ if (
       customSelect.classList.remove("open");
     }
   });
+
+  loadSchoolLookupCsv();
 }
 
 /* Demographic Participation Chart.js chart */
