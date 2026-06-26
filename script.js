@@ -142,6 +142,125 @@ function updateSnapshotTitles() {
   }
 }
 
+const sampleSchoolSummaryData = {
+  default: {
+    totalStudents: "1049",
+    csCourses: "2",
+    csTeachers: "1",
+    csEnrollments: "28",
+    csCoursesComparison: "NULL%",
+    apCsa: "Unavailable",
+    apCsp: "Available",
+    otherCourses: "Introduction to Digital Technology",
+    csEnrollmentPercent: "2.67%",
+    csEnrollmentComparison: "NULL%",
+    category1: "15",
+    category2: "0",
+    category34: "13",
+    teacherStudentRatio: "0.04",
+    teacherStudentRatioComparison: "NULL",
+  },
+};
+
+const sampleDistrictSummaryData = {
+  default: {
+    totalStudents: "1049",
+    csCourses: "2",
+    csTeachers: "1",
+    csEnrollments: "28",
+    csCoursesComparison: "NULL%",
+    apCsa: "Unavailable",
+    apCsp: "Available",
+    otherCourses: "Introduction to Digital Technology",
+    csEnrollmentPercent: "2.67%",
+    csEnrollmentComparison: "NULL%",
+    category1: "15",
+    category2: "0",
+    category34: "13",
+    teacherStudentRatio: "0.04",
+    teacherStudentRatioComparison: "NULL",
+  },
+};
+
+function setTextById(id, value) {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+function updateSchoolSummaryFromData(data) {
+  setTextById("schoolTotalStudents", data.totalStudents);
+  setTextById("schoolCsCourses", data.csCourses);
+  setTextById("schoolCsTeachers", data.csTeachers);
+  setTextById("schoolCsEnrollments", data.csEnrollments);
+
+  setTextById("schoolTotalStudentsText", data.totalStudents);
+  setTextById("schoolCsCoursesText", data.csCourses);
+  setTextById("schoolCsCoursesComparison", data.csCoursesComparison);
+  setTextById("schoolApCsa", data.apCsa);
+  setTextById("schoolApCsp", data.apCsp);
+  setTextById("schoolOtherCourses", data.otherCourses);
+  setTextById("schoolCsEnrollmentsText", data.csEnrollments);
+  setTextById("schoolCsEnrollmentPercent", data.csEnrollmentPercent);
+  setTextById("schoolCsEnrollmentComparison", data.csEnrollmentComparison);
+  setTextById("schoolCategory1", data.category1);
+  setTextById("schoolCategory2", data.category2);
+  setTextById("schoolCategory34", data.category34);
+  setTextById("schoolCsTeachersText", data.csTeachers);
+  setTextById("schoolTeacherStudentRatio", data.teacherStudentRatio);
+  setTextById(
+    "schoolTeacherStudentRatioComparison",
+    data.teacherStudentRatioComparison,
+  );
+}
+
+function updateDistrictSummaryFromData(data) {
+  setTextById("districtTotalStudents", data.totalStudents);
+  setTextById("districtCsCourses", data.csCourses);
+  setTextById("districtCsTeachers", data.csTeachers);
+  setTextById("districtCsEnrollments", data.csEnrollments);
+
+  setTextById("districtTotalStudentsText", data.totalStudents);
+  setTextById("districtCsCoursesText", data.csCourses);
+  setTextById("districtCsCoursesComparison", data.csCoursesComparison);
+  setTextById("districtApCsa", data.apCsa);
+  setTextById("districtApCsp", data.apCsp);
+  setTextById("districtOtherCourses", data.otherCourses);
+  setTextById("districtCsEnrollmentsText", data.csEnrollments);
+  setTextById("districtCsEnrollmentPercent", data.csEnrollmentPercent);
+  setTextById("districtCsEnrollmentComparison", data.csEnrollmentComparison);
+  setTextById("districtCategory1", data.category1);
+  setTextById("districtCategory2", data.category2);
+  setTextById("districtCategory34", data.category34);
+  setTextById("districtCsTeachersText", data.csTeachers);
+  setTextById("districtTeacherStudentRatio", data.teacherStudentRatio);
+  setTextById(
+    "districtTeacherStudentRatioComparison",
+    data.teacherStudentRatioComparison,
+  );
+}
+
+function updateSummaryFromSampleData() {
+  if (selectedReportType === "school") {
+    const schoolData =
+      sampleSchoolSummaryData[selectedReportValue] ||
+      sampleSchoolSummaryData.default;
+
+    updateSchoolSummaryFromData(schoolData);
+  }
+
+  if (selectedReportType === "district") {
+    const districtData =
+      sampleDistrictSummaryData[selectedDistrictName] ||
+      sampleDistrictSummaryData[selectedReportValue] ||
+      sampleDistrictSummaryData.default;
+
+    updateDistrictSummaryFromData(districtData);
+  }
+}
+
 function hideAllReportGrids() {
   if (stateReportGrid) {
     stateReportGrid.classList.remove("show");
@@ -212,6 +331,7 @@ function selectDropdownOption(option) {
   clearDropdownSearch();
   updateCurrentReportSelection();
   updateSnapshotTitles();
+  updateSummaryFromSampleData();
 
   console.log("Selected report option:", window.currentReportSelection);
 }
