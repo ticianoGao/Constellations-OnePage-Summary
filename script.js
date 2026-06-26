@@ -773,6 +773,161 @@ async function loadSchoolSummaryFromArcGIS() {
   }
 }
 
+// District summary functions
+const districtCourseFields = [
+  { field: "APCSA", label: "AP Computer Science A" },
+  { field: "APCSP", label: "AP Computer Science Principles" },
+  ...otherCourseFields,
+];
+
+async function fetchDistrictSchoolFeaturesFromArcGIS() {
+  if (!selectedDistrictName) {
+    return [];
+  }
+
+  const pageSize = 2000;
+  let resultOffset = 0;
+  const allFeatures = [];
+
+  while (true) {
+    const queryParams = new URLSearchParams({
+      where: `SystemName = '${escapeSqlValue(selectedDistrictName)}'`,
+      outFields: "*",
+      returnGeometry: "false",
+      resultOffset: String(resultOffset),
+      resultRecordCount: String(pageSize),
+      f: "json",
+    });
+
+    const response = await fetch(`${schoolLookupLayerQueryUrl}?${queryParams}`);
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(JSON.stringify(data.error));
+    }
+
+    const features = data.features || [];
+    allFeatures.push(...features);
+
+    if (features.length < pageSize) {
+      break;
+    }
+
+    resultOffset += pageSize;
+  }
+
+  return allFeatures;
+}
+
+function buildDistrictSummaryDataFromFeatures(features) {
+  const totals = {
+    totalStudents: 0,
+    csTeachers: 0,
+    csEnrollments: 0,
+    category1: 0,
+    category2: 0,
+    category3: 0,
+    category4: 0,
+  };
+
+  const availableCourseLabels = new Set();
+
+  features.forEach((feature) => {
+    const attributes = feature.attributes || {};
+
+    totals.totalStudents += Number(attributes.StudentCou) || 0;
+    totals.csTeachers += Number(attributes.NumCSTeach) || 0;
+    totals.csEnrollments += Number(attributes.NumCSEnrol) || 0;
+    totals.category1 += Number(attributes.NumCategor) || 0;
+    totals.category2 += Number(attributes.NumCateg_1) || 0;
+    totals.category3 += Number(attributes.NumCateg_2) || 0;
+    totals.category4 += Number(attributes.NumCateg_3) || 0;
+
+    districtCourseFields.forEach((course) => {
+      if (isAvailable(attributes[course.field])) {
+        availableCourseLabels.add(course.label);
+      }
+    });
+  });
+
+  const otherCoursesAvailable = [...availableCourseLabels].filter((label) => {
+    return (
+      label !== "AP Computer Science A" &&
+      label !== "AP Computer Science Principles"
+    );
+  });
+
+  const csEnrollmentRatio =
+    totals.totalStudents > 0
+      ? totals.csEnrollments / totals.totalStudents
+      : null;
+
+  const teacherStudentRatio =
+    totals.csEnrollments > 0 ? totals.csTeachers / totals.csEnrollments : null;
+
+  return {
+    totalStudents: formatWholeNumber(totals.totalStudents),
+    csCourses: formatWholeNumber(availableCourseLabels.size),
+    csTeachers: formatWholeNumber(totals.csTeachers),
+    csEnrollments: formatWholeNumber(totals.csEnrollments),
+
+    csCoursesComparison: "NULL%",
+    apCsa: availableCourseLabels.has("AP Computer Science A")
+      ? "Available"
+      : "Unavailable",
+    apCsp: availableCourseLabels.has("AP Computer Science Principles")
+      ? "Available"
+      : "Unavailable",
+    otherCourses:
+      otherCoursesAvailable.length > 0
+        ? otherCoursesAvailable.join(", ")
+        : "None listed",
+
+    csEnrollmentPercent: formatPercent(csEnrollmentRatio),
+    csEnrollmentComparison: "NULL%",
+
+    category1: formatWholeNumber(totals.category1),
+    category2: formatWholeNumber(totals.category2),
+    category34: formatWholeNumber(totals.category3 + totals.category4),
+
+    teacherStudentRatio: formatDecimal(teacherStudentRatio),
+    teacherStudentRatioComparison: "NULL",
+  };
+}
+
+async function loadDistrictSummaryFromArcGIS() {
+  if (!selectedDistrictName) {
+    updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+    return;
+  }
+
+  try {
+    const features = await fetchDistrictSchoolFeaturesFromArcGIS();
+
+    if (!features || features.length === 0) {
+      console.warn(
+        "No ArcGIS district schools found for:",
+        selectedDistrictName,
+      );
+      updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+      return;
+    }
+
+    const districtSummaryData = buildDistrictSummaryDataFromFeatures(features);
+
+    updateDistrictSummaryFromData(districtSummaryData);
+
+    console.log("Loaded district summary from ArcGIS:", {
+      selectedDistrictName,
+      schoolCount: features.length,
+      districtSummaryData,
+    });
+  } catch (error) {
+    console.error("Could not load district summary from ArcGIS:", error);
+    updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+  }
+}
+
 async function updateSummaryForSelection() {
   if (selectedReportType === "school") {
     await loadSchoolSummaryFromArcGIS();
@@ -780,7 +935,8 @@ async function updateSummaryForSelection() {
   }
 
   if (selectedReportType === "district") {
-    updateSummaryFromSampleData();
+    await loadDistrictSummaryFromArcGIS();
+    return;
   }
 }
 
