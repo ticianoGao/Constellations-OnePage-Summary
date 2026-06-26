@@ -335,7 +335,7 @@ function selectDropdownOption(option) {
   clearDropdownSearch();
   updateCurrentReportSelection();
   updateSnapshotTitles();
-  updateSummaryFromSampleData();
+  updateSummaryForSelection();
 
   console.log("Selected report option:", window.currentReportSelection);
 }
@@ -576,6 +576,211 @@ async function loadSchoolLookupFromArcGIS() {
     if (selectTrigger) {
       selectTrigger.disabled = false;
     }
+  }
+}
+
+const otherCourseFields = [
+  { field: "IB_ONE", label: "IB Computer Science, Year One" },
+  { field: "IB_TWO", label: "IB Computer Science, Year Two" },
+  { field: "CSP", label: "Computer Science Principles" },
+  { field: "PGAS", label: "Programming, Games, Apps and Society" },
+  { field: "WEBDEV", label: "Web Development" },
+  { field: "EMBCOMP", label: "Embedded Computing" },
+  { field: "GDAAS", label: "Game Design: Animation and Simulation" },
+  { field: "CYBERSEC", label: "Introduction to Cybersecurity" },
+  { field: "ADVCYBER", label: "Advanced Cybersecurity" },
+  { field: "FINTECH", label: "Coding for Fintech" },
+  { field: "PYTHON", label: "Introduction to Python" },
+  { field: "INTROSW", label: "Introduction to Software Technology" },
+  { field: "INTRODIG", label: "Introduction to Digital Technology" },
+  { field: "INTROHARD", label: "Introduction to Hardware Technology" },
+];
+
+function escapeSqlValue(value) {
+  return String(value || "").replaceAll("'", "''");
+}
+
+function isAvailable(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+
+  if (!normalized) {
+    return false;
+  }
+
+  return !["no", "n", "0", "false", "null", "none", "unavailable"].includes(
+    normalized,
+  );
+}
+
+function formatWholeNumber(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "--";
+  }
+
+  return Math.round(number).toLocaleString();
+}
+
+function formatPercent(value) {
+  let number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "--";
+  }
+
+  if (Math.abs(number) <= 1) {
+    number = number * 100;
+  }
+
+  return `${number.toFixed(2).replace(/\.?0+$/, "")}%`;
+}
+
+function formatDecimal(value, digits = 2) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "--";
+  }
+
+  return number.toFixed(digits).replace(/\.?0+$/, "");
+}
+
+function getOtherCourses(attributes) {
+  const availableCourses = otherCourseFields
+    .filter((course) => isAvailable(attributes[course.field]))
+    .map((course) => course.label);
+
+  if (availableCourses.length === 0) {
+    return "None listed";
+  }
+
+  return availableCourses.join(", ");
+}
+
+function buildSchoolSummaryDataFromAttributes(attributes) {
+  const category3 = Number(attributes.NumCateg_2) || 0;
+  const category4 = Number(attributes.NumCateg_3) || 0;
+
+  return {
+    totalStudents: formatWholeNumber(attributes.StudentCou),
+    csCourses: formatWholeNumber(attributes.NumCSCours),
+    csTeachers: formatWholeNumber(attributes.NumCSTeach),
+    csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
+
+    csCoursesComparison: "NULL%",
+    apCsa: isAvailable(attributes.APCSA) ? "Available" : "Unavailable",
+    apCsp: isAvailable(attributes.APCSP) ? "Available" : "Unavailable",
+    otherCourses: getOtherCourses(attributes),
+
+    csEnrollmentPercent: formatPercent(attributes.RatioCStoSchool),
+    csEnrollmentComparison: "NULL%",
+
+    category1: formatWholeNumber(attributes.NumCategor),
+    category2: formatWholeNumber(attributes.NumCateg_1),
+    category34: formatWholeNumber(category3 + category4),
+
+    teacherStudentRatio: formatDecimal(attributes.RatioCSTeacherToStudent),
+    teacherStudentRatioComparison: "NULL",
+  };
+}
+
+async function querySchoolSummaryByWhere(whereClause) {
+  const queryParams = new URLSearchParams({
+    where: whereClause,
+    outFields: "*",
+    returnGeometry: "false",
+    resultRecordCount: "1",
+    f: "json",
+  });
+
+  const response = await fetch(`${schoolLookupLayerQueryUrl}?${queryParams}`);
+  const data = await response.json();
+
+  if (data.error) {
+    console.error("ArcGIS school summary query error:", data.error);
+    return null;
+  }
+
+  if (!data.features || data.features.length === 0) {
+    return null;
+  }
+
+  return data.features[0];
+}
+
+async function loadSchoolSummaryFromArcGIS() {
+  if (!selectedReportValue) {
+    updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+    return;
+  }
+
+  const whereClauses = [];
+
+  if (selectedSchoolId) {
+    whereClauses.push(`FullID = '${escapeSqlValue(selectedSchoolId)}'`);
+  }
+
+  if (selectedReportValue && selectedDistrictName) {
+    whereClauses.push(
+      `SchoolName = '${escapeSqlValue(selectedReportValue)}' AND SystemName = '${escapeSqlValue(selectedDistrictName)}'`,
+    );
+  }
+
+  if (selectedReportValue) {
+    whereClauses.push(`SchoolName = '${escapeSqlValue(selectedReportValue)}'`);
+  }
+
+  try {
+    let feature = null;
+    let successfulWhereClause = null;
+
+    for (const whereClause of whereClauses) {
+      feature = await querySchoolSummaryByWhere(whereClause);
+
+      if (feature) {
+        successfulWhereClause = whereClause;
+        break;
+      }
+    }
+
+    if (!feature) {
+      console.warn("No ArcGIS school summary found after all attempts:", {
+        selectedSchoolId,
+        selectedReportValue,
+        selectedDistrictName,
+        whereClauses,
+      });
+
+      updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+      return;
+    }
+
+    const attributes = feature.attributes;
+    const schoolSummaryData = buildSchoolSummaryDataFromAttributes(attributes);
+
+    updateSchoolSummaryFromData(schoolSummaryData);
+
+    console.log("Loaded school summary from ArcGIS:", {
+      successfulWhereClause,
+      attributes,
+    });
+  } catch (error) {
+    console.error("Could not load school summary from ArcGIS:", error);
+    updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+  }
+}
+
+async function updateSummaryForSelection() {
+  if (selectedReportType === "school") {
+    await loadSchoolSummaryFromArcGIS();
+    return;
+  }
+
+  if (selectedReportType === "district") {
+    updateSummaryFromSampleData();
   }
 }
 
