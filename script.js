@@ -34,6 +34,7 @@ let selectedReportValue = "Georgia Statewide";
 let selectedReportType = "state";
 let selectedSchoolId = null;
 let selectedDistrictName = null;
+let selectedSystemId = null;
 let selectedGradeRange = null;
 let selectedLatitude = null;
 let selectedLongitude = null;
@@ -45,6 +46,7 @@ window.currentReportSelection = {
   value: selectedReportValue,
   schoolId: selectedSchoolId,
   districtName: selectedDistrictName,
+  systemId: selectedSystemId,
   gradeRange: selectedGradeRange,
   latitude: selectedLatitude,
   longitude: selectedLongitude,
@@ -56,6 +58,7 @@ function updateCurrentReportSelection() {
     value: selectedReportValue,
     schoolId: selectedSchoolId,
     districtName: selectedDistrictName,
+    systemId: selectedSystemId,
     gradeRange: selectedGradeRange,
     latitude: selectedLatitude,
     longitude: selectedLongitude,
@@ -313,6 +316,7 @@ function selectDropdownOption(option) {
   selectedReportType = type;
   selectedSchoolId = option.dataset.schoolId || null;
   selectedDistrictName = option.dataset.district || null;
+  selectedSystemId = option.dataset.systemId || null;
   selectedGradeRange = option.dataset.gradeRange || null;
   selectedLatitude = option.dataset.lat || null;
   selectedLongitude = option.dataset.lon || null;
@@ -373,14 +377,14 @@ function cleanSchoolRows(rows) {
   return rows
     .map((row) => {
       return {
-        schoolId: row.ga_full_id || "",
-        schoolName: row.SCHOOL_NAME || "",
-        districtName: row.SYSTEM_NAME || "",
-        systemId: row.SYSTEM_ID || "",
-        gradeRange: row.GRADE_RANGE || "",
-        schoolType: row.FAC_SCHTYPE || "",
-        lat: row.LAT || "",
-        lon: row.LON || "",
+        schoolId: row.ga_full_id || row.FullID || "",
+        schoolName: row.SCHOOL_NAME || row.SchoolName || "",
+        districtName: row.SYSTEM_NAME || row.SystemName || "",
+        systemId: row.SYSTEM_ID || row.LEAID || row.SystemName || "",
+        gradeRange: row.GRADE_RANGE || row.GradeRange || "",
+        schoolType: row.FAC_SCHTYPE || row.SchoolType || "",
+        lat: row.LAT || row.Latitude || "",
+        lon: row.LON || row.Longitude || "",
       };
     })
     .filter((row) => row.schoolName.trim() !== "");
@@ -464,6 +468,7 @@ function buildDropdownFromCsvRows(rows) {
   selectedReportType = "state";
   selectedSchoolId = null;
   selectedDistrictName = null;
+  selectedSystemId = null;
   selectedGradeRange = null;
   selectedLatitude = null;
   selectedLongitude = null;
@@ -500,6 +505,80 @@ function loadSchoolLookupCsv() {
   });
 }
 
+const schoolLookupLayerQueryUrl =
+  "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/All_GA_2_18/FeatureServer/0/query";
+
+async function fetchAllSchoolLookupRowsFromArcGIS() {
+  const pageSize = 2000;
+  let resultOffset = 0;
+  const allRows = [];
+
+  while (true) {
+    const queryParams = new URLSearchParams({
+      where: "SchoolName IS NOT NULL",
+      outFields:
+        "FullID,SchoolName,SystemName,GradeRange,SchoolType,Latitude,Longitude,LEAID",
+      returnGeometry: "false",
+      orderByFields: "SchoolName ASC",
+      resultOffset: String(resultOffset),
+      resultRecordCount: String(pageSize),
+      f: "json",
+    });
+
+    const response = await fetch(`${schoolLookupLayerQueryUrl}?${queryParams}`);
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(JSON.stringify(data.error));
+    }
+
+    const features = data.features || [];
+
+    allRows.push(...features.map((feature) => feature.attributes));
+
+    if (features.length < pageSize) {
+      break;
+    }
+
+    resultOffset += pageSize;
+  }
+
+  return allRows;
+}
+
+async function loadSchoolLookupFromArcGIS() {
+  if (!selectOptionsList) {
+    return;
+  }
+
+  try {
+    selectedValue.textContent = "Loading schools...";
+
+    if (selectTrigger) {
+      selectTrigger.disabled = true;
+    }
+
+    const rows = await fetchAllSchoolLookupRowsFromArcGIS();
+
+    buildDropdownFromCsvRows(rows);
+
+    console.log("School lookup loaded from ArcGIS:", {
+      rowCount: rows.length,
+    });
+  } catch (error) {
+    console.error("Could not load school lookup from ArcGIS:", error);
+
+    selectedValue.textContent = "Georgia Statewide";
+
+    // Fallback to CSV while testing.
+    loadSchoolLookupCsv();
+  } finally {
+    if (selectTrigger) {
+      selectTrigger.disabled = false;
+    }
+  }
+}
+
 if (customSelect && selectTrigger && selectedValue && selectSearch) {
   selectTrigger.addEventListener("click", () => {
     customSelect.classList.toggle("open");
@@ -529,7 +608,7 @@ if (customSelect && selectTrigger && selectedValue && selectSearch) {
     }
   });
 
-  loadSchoolLookupCsv();
+  loadSchoolLookupFromArcGIS();
 }
 
 /* Demographic Participation Chart.js chart */
