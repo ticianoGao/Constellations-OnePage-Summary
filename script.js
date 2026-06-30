@@ -2208,6 +2208,97 @@ document.querySelectorAll(".card-info-popup").forEach((popup) => {
 
 /* Export report as PDF */
 
+function getInfoTextFromPopup(popup) {
+  const clone = popup.cloneNode(true);
+
+  const closeButton = clone.querySelector(".card-info-close");
+  if (closeButton) {
+    closeButton.remove();
+  }
+
+  return clone.textContent.replace(/\s+/g, " ").trim();
+}
+
+function collectReportInfoItems(reportElement) {
+  const cards = reportElement.querySelectorAll(".report-card");
+  const infoItems = [];
+
+  cards.forEach((card) => {
+    const popup = card.querySelector(".card-info-popup");
+
+    if (!popup) {
+      return;
+    }
+
+    const cardTitle =
+      card.querySelector("h3")?.textContent.trim() || "Report Information";
+
+    const infoText = getInfoTextFromPopup(popup);
+
+    if (!infoText) {
+      return;
+    }
+
+    infoItems.push({
+      title: cardTitle,
+      text: infoText,
+    });
+  });
+
+  return infoItems;
+}
+
+function addInfoPageToPdf({
+  pdf,
+  reportElement,
+  pageWidth,
+  pageHeight,
+  margin,
+}) {
+  const infoItems = collectReportInfoItems(reportElement);
+
+  if (infoItems.length === 0) {
+    return;
+  }
+
+  pdf.addPage([pageWidth, pageHeight], "portrait");
+
+  const usableWidth = pageWidth - margin * 2;
+  const bottomMargin = margin;
+  let y = margin;
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(18);
+  pdf.text("Information Notes", margin, y);
+
+  y += 28;
+
+  infoItems.forEach((item, index) => {
+    const titleLines = pdf.splitTextToSize(item.title, usableWidth);
+    const bodyLines = pdf.splitTextToSize(item.text, usableWidth - 14);
+
+    const estimatedBlockHeight =
+      titleLines.length * 15 + bodyLines.length * 12 + 22;
+
+    if (y + estimatedBlockHeight > pageHeight - bottomMargin) {
+      pdf.addPage([pageWidth, pageHeight], "portrait");
+      y = margin;
+    }
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(12);
+    pdf.text(`${index + 1}. ${item.title}`, margin, y);
+
+    y += 18;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.text(bodyLines, margin + 14, y);
+
+    y += bodyLines.length * 12 + 18;
+  });
+}
+
 async function replaceMapsWithScreenshots(mapIds) {
   const replacements = [];
 
@@ -2314,6 +2405,15 @@ async function exportReportAsPdf({
     });
 
     pdf.addImage(imageData, "PNG", margin, margin, usableWidth, imageHeight);
+
+    addInfoPageToPdf({
+      pdf,
+      reportElement,
+      pageWidth,
+      pageHeight,
+      margin,
+    });
+
     pdf.save(fileName);
   } catch (error) {
     console.error("PDF export failed:", error);
