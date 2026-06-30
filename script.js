@@ -1509,7 +1509,15 @@ if (typeof require !== "undefined") {
       });
     }
 
-    function updateOneReportMapLocation(containerId, location) {
+    function waitForVisibleReportLayout() {
+      return new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
+    }
+
+    async function updateOneReportMapLocation(containerId, location) {
       const view = reportMapViews[containerId];
       const markerLayer = reportMapMarkerLayers[containerId];
 
@@ -1517,10 +1525,20 @@ if (typeof require !== "undefined") {
         return;
       }
 
+      try {
+        await view.when();
+      } catch (error) {
+        console.warn("Map view was not ready:", containerId, error);
+      }
+
+      if (typeof view.resize === "function") {
+        view.resize();
+      }
+
       markerLayer.removeAll();
 
       if (!location) {
-        view
+        await view
           .goTo({
             center: [-83.5, 32.7],
             zoom: 6,
@@ -1531,7 +1549,7 @@ if (typeof require !== "undefined") {
 
       markerLayer.add(buildSelectedLocationCircle(location));
 
-      view
+      await view
         .goTo({
           center: [Number(location.longitude), Number(location.latitude)],
           zoom: selectedReportType === "district" ? 6 : 7,
@@ -1540,11 +1558,15 @@ if (typeof require !== "undefined") {
     }
 
     window.updateReportMapsForSelection = async function () {
+      await waitForVisibleReportLayout();
+
       const location = await getCurrentReportMapLocation();
 
-      Object.keys(reportMapViews).forEach((containerId) => {
-        updateOneReportMapLocation(containerId, location);
-      });
+      await Promise.all(
+        Object.keys(reportMapViews).map((containerId) => {
+          return updateOneReportMapLocation(containerId, location);
+        }),
+      );
     };
 
     function createProficiencyMap(
