@@ -2175,15 +2175,9 @@ document.querySelectorAll(".card-info-popup").forEach((popup) => {
 });
 
 /* Export report as PDF */
-async function replaceMapsWithScreenshots() {
-  const replacements = [];
 
-  const mapIds = [
-    "mathProficiencyMap",
-    "englishProficiencyMap",
-    "internetAccessMap",
-    "incomeMap",
-  ];
+async function replaceMapsWithScreenshots(mapIds) {
+  const replacements = [];
 
   for (const mapId of mapIds) {
     const mapDiv = document.getElementById(mapId);
@@ -2223,68 +2217,124 @@ function restoreLiveMaps(replacements) {
     item.mapDiv.classList.remove("exporting-map");
   });
 }
+
+async function exportReportAsPdf({
+  button,
+  reportElementId,
+  mapIds,
+  fileName,
+  backgroundColor = "#eeeeee",
+}) {
+  const reportElement = document.getElementById(reportElementId);
+
+  if (!reportElement || !reportElement.classList.contains("show")) {
+    alert("Please select a report before exporting.");
+    return;
+  }
+
+  if (typeof html2canvas === "undefined") {
+    alert("html2canvas is not loaded. Check the script tag in index.html.");
+    return;
+  }
+
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("jsPDF is not loaded. Check the script tag in index.html.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Generating...";
+
+  let mapReplacements = [];
+
+  try {
+    reportElement.classList.add("exporting-report");
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    mapReplacements = await replaceMapsWithScreenshots(mapIds);
+
+    const canvas = await html2canvas(reportElement, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+    });
+
+    const imageData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
+
+    const margin = 24;
+    const pageWidth = 595.28;
+    const usableWidth = pageWidth - margin * 2;
+    const imageHeight = (canvas.height * usableWidth) / canvas.width;
+    const pageHeight = imageHeight + margin * 2;
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "pt",
+      format: [pageWidth, pageHeight],
+    });
+
+    pdf.addImage(imageData, "PNG", margin, margin, usableWidth, imageHeight);
+    pdf.save(fileName);
+  } catch (error) {
+    console.error("PDF export failed:", error);
+    alert(
+      "The PDF could not be generated. Please check the console for details.",
+    );
+  } finally {
+    restoreLiveMaps(mapReplacements);
+
+    reportElement.classList.remove("exporting-report");
+    button.disabled = false;
+    button.textContent = "Export";
+  }
+}
+
+/* School export */
+
 const exportReportButton = document.getElementById("exportReportButton");
 
 if (exportReportButton) {
-  exportReportButton.addEventListener("click", async () => {
-    const reportElement = document.getElementById("schoolGrid");
+  exportReportButton.addEventListener("click", () => {
+    exportReportAsPdf({
+      button: exportReportButton,
+      reportElementId: "schoolGrid",
+      mapIds: [
+        "mathProficiencyMap",
+        "englishProficiencyMap",
+        "internetAccessMap",
+        "incomeMap",
+      ],
+      fileName: "constellations-school-report.pdf",
+    });
+  });
+}
 
-    if (!reportElement || !reportElement.classList.contains("show")) {
-      alert("Please select a report before exporting.");
-      return;
-    }
+/* District export */
 
-    exportReportButton.disabled = true;
-    exportReportButton.textContent = "Generating...";
+const exportDistrictReportButton = document.getElementById(
+  "exportDistrictReportButton",
+);
 
-    let mapReplacements = [];
-
-    try {
-      reportElement.classList.add("exporting-report");
-
-      mapReplacements = await replaceMapsWithScreenshots();
-
-      const canvas = await html2canvas(reportElement, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#eeeeee",
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        windowWidth: document.documentElement.scrollWidth,
-        windowHeight: document.documentElement.scrollHeight,
-      });
-
-      const imageData = canvas.toDataURL("image/png");
-
-      const { jsPDF } = window.jspdf;
-
-      const margin = 24;
-
-      // Use A4 width, but custom height based on the report image
-      const pageWidth = 595.28;
-      const usableWidth = pageWidth - margin * 2;
-      const imageHeight = (canvas.height * usableWidth) / canvas.width;
-      const pageHeight = imageHeight + margin * 2;
-
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "pt",
-        format: [pageWidth, pageHeight],
-      });
-
-      pdf.addImage(imageData, "PNG", margin, margin, usableWidth, imageHeight);
-
-      pdf.save("constellations-report.pdf");
-    } catch (error) {
-      console.error("PDF export failed:", error);
-      alert("The PDF could not be generated. Please try again.");
-    } finally {
-      restoreLiveMaps(mapReplacements);
-
-      reportElement.classList.remove("exporting-report");
-      exportReportButton.disabled = false;
-      exportReportButton.textContent = "Export";
-    }
+if (exportDistrictReportButton) {
+  exportDistrictReportButton.addEventListener("click", () => {
+    exportReportAsPdf({
+      button: exportDistrictReportButton,
+      reportElementId: "districtReportGrid",
+      mapIds: [
+        "districtMathProficiencyMap",
+        "districtEnglishProficiencyMap",
+        "districtInternetAccessMap",
+        "districtIncomeMap",
+      ],
+      fileName: "constellations-district-report.pdf",
+    });
   });
 }

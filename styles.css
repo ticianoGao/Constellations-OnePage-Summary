@@ -635,7 +635,7 @@ a:hover {
 }
 
 .double-chart-box {
-  height: 360px;
+  height: 280px;
 }
 
 .group-block {
@@ -1295,4 +1295,133 @@ a:hover {
 
 .card-map .legend-content .esri-legend {
   width: 170px;
+}
+
+/* Reduce spacing inside map/image report cards */
+
+.image-card h3,
+.two-image-card h3 {
+  margin-bottom: 4px;
+}
+
+.two-map-grid {
+  margin-top: 4px;
+  gap: 8px;
+}
+
+.map-panel-title {
+  margin: 4px 0 6px;
+}
+
+.participation-card .chart-js-section {
+  border-top: none;
+}
+
+.participation-card .chart-js-section {
+  border-top: none;
+  margin-top: 10px;
+  padding-top: 6px;
+}
+
+/* Make report shell and cards align evenly */
+
+.school-grid.show,
+.district-report-grid.show {
+  padding: 24px;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.school-grid.show .report-card,
+.district-report-grid.show .report-card {
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.school-grid.show .report-card:hover,
+.district-report-grid.show .report-card:hover {
+  transform: none;
+}
+
+/* Make school and district report layouts use the same shell/card sizing */
+
+#schoolGrid.show,
+#districtReportGrid.show {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+
+  background: #eeeeee;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+
+  min-height: 980px;
+}
+
+#schoolGrid > .snapshot-title-card,
+#districtReportGrid > .snapshot-title-card {
+  grid-column: 1 / -1;
+}
+
+#schoolGrid > .grid-column,
+#districtReportGrid > .grid-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* Match the major front-card heights */
+
+#schoolGrid .school-summary-card,
+#districtReportGrid .school-summary-card {
+  min-height: 520px;
+}
+
+#schoolGrid .participation-card,
+#districtReportGrid .participation-card {
+  min-height: 520px;
+}
+
+#schoolGrid .image-card,
+#districtReportGrid .image-card,
+#schoolGrid .two-image-card,
+#districtReportGrid .two-image-card {
+  min-height: 360px;
+}
+
+/* Prevent hover from visually changing report size */
+
+#schoolGrid .report-card:hover,
+#districtReportGrid .report-card:hover {
+  transform: none;
+}
+
+/* Make Summary metric boxes fit inside the card */
+
+.school-summary-card .summary-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+
+.school-summary-card .metric-box {
+  min-width: 0;
+  padding: 10px 6px;
+}
+
+.school-summary-card .metric-number {
+  font-size: 1.35rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.school-summary-card .metric-label {
+  font-size: 0.72rem;
+  line-height: 1.15;
+  margin-top: 5px;
 }
