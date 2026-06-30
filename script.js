@@ -17,11 +17,11 @@ if (menuButton && mainNav) {
 
 const stateReportGrid = document.getElementById("stateReportGrid");
 const schoolGrid = document.getElementById("schoolGrid");
-const districtGrid = document.getElementById("districtGrid");
 const districtReportGrid = document.getElementById("districtReportGrid");
 const customSelect = document.getElementById("districtSelect");
 
 const reportMapViews = {};
+const reportMapMarkerLayers = {};
 
 const selectTrigger = document.getElementById("selectTrigger");
 const selectedValue = document.getElementById("selectedValue");
@@ -273,10 +273,6 @@ function hideAllReportGrids() {
     schoolGrid.classList.remove("show");
   }
 
-  if (districtGrid) {
-    districtGrid.classList.remove("show");
-  }
-
   if (districtReportGrid) {
     districtReportGrid.classList.remove("show");
   }
@@ -336,6 +332,10 @@ function selectDropdownOption(option) {
   updateCurrentReportSelection();
   updateSnapshotTitles();
   updateSummaryForSelection();
+
+  if (typeof window.updateReportMapsForSelection === "function") {
+    window.updateReportMapsForSelection();
+  }
 
   console.log("Selected report option:", window.currentReportSelection);
 }
@@ -972,64 +972,6 @@ if (customSelect && selectTrigger && selectedValue && selectSearch) {
   loadSchoolLookupFromArcGIS();
 }
 
-/* Demographic Participation Chart.js chart */
-
-const demographicChartCanvas = document.getElementById("demographicChart");
-
-if (demographicChartCanvas && typeof Chart !== "undefined") {
-  new Chart(demographicChartCanvas, {
-    type: "bar",
-    data: {
-      labels: ["Asian", "Black", "Hispanic", "White"],
-      datasets: [
-        {
-          label: "CS Enrollment",
-          data: [1, 24, 19, 52],
-          backgroundColor: "#003057",
-          borderRadius: 8,
-          barThickness: 14,
-        },
-      ],
-    },
-    options: {
-      indexAxis: "y",
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              return context.raw + "%";
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          min: 0,
-          max: 100,
-          ticks: {
-            callback: function (value) {
-              return value + "%";
-            },
-          },
-          grid: {
-            color: "#eeeeee",
-          },
-        },
-        y: {
-          grid: {
-            display: false,
-          },
-        },
-      },
-    },
-  });
-}
-
 /* Race/Ethnicity double bar chart */
 
 const raceEthnicityChartCanvas = document.getElementById("raceEthnicityChart");
@@ -1427,7 +1369,6 @@ if (typeof require !== "undefined") {
     const internetAccessField = "percent_broadband";
     const incomeField = "median_hh_income";
 
-    const selectedSchoolName = "Appling County High School";
     const schoolNameField = "SchoolName";
 
     async function getSchoolLocationByName(schoolName) {
@@ -1453,8 +1394,158 @@ if (typeof require !== "undefined") {
       return {
         longitude: feature.attributes.Longitude,
         latitude: feature.attributes.Latitude,
+        title: feature.attributes.SchoolName || schoolName,
       };
     }
+
+    function getSelectedCoordinateLocation() {
+      const longitude = Number(selectedLongitude);
+      const latitude = Number(selectedLatitude);
+
+      if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
+        return null;
+      }
+
+      return {
+        longitude,
+        latitude,
+        title: selectedReportValue,
+      };
+    }
+
+    function getDistrictCenterFromLookup(districtName) {
+      if (!districtName) {
+        return null;
+      }
+
+      const districtSchools = schoolLookupData
+        .filter((school) => school.districtName === districtName)
+        .map((school) => {
+          return {
+            longitude: Number(school.lon),
+            latitude: Number(school.lat),
+          };
+        })
+        .filter((point) => {
+          return (
+            Number.isFinite(point.longitude) && Number.isFinite(point.latitude)
+          );
+        });
+
+      if (districtSchools.length === 0) {
+        return null;
+      }
+
+      const longitude =
+        districtSchools.reduce((sum, point) => sum + point.longitude, 0) /
+        districtSchools.length;
+
+      const latitude =
+        districtSchools.reduce((sum, point) => sum + point.latitude, 0) /
+        districtSchools.length;
+
+      return {
+        longitude,
+        latitude,
+        title: districtName,
+      };
+    }
+
+    async function getCurrentReportMapLocation() {
+      if (selectedReportType === "school") {
+        const coordinateLocation = getSelectedCoordinateLocation();
+
+        if (coordinateLocation) {
+          return coordinateLocation;
+        }
+
+        if (selectedReportValue) {
+          return await getSchoolLocationByName(selectedReportValue);
+        }
+      }
+
+      if (selectedReportType === "district") {
+        return getDistrictCenterFromLookup(
+          selectedDistrictName || selectedReportValue,
+        );
+      }
+
+      return null;
+    }
+
+    function buildSelectedLocationCircle(location) {
+      const schoolPoint = new Point({
+        longitude: Number(location.longitude),
+        latitude: Number(location.latitude),
+        spatialReference: {
+          wkid: 4326,
+        },
+      });
+
+      const schoolCircleGeometry = new Circle({
+        center: schoolPoint,
+        radius: 5,
+        radiusUnit: "kilometers",
+        geodesic: true,
+      });
+
+      return new Graphic({
+        geometry: schoolCircleGeometry,
+        symbol: {
+          type: "simple-fill",
+          color: [179, 163, 105, 0.28],
+          outline: {
+            color: [0, 48, 87, 1],
+            width: 2,
+          },
+        },
+        popupTemplate: {
+          title: location.title || "Selected location",
+          content:
+            selectedReportType === "district"
+              ? "Selected district area highlight"
+              : "Selected school area highlight",
+        },
+      });
+    }
+
+    function updateOneReportMapLocation(containerId, location) {
+      const view = reportMapViews[containerId];
+      const markerLayer = reportMapMarkerLayers[containerId];
+
+      if (!view || !markerLayer) {
+        return;
+      }
+
+      markerLayer.removeAll();
+
+      if (!location) {
+        view
+          .goTo({
+            center: [-83.5, 32.7],
+            zoom: 6,
+          })
+          .catch(() => {});
+        return;
+      }
+
+      markerLayer.add(buildSelectedLocationCircle(location));
+
+      view
+        .goTo({
+          center: [Number(location.longitude), Number(location.latitude)],
+          zoom: selectedReportType === "district" ? 6 : 7,
+        })
+        .catch(() => {});
+    }
+
+    window.updateReportMapsForSelection = async function () {
+      const location = await getCurrentReportMapLocation();
+
+      Object.keys(reportMapViews).forEach((containerId) => {
+        updateOneReportMapLocation(containerId, location);
+      });
+    };
 
     function createProficiencyMap(
       containerId,
@@ -1562,40 +1653,10 @@ if (typeof require !== "undefined") {
       });
 
       const schoolMarkerLayer = new GraphicsLayer();
+      reportMapMarkerLayers[containerId] = schoolMarkerLayer;
 
       if (schoolLocation) {
-        const schoolPoint = new Point({
-          longitude: Number(schoolLocation.longitude),
-          latitude: Number(schoolLocation.latitude),
-          spatialReference: {
-            wkid: 4326,
-          },
-        });
-
-        const schoolCircleGeometry = new Circle({
-          center: schoolPoint,
-          radius: 5,
-          radiusUnit: "kilometers",
-          geodesic: true,
-        });
-
-        const schoolCircle = new Graphic({
-          geometry: schoolCircleGeometry,
-          symbol: {
-            type: "simple-fill",
-            color: [179, 163, 105, 0.28],
-            outline: {
-              color: [0, 48, 87, 1],
-              width: 2,
-            },
-          },
-          popupTemplate: {
-            title: selectedSchoolName,
-            content: "Selected school area highlight",
-          },
-        });
-
-        schoolMarkerLayer.add(schoolCircle);
+        schoolMarkerLayer.add(buildSelectedLocationCircle(schoolLocation));
       }
 
       const map = new Map({
@@ -1720,40 +1781,10 @@ if (typeof require !== "undefined") {
       const contextLayer = new FeatureLayer(layerOptions);
 
       const schoolMarkerLayer = new GraphicsLayer();
+      reportMapMarkerLayers[containerId] = schoolMarkerLayer;
 
       if (schoolLocation) {
-        const schoolPoint = new Point({
-          longitude: Number(schoolLocation.longitude),
-          latitude: Number(schoolLocation.latitude),
-          spatialReference: {
-            wkid: 4326,
-          },
-        });
-
-        const schoolCircleGeometry = new Circle({
-          center: schoolPoint,
-          radius: 5,
-          radiusUnit: "kilometers",
-          geodesic: true,
-        });
-
-        const schoolCircle = new Graphic({
-          geometry: schoolCircleGeometry,
-          symbol: {
-            type: "simple-fill",
-            color: [179, 163, 105, 0.28],
-            outline: {
-              color: [0, 48, 87, 1],
-              width: 2,
-            },
-          },
-          popupTemplate: {
-            title: selectedSchoolName,
-            content: "Selected school area highlight",
-          },
-        });
-
-        schoolMarkerLayer.add(schoolCircle);
+        schoolMarkerLayer.add(buildSelectedLocationCircle(schoolLocation));
       }
 
       const map = new Map({
@@ -1824,7 +1855,7 @@ if (typeof require !== "undefined") {
       return view;
     }
 
-    getSchoolLocationByName(selectedSchoolName).then((schoolLocation) => {
+    getCurrentReportMapLocation().then((schoolLocation) => {
       createProficiencyMap(
         "mathProficiencyMap",
         "MathProf",
@@ -2123,6 +2154,7 @@ if (typeof require !== "undefined") {
         ],
         schoolLocation,
       );
+      window.updateReportMapsForSelection();
     });
   });
 }
