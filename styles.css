@@ -1425,3 +1425,83 @@ a:hover {
   line-height: 1.15;
   margin-top: 5px;
 }
+
+.snapshot-title-card {
+  grid-column: 1 / -1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: var(--blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 24px 32px;
+  min-height: 124px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.snapshot-title-card:hover {
+  transform: none;
+}
+
+.snapshot-title-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+  flex: 1;
+}
+
+.snapshot-title-image {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 6px;
+}
+
+.snapshot-title-text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.snapshot-title-card h2 {
+  color: #ffffff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  white-space: normal;
+}
+
+.snapshot-title-card p {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+}
+
+.snapshot-title-card p span {
+  color: var(--gold);
+  margin: 0 8px;
+}
+
+.snapshot-title-logo-text {
+  position: static;
+  color: var(--gold);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  flex-shrink: 0;
+}
