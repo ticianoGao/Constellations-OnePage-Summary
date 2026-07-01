@@ -1633,185 +1633,160 @@ if (typeof require !== "undefined") {
       );
     };
 
-    function createProficiencyMap(
-      containerId,
-      valueField,
-      valueLabel,
-      schoolLocation,
-    ) {
-      const container = document.getElementById(containerId);
-
-      if (!container) {
-        return;
-      }
-
-      const proficiencyLayer = new FeatureLayer({
-        url: districtLayerUrl,
-        title: valueLabel,
-        outFields: ["*"],
-
-        renderer: {
-          type: "class-breaks",
-          field: valueField,
-          classBreakInfos: [
-            {
-              minValue: 5.8,
-              maxValue: 22.7,
-              symbol: {
-                type: "simple-fill",
-                color: "#4f7f7b",
-                outline: {
-                  color: "#666666",
-                  width: 0.5,
-                },
-              },
-              label: "5.8 - 22.7",
-            },
-            {
-              minValue: 22.7,
-              maxValue: 38,
-              symbol: {
-                type: "simple-fill",
-                color: "#6f9992",
-                outline: {
-                  color: "#666666",
-                  width: 0.5,
-                },
-              },
-              label: "> 22.7 - 38",
-            },
-            {
-              minValue: 38,
-              maxValue: 52.7,
-              symbol: {
-                type: "simple-fill",
-                color: "#9fbbb0",
-                outline: {
-                  color: "#666666",
-                  width: 0.5,
-                },
-              },
-              label: "> 38 - 52.7",
-            },
-            {
-              minValue: 52.7,
-              maxValue: 67,
-              symbol: {
-                type: "simple-fill",
-                color: "#cbdcad",
-                outline: {
-                  color: "#666666",
-                  width: 0.5,
-                },
-              },
-              label: "> 52.7 - 67",
-            },
-            {
-              minValue: 67,
-              maxValue: 88,
-              symbol: {
-                type: "simple-fill",
-                color: "#eef4c2",
-                outline: {
-                  color: "#666666",
-                  width: 0.5,
-                },
-              },
-              label: "> 67 - 88",
-            },
-          ],
-        },
-
-        popupTemplate: {
-          title: "{NAME}",
-          content: [
-            {
-              type: "fields",
-              fieldInfos: [
-                {
-                  fieldName: valueField,
-                  label: valueLabel,
-                },
-              ],
-            },
-          ],
-        },
-      });
-
-      const schoolMarkerLayer = new GraphicsLayer();
-      reportMapMarkerLayers[containerId] = schoolMarkerLayer;
-
-      if (schoolLocation) {
-        schoolMarkerLayer.add(buildSelectedLocationMarker(schoolLocation));
-      }
-
-      const map = new Map({
-        basemap: "gray-vector",
-        layers: [proficiencyLayer, schoolMarkerLayer],
-      });
-
-      const view = new MapView({
-        container: containerId,
-        map: map,
-        center: schoolLocation
-          ? [schoolLocation.longitude, schoolLocation.latitude]
-          : [-83.5, 32.7],
-        zoom: schoolLocation ? 7 : 6,
-        constraints: {
-          rotationEnabled: false,
-        },
-        ui: {
-          components: ["zoom"],
-        },
-      });
-
-      const legendWrapper = document.createElement("div");
-      legendWrapper.className = "legend-wrapper esri-widget";
-
-      const legendToggleButton = document.createElement("button");
-      legendToggleButton.className = "legend-toggle-button";
-      legendToggleButton.type = "button";
-      legendToggleButton.textContent = "Hide";
-
-      const legendContent = document.createElement("div");
-      legendContent.className = "legend-content";
-
-      legendWrapper.appendChild(legendToggleButton);
-      legendWrapper.appendChild(legendContent);
-
-      const legend = new Legend({
-        view: view,
-        container: legendContent,
-        layerInfos: [
+    function createMathProficiencyMap(containerId, schoolLocation) {
+      return createContextMap(
+        containerId,
+        districtLayerUrl,
+        "MathProf",
+        "Math Proficiency",
+        [
           {
-            layer: proficiencyLayer,
-            title: valueLabel,
+            minValue: 5.8,
+            maxValue: 22.7,
+            symbol: {
+              type: "simple-fill",
+              color: "#4f7f7b",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "5.8 - 22.7",
+          },
+          {
+            minValue: 22.7,
+            maxValue: 38,
+            symbol: {
+              type: "simple-fill",
+              color: "#6f9992",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 22.7 - 38",
+          },
+          {
+            minValue: 38,
+            maxValue: 52.7,
+            symbol: {
+              type: "simple-fill",
+              color: "#9fbbb0",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 38 - 52.7",
+          },
+          {
+            minValue: 52.7,
+            maxValue: 67,
+            symbol: {
+              type: "simple-fill",
+              color: "#cbdcad",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 52.7 - 67",
+          },
+          {
+            minValue: 67,
+            maxValue: 88,
+            symbol: {
+              type: "simple-fill",
+              color: "#eef4c2",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 67 - 88",
           },
         ],
-      });
-
-      let legendVisible = true;
-
-      container.classList.remove("legend-is-hidden");
-
-      legendToggleButton.addEventListener("click", () => {
-        legendVisible = !legendVisible;
-
-        if (legendVisible) {
-          legendContent.classList.remove("legend-content-hidden");
-          legendToggleButton.textContent = "Hide";
-          container.classList.remove("legend-is-hidden");
-        } else {
-          legendContent.classList.add("legend-content-hidden");
-          legendToggleButton.textContent = "Show";
-          container.classList.add("legend-is-hidden");
-        }
-      });
-
-      view.ui.add(legendWrapper, "bottom-right");
-      reportMapViews[containerId] = view;
-      return view;
+        schoolLocation,
+      );
     }
+
+    function createEnglishProficiencyMap(containerId, schoolLocation) {
+      return createContextMap(
+        containerId,
+        districtLayerUrl,
+        "EngProf",
+        "English Language Arts Proficiency",
+        [
+          {
+            minValue: 7.6,
+            maxValue: 18.4,
+            symbol: {
+              type: "simple-fill",
+              color: "#6677a3",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "7.6 - 18.4",
+          },
+          {
+            minValue: 18.4,
+            maxValue: 29.5,
+            symbol: {
+              type: "simple-fill",
+              color: "#a696aa",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 18.4 - 29.5",
+          },
+          {
+            minValue: 29.5,
+            maxValue: 38.5,
+            symbol: {
+              type: "simple-fill",
+              color: "#c994a0",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 29.5 - 38.5",
+          },
+          {
+            minValue: 38.5,
+            maxValue: 51.7,
+            symbol: {
+              type: "simple-fill",
+              color: "#edc9aa",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 38.5 - 51.7",
+          },
+          {
+            minValue: 51.7,
+            maxValue: 78,
+            symbol: {
+              type: "simple-fill",
+              color: "#fff0cc",
+              outline: {
+                color: "#666666",
+                width: 0.5,
+              },
+            },
+            label: "> 51.7 - 78",
+          },
+        ],
+        schoolLocation,
+      );
+    }
+
     function createContextMap(
       containerId,
       layerUrl,
@@ -1942,31 +1917,14 @@ if (typeof require !== "undefined") {
     }
 
     getCurrentReportMapLocation().then((schoolLocation) => {
-      createProficiencyMap(
-        "mathProficiencyMap",
-        "MathProf",
-        "Math Proficiency",
-        schoolLocation,
-      );
+      createMathProficiencyMap("mathProficiencyMap", schoolLocation);
 
-      createProficiencyMap(
-        "englishProficiencyMap",
-        "EngProf",
-        "English Language Arts Proficiency",
-        schoolLocation,
-      );
+      createEnglishProficiencyMap("englishProficiencyMap", schoolLocation);
 
-      createProficiencyMap(
-        "districtMathProficiencyMap",
-        "MathProf",
-        "Math Proficiency",
-        schoolLocation,
-      );
+      createMathProficiencyMap("districtMathProficiencyMap", schoolLocation);
 
-      createProficiencyMap(
+      createEnglishProficiencyMap(
         "districtEnglishProficiencyMap",
-        "EngProf",
-        "English Language Arts Proficiency",
         schoolLocation,
       );
 
