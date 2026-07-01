@@ -1483,3 +1483,36 @@ a:hover {
   color: var(--gold);
   margin: 0 8px;
 }
+
+.select-options li.district-group-option {
+  margin-top: 8px;
+  font-weight: 700;
+  color: var(--blue);
+  background: #f7f3e5;
+  border-left: 4px solid var(--gold);
+}
+
+.select-options li.district-group-option:hover {
+  background: #efe6c8;
+}
+
+.select-options li.school-sub-option {
+  padding-left: 36px;
+  font-size: 0.95rem;
+  color: #555555;
+}
+
+.select-options li.school-sub-option::before {
+  content: "↳";
+  margin-right: 8px;
+  color: var(--gold);
+}
+
+.select-options li.school-sub-option.selected {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.select-options li.school-sub-option.selected::before {
+  color: #ffffff;
+}

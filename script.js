@@ -390,6 +390,13 @@ function cleanSchoolRows(rows) {
     .filter((row) => row.schoolName.trim() !== "");
 }
 
+function makeGroupId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function buildDropdownFromCsvRows(rows) {
   if (!selectOptionsList) {
     return;
@@ -411,19 +418,17 @@ function buildDropdownFromCsvRows(rows) {
   const districtMap = new Map();
 
   schoolLookupData.forEach((school) => {
-    if (!school.districtName) {
-      return;
-    }
+    const districtName = school.districtName || "District unavailable";
 
-    if (!districtMap.has(school.districtName)) {
-      districtMap.set(school.districtName, {
-        districtName: school.districtName,
+    if (!districtMap.has(districtName)) {
+      districtMap.set(districtName, {
+        districtName,
         systemId: school.systemId,
-        schoolCount: 0,
+        schools: [],
       });
     }
 
-    districtMap.get(school.districtName).schoolCount += 1;
+    districtMap.get(districtName).schools.push(school);
   });
 
   const districts = Array.from(districtMap.values()).sort((a, b) => {
@@ -431,37 +436,45 @@ function buildDropdownFromCsvRows(rows) {
   });
 
   districts.forEach((district) => {
+    const groupId = makeGroupId(district.districtName);
+
     const districtOption = createDropdownOption({
       label: district.districtName,
-      displayText: `${district.districtName} — ${district.schoolCount} schools`,
+      displayText: `${district.districtName} — ${district.schools.length} schools`,
       value: district.districtName,
       type: "district",
       district: district.districtName,
       systemId: district.systemId,
     });
 
+    districtOption.classList.add("district-group-option");
+    districtOption.dataset.groupId = groupId;
+
     selectOptionsList.appendChild(districtOption);
-  });
 
-  const schools = [...schoolLookupData].sort((a, b) => {
-    return a.schoolName.localeCompare(b.schoolName);
-  });
-
-  schools.forEach((school) => {
-    const schoolOption = createDropdownOption({
-      label: school.schoolName,
-      displayText: `${school.schoolName} — ${school.districtName}`,
-      value: school.schoolName,
-      type: "school",
-      schoolId: school.schoolId,
-      district: school.districtName,
-      gradeRange: school.gradeRange,
-      lat: school.lat,
-      lon: school.lon,
-      systemId: school.systemId,
+    const schools = [...district.schools].sort((a, b) => {
+      return a.schoolName.localeCompare(b.schoolName);
     });
 
-    selectOptionsList.appendChild(schoolOption);
+    schools.forEach((school) => {
+      const schoolOption = createDropdownOption({
+        label: school.schoolName,
+        displayText: school.schoolName,
+        value: school.schoolName,
+        type: "school",
+        schoolId: school.schoolId,
+        district: school.districtName,
+        gradeRange: school.gradeRange,
+        lat: school.lat,
+        lon: school.lon,
+        systemId: school.systemId,
+      });
+
+      schoolOption.classList.add("school-sub-option");
+      schoolOption.dataset.groupId = groupId;
+
+      selectOptionsList.appendChild(schoolOption);
+    });
   });
 
   selectedReportValue = "Georgia Statewide";
@@ -950,12 +963,71 @@ if (customSelect && selectTrigger && selectedValue && selectSearch) {
   });
 
   selectSearch.addEventListener("input", () => {
-    const searchValue = selectSearch.value.toLowerCase();
+    const searchValue = selectSearch.value.trim().toLowerCase();
+    const options = Array.from(document.querySelectorAll("#selectOptions li"));
 
-    document.querySelectorAll("#selectOptions li").forEach((option) => {
+    if (!searchValue) {
+      options.forEach((option) => {
+        option.classList.remove("hidden");
+      });
+      return;
+    }
+
+    const matchingDistrictGroups = new Set();
+    const matchingSchoolGroups = new Set();
+
+    options.forEach((option) => {
       const optionText = option.textContent.toLowerCase();
+      const groupId = option.dataset.groupId;
 
-      if (optionText.includes(searchValue)) {
+      if (!groupId) {
+        return;
+      }
+
+      if (
+        option.classList.contains("district-group-option") &&
+        optionText.includes(searchValue)
+      ) {
+        matchingDistrictGroups.add(groupId);
+      }
+
+      if (
+        option.classList.contains("school-sub-option") &&
+        optionText.includes(searchValue)
+      ) {
+        matchingSchoolGroups.add(groupId);
+      }
+    });
+
+    options.forEach((option) => {
+      const optionText = option.textContent.toLowerCase();
+      const groupId = option.dataset.groupId;
+
+      let shouldShow = false;
+
+      // Statewide option
+      if (option.dataset.type === "state") {
+        shouldShow = optionText.includes(searchValue);
+      }
+
+      // District row:
+      // show if district itself matches OR one of its schools matches
+      if (option.classList.contains("district-group-option")) {
+        shouldShow =
+          matchingDistrictGroups.has(groupId) ||
+          matchingSchoolGroups.has(groupId);
+      }
+
+      // School row:
+      // show all schools if parent district matches,
+      // or show only matching school if searching by school name
+      if (option.classList.contains("school-sub-option")) {
+        shouldShow =
+          matchingDistrictGroups.has(groupId) ||
+          optionText.includes(searchValue);
+      }
+
+      if (shouldShow) {
         option.classList.remove("hidden");
       } else {
         option.classList.add("hidden");
@@ -1344,7 +1416,6 @@ if (typeof require !== "undefined") {
     "esri/Graphic",
     "esri/rest/support/Query",
     "esri/geometry/Point",
-    "esri/geometry/Circle",
     "esri/widgets/Legend",
   ], function (
     Map,
@@ -1354,7 +1425,6 @@ if (typeof require !== "undefined") {
     Graphic,
     Query,
     Point,
-    Circle,
     Legend,
   ) {
     const districtLayerUrl =
@@ -1473,8 +1543,10 @@ if (typeof require !== "undefined") {
       return null;
     }
 
-    function buildSelectedLocationCircle(location) {
-      const schoolPoint = new Point({
+    const selectedLocationIconUrl = "pics/Location_Indicator.png";
+
+    function buildSelectedLocationMarker(location) {
+      const locationPoint = new Point({
         longitude: Number(location.longitude),
         latitude: Number(location.latitude),
         spatialReference: {
@@ -1482,29 +1554,21 @@ if (typeof require !== "undefined") {
         },
       });
 
-      const schoolCircleGeometry = new Circle({
-        center: schoolPoint,
-        radius: 5,
-        radiusUnit: "kilometers",
-        geodesic: true,
-      });
-
       return new Graphic({
-        geometry: schoolCircleGeometry,
+        geometry: locationPoint,
         symbol: {
-          type: "simple-fill",
-          color: [179, 163, 105, 0.28],
-          outline: {
-            color: [0, 48, 87, 1],
-            width: 2,
-          },
+          type: "picture-marker",
+          url: selectedLocationIconUrl,
+          width: "34px",
+          height: "34px",
+          yoffset: "12px",
         },
         popupTemplate: {
           title: location.title || "Selected location",
           content:
             selectedReportType === "district"
-              ? "Selected district area highlight"
-              : "Selected school area highlight",
+              ? "Selected district center"
+              : "Selected school location",
         },
       });
     }
@@ -1547,7 +1611,7 @@ if (typeof require !== "undefined") {
         return;
       }
 
-      markerLayer.add(buildSelectedLocationCircle(location));
+      markerLayer.add(buildSelectedLocationMarker(location));
 
       await view
         .goTo({
@@ -1678,7 +1742,7 @@ if (typeof require !== "undefined") {
       reportMapMarkerLayers[containerId] = schoolMarkerLayer;
 
       if (schoolLocation) {
-        schoolMarkerLayer.add(buildSelectedLocationCircle(schoolLocation));
+        schoolMarkerLayer.add(buildSelectedLocationMarker(schoolLocation));
       }
 
       const map = new Map({
@@ -1806,7 +1870,7 @@ if (typeof require !== "undefined") {
       reportMapMarkerLayers[containerId] = schoolMarkerLayer;
 
       if (schoolLocation) {
-        schoolMarkerLayer.add(buildSelectedLocationCircle(schoolLocation));
+        schoolMarkerLayer.add(buildSelectedLocationMarker(schoolLocation));
       }
 
       const map = new Map({
