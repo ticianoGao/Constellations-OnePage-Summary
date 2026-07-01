@@ -1688,3 +1688,24 @@ a:hover {
   font-size: 0.55rem !important;
   line-height: 1.1 !important;
 }
+
+/* Better vertical alignment between polygon legend patch and text */
+.card-map .legend-content .esri-legend__layer-table td,
+.card-map .legend-content .esri-legend__layer-cell,
+.card-map .legend-content .esri-legend__layer-cell--symbols,
+.card-map .legend-content .esri-legend__layer-cell--info {
+  vertical-align: middle !important;
+}
+
+/* Move legend label text down without increasing row spacing */
+.card-map .legend-content .esri-legend__layer-cell--info {
+  padding-top: 0 !important;
+  position: relative !important;
+  top: 8px !important;
+}
+
+/* Keep the symbol cell tight */
+.card-map .legend-content .esri-legend__layer-cell--symbols {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
