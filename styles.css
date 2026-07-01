@@ -1516,3 +1516,175 @@ a:hover {
 .select-options li.school-sub-option.selected::before {
   color: #ffffff;
 }
+
+/* Make ArcGIS map legend text smaller */
+.card-map .legend-content .esri-legend,
+.card-map .legend-content .esri-legend__service,
+.card-map .legend-content .esri-legend__layer,
+.card-map .legend-content .esri-legend__layer-cell,
+.card-map .legend-content .esri-legend__layer-cell--info {
+  font-size: 0.72rem !important;
+  line-height: 1.15 !important;
+}
+
+/* Smaller legend layer title, like "Mathematics Proficiency Percentage" */
+.card-map .legend-content .esri-legend__layer-caption {
+  font-size: 0.72rem !important;
+  line-height: 1.15 !important;
+}
+
+/* Tighten spacing between legend rows */
+.card-map .legend-content .esri-legend__layer-row {
+  height: auto !important;
+}
+
+/* Optional: make the full legend box slightly more compact */
+.card-map .legend-wrapper {
+  padding: 6px 8px !important;
+}
+
+/* Different legend widths for different map types */
+
+/* Math + English legends: narrower */
+#mathProficiencyMap .legend-wrapper,
+#englishProficiencyMap .legend-wrapper,
+#districtMathProficiencyMap .legend-wrapper,
+#districtEnglishProficiencyMap .legend-wrapper {
+  width: 150px !important;
+}
+
+#mathProficiencyMap .legend-content .esri-legend,
+#englishProficiencyMap .legend-content .esri-legend,
+#districtMathProficiencyMap .legend-content .esri-legend,
+#districtEnglishProficiencyMap .legend-content .esri-legend {
+  width: 140px !important;
+}
+
+/* Income legend: wider because the number ranges are longer */
+#incomeMap .legend-wrapper,
+#districtIncomeMap .legend-wrapper {
+  width: 200px !important;
+}
+
+#incomeMap .legend-content .esri-legend,
+#districtIncomeMap .legend-content .esri-legend {
+  width: 190px !important;
+}
+
+/* Make all ArcGIS map legends more compact */
+.card-map .legend-wrapper {
+  padding: 5px 6px !important;
+  width: 150px !important;
+}
+
+/* Keep income legends a little wider because their numbers are longer */
+#incomeMap .legend-wrapper,
+#districtIncomeMap .legend-wrapper {
+  width: 175px !important;
+}
+
+/* Shrink all legend text */
+.card-map .legend-content .esri-legend,
+.card-map .legend-content .esri-widget,
+.card-map .legend-content .esri-legend *,
+.card-map .legend-content .esri-legend__layer-cell,
+.card-map .legend-content .esri-legend__layer-cell--info,
+.card-map .legend-content .esri-legend__layer-caption {
+  font-size: 0.56rem !important;
+  line-height: 1.08 !important;
+}
+
+/* Shrink legend title */
+.card-map .legend-content .esri-legend__layer-caption {
+  margin-bottom: 2px !important;
+  padding-right: 38px !important;
+}
+
+/* Shrink color patches */
+.card-map .legend-content .esri-legend__symbol {
+  width: 20px !important;
+  height: 13px !important;
+}
+
+/* Reduce spacing between legend rows */
+.card-map .legend-content .esri-legend__layer-cell {
+  padding: 1px 3px !important;
+}
+
+/* Make Hide/Show button smaller too */
+.card-map .legend-toggle-button {
+  font-size: 0.55rem !important;
+  padding: 1px 5px !important;
+  min-width: 32px !important;
+}
+
+/* Keep collapsed Show button at bottom-right */
+.card-map.legend-is-hidden .legend-wrapper {
+  position: absolute !important;
+  right: 8px !important;
+  bottom: 8px !important;
+  top: auto !important;
+  left: auto !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.card-map.legend-is-hidden .legend-toggle-button {
+  position: static !important;
+  display: block !important;
+
+  width: auto !important;
+  min-width: 32px !important;
+  padding: 1px 5px !important;
+  margin: 0 !important;
+
+  font-size: 0.55rem !important;
+  line-height: 1.1 !important;
+}
+
+/* Force closed legend Show button to sit at the real bottom-right */
+#mathProficiencyMap.legend-is-hidden .legend-wrapper,
+#englishProficiencyMap.legend-is-hidden .legend-wrapper,
+#incomeMap.legend-is-hidden .legend-wrapper,
+#districtMathProficiencyMap.legend-is-hidden .legend-wrapper,
+#districtEnglishProficiencyMap.legend-is-hidden .legend-wrapper,
+#districtIncomeMap.legend-is-hidden .legend-wrapper {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+#mathProficiencyMap.legend-is-hidden .legend-toggle-button,
+#englishProficiencyMap.legend-is-hidden .legend-toggle-button,
+#incomeMap.legend-is-hidden .legend-toggle-button,
+#districtMathProficiencyMap.legend-is-hidden .legend-toggle-button,
+#districtEnglishProficiencyMap.legend-is-hidden .legend-toggle-button,
+#districtIncomeMap.legend-is-hidden .legend-toggle-button {
+  position: static !important;
+  display: block !important;
+
+  width: auto !important;
+  min-width: 32px !important;
+
+  padding: 1px 5px !important;
+  margin: 0 !important;
+
+  font-size: 0.55rem !important;
+  line-height: 1.1 !important;
+}
