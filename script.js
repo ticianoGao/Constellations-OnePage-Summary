@@ -1707,6 +1707,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
+        "Percentage",
       );
     }
 
@@ -1784,6 +1785,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
+        "Percentage",
       );
     }
 
@@ -1794,6 +1796,7 @@ if (typeof require !== "undefined") {
       valueLabel,
       classBreakInfos,
       schoolLocation,
+      legendTitle = valueLabel,
     ) {
       const container = document.getElementById(containerId);
 
@@ -1826,6 +1829,11 @@ if (typeof require !== "undefined") {
         layerOptions.renderer = {
           type: "class-breaks",
           field: valueField,
+
+          legendOptions: {
+            title: legendTitle,
+          },
+
           defaultSymbol: {
             type: "simple-fill",
             color: [220, 220, 220, 0.25],
@@ -2062,6 +2070,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
+        "Income",
       );
       createContextMap(
         "districtInternetAccessMap",
@@ -2197,6 +2206,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
+        "Income",
       );
       window.updateReportMapsForSelection();
     });
