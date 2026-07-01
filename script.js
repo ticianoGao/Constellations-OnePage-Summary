@@ -2527,7 +2527,7 @@ if (exportReportButton) {
       mapIds: [
         "mathProficiencyMap",
         "englishProficiencyMap",
-        "internetAccessMap",
+        // "internetAccessMap",
         "incomeMap",
       ],
       fileName: "constellations-school-report.pdf",
@@ -2549,7 +2549,7 @@ if (exportDistrictReportButton) {
       mapIds: [
         "districtMathProficiencyMap",
         "districtEnglishProficiencyMap",
-        "districtInternetAccessMap",
+        // "districtInternetAccessMap",
         "districtIncomeMap",
       ],
       fileName: "constellations-district-report.pdf",
