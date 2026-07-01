@@ -767,33 +767,16 @@ a:hover {
   margin-top: 0;
 }
 
-.snapshot-title-text {
-  position: relative;
-  z-index: 1;
-}
-
-.snapshot-title-logo {
-  position: absolute;
-  right: 24px;
-  bottom: 18px;
-  width: 120px;
-  max-height: 52px;
-  object-fit: contain;
-  display: block;
-
-  background: rgba(255, 255, 255, 0.95);
-  padding: 6px 8px;
-  border-radius: 8px;
-}
-
 .snapshot-title-card {
   grid-column: 1 / -1;
   position: relative;
+  display: flex;
+  align-items: center;
   background: var(--blue);
   color: #ffffff;
   border: none;
   border-radius: 10px;
-  padding: 30px 170px 28px 32px;
+  padding: 24px 32px;
   min-height: 124px;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -803,6 +786,30 @@ a:hover {
   transform: none;
 }
 
+.snapshot-title-main {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  width: 100%;
+  min-width: 0;
+}
+
+.snapshot-title-image {
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 8px;
+}
+
+.snapshot-title-text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
 .snapshot-title-card h2 {
   color: #ffffff;
   font-family: Georgia, "Times New Roman", serif;
@@ -810,7 +817,7 @@ a:hover {
   line-height: 1.2;
   letter-spacing: 0.04em;
   margin-bottom: 8px;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .snapshot-title-card p {
@@ -825,24 +832,6 @@ a:hover {
 .snapshot-title-card p span {
   color: var(--gold);
   margin: 0 8px;
-}
-
-.snapshot-title-text {
-  position: relative;
-  z-index: 1;
-}
-
-.snapshot-title-logo-text {
-  position: absolute;
-  right: 28px;
-  bottom: 18px;
-
-  color: var(--gold);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
 }
 
 /* Remove the first separation line in Demographic Participation, so there's no line before the first graph*/
@@ -1493,15 +1482,4 @@ a:hover {
 .snapshot-title-card p span {
   color: var(--gold);
   margin: 0 8px;
-}
-
-.snapshot-title-logo-text {
-  position: static;
-  color: var(--gold);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  flex-shrink: 0;
 }
