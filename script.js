@@ -145,6 +145,10 @@ const sampleSchoolSummaryData = {
   default: {
     totalStudents: "1049",
     csCourses: "2",
+    approvedCsCourses: "1",
+    approvedCsCoursesVerb: "is",
+    csCourseAverageSentence:
+      "On average, high schools in Georgia have 3 computer science courses available.",
     csTeachers: "1",
     csEnrollments: "28",
     csCoursesComparison: "NULL%",
@@ -199,6 +203,9 @@ function updateSchoolSummaryFromData(data) {
 
   setTextById("schoolTotalStudentsText", data.totalStudents);
   setTextById("schoolCsCoursesText", data.csCourses);
+  setTextById("schoolApprovedCsCoursesText", data.approvedCsCourses);
+  setTextById("schoolApprovedCsCoursesVerb", data.approvedCsCoursesVerb);
+  setTextById("schoolCsCourseAverageSentence", data.csCourseAverageSentence);
   setTextById("schoolCsCoursesComparison", data.csCoursesComparison);
   setTextById("schoolApCsa", data.apCsa);
   setTextById("schoolApCsp", data.apCsp);
@@ -693,6 +700,43 @@ function toFiniteNumber(value) {
   return number;
 }
 
+const schoolTypePluralLabels = {
+  E: "elementary schools",
+  H: "high schools",
+  M: "middle schools",
+  K12: "K-12 schools",
+};
+
+function getSchoolTypePluralLabel(schoolType) {
+  return schoolTypePluralLabels[schoolType] || "schools";
+}
+
+function getApprovedCourseVerb(value) {
+  const number = toFiniteNumber(value);
+
+  return number === 1 ? "is" : "are";
+}
+
+function getCourseUnit(value) {
+  const number = toFiniteNumber(value);
+
+  return number === 1 ? "course" : "courses";
+}
+
+function formatCourseAverageSentence(schoolType, averageCourseCount) {
+  const average = toFiniteNumber(averageCourseCount);
+  const schoolTypeLabel = getSchoolTypePluralLabel(schoolType);
+
+  if (average === null) {
+    return `On average, ${schoolTypeLabel} in Georgia have -- computer science courses available.`;
+  }
+
+  const formattedAverage = formatDecimal(average, 1);
+  const courseUnit = getCourseUnit(average);
+
+  return `On average, ${schoolTypeLabel} in Georgia have ${formattedAverage} computer science ${courseUnit} available.`;
+}
+
 function safeDivide(numerator, denominator) {
   const top = toFiniteNumber(numerator);
   const bottom = toFiniteNumber(denominator);
@@ -787,7 +831,7 @@ function formatPercentagePointComparison(currentValue, benchmarkValue) {
   const formattedDifference = formatDecimal(absoluteDifference, 1);
   const direction = pointDifference > 0 ? "higher than" : "lower than";
 
-  return `${formattedDifference} percentage points ${direction}`;
+  return `${formattedDifference} % ${direction}`;
 }
 
 function formatCountDifferenceComparison(
@@ -971,6 +1015,10 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
       stateAverageCsCourses,
       "course",
       "courses",
+    ),
+    csCourseAverageSentence: formatCourseAverageSentence(
+      attributes.SchoolType,
+      stateAverageCsCourses,
     ),
     csEnrollmentComparison: formatPercentagePointComparison(
       schoolCsEnrollmentRatio,
@@ -1203,6 +1251,9 @@ function buildSchoolSummaryDataFromAttributes(
   return {
     totalStudents: formatWholeNumber(attributes.StudentCou),
     csCourses: formatWholeNumber(attributes.NumCSCours),
+    approvedCsCourses: formatWholeNumber(attributes.NumApprove),
+    approvedCsCoursesVerb: getApprovedCourseVerb(attributes.NumApprove),
+    csCourseAverageSentence: comparisonValues.csCourseAverageSentence,
     csTeachers: formatWholeNumber(attributes.NumCSTeach),
     csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
 

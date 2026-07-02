@@ -237,9 +237,20 @@
                         id="schoolApprovedCourseNote"
                         class="info-highlight-target"
                       >
-                        *The approved Georgia CS course list is based on the
-                        Georgia Department of Education's approved CS courses in
-                        Senate Bill 108.
+                        The approved CS course list is the set of CS courses
+                        recognized by Georgia Department of Education as meeting
+                        the requirements of Senate Bill 108. Courses on this
+                        list are officially designated by the state as teaching
+                        core computer science concepts that align with Georgia's
+                        Computer Science Standards. You may refer
+                        <a
+                          href="https://lor2.gadoe.org/gadoe/file/2774a26d-c768-4d26-ac1d-48e069aed6ee/1/Computer%20Science%20Legislative%20Requirement%20%282019%20SB108%29%20FAQ%20%20UPDATED24.pdf"
+                          class="dashboard-link"
+                          >here</a
+                        >
+                        for additional details about the bill. Currently, the
+                        list includes 18 high school courses and 5 middle school
+                        courses.
                       </li>
                     </ul>
                   </div>
@@ -280,17 +291,22 @@
                       <li>
                         It provides
                         <strong id="schoolCsCoursesText">2</strong> computer
-                        science courses out of the total approved<button
+                        science courses, of which
+                        <strong id="schoolApprovedCsCoursesText">--</strong>
+                        <span id="schoolApprovedCsCoursesVerb">are</span> from
+                        the GA DOE approved CS course list<button
                           class="inline-info-link"
                           type="button"
                           data-info-target="schoolApprovedCourseNote"
                           aria-label="Show approved Georgia CS course list note"
                         >
-                          *
-                        </button>
-                        CS course list. This is
-                        <strong id="schoolCsCoursesComparison">--</strong>
-                        the state average for this school type.
+                          *</button
+                        >.
+                        <span id="schoolCsCourseAverageSentence">
+                          On average, schools in Georgia have -- computer
+                          science courses available.
+                        </span>
+
                         <ul class="summary-sublist">
                           <li>
                             AP CS A:
@@ -759,17 +775,16 @@
                       <li>
                         It provides
                         <strong id="districtCsCoursesText">2</strong> computer
-                        science courses out of the total approved<button
+                        science courses from the GA DOE approved CS course
+                        list<button
                           class="inline-info-link"
                           type="button"
                           data-info-target="districtApprovedCourseNote"
                           aria-label="Show approved Georgia CS course list note"
                         >
-                          *
-                        </button>
-                        Georgia CS course list. This is
-                        <strong id="districtCsCoursesComparison">--</strong>
-                        the average Georgia district.
+                          *</button
+                        >.
+
                         <ul class="summary-sublist">
                           <li>
                             AP CS A:
