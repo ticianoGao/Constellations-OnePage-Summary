@@ -28,7 +28,7 @@ const selectedValue = document.getElementById("selectedValue");
 const selectSearch = document.getElementById("selectSearch");
 const selectOptionsList = document.getElementById("selectOptions");
 
-const reportSchoolYearLabel = "2024–25";
+const reportSchoolYearLabel = "2024 – 2025";
 
 let selectedReportValue = "Georgia Statewide";
 let selectedReportType = "state";
@@ -108,7 +108,7 @@ function updateSnapshotTitles() {
     if (stateSnapshotSubtitle) {
       stateSnapshotSubtitle.innerHTML = `
         Georgia Statewide
-        <span>–</span>
+        <span>•</span>
         State Report
       `;
     }
@@ -122,9 +122,9 @@ function updateSnapshotTitles() {
     if (schoolSnapshotSubtitle) {
       schoolSnapshotSubtitle.innerHTML = `
         ${selectedDistrictName || "District unavailable"}
-        <span>–</span>
+        <span>•</span>
         ${selectedReportValue}
-        <span>–</span>
+        <span>•</span>
         ${formatGradeRange(selectedGradeRange)}
       `;
     }
@@ -138,7 +138,7 @@ function updateSnapshotTitles() {
     if (districtSnapshotSubtitle) {
       districtSnapshotSubtitle.innerHTML = `
         ${selectedDistrictName || selectedReportValue}
-        <span>–</span>
+        <span>•</span>
         District Report
       `;
     }
@@ -1044,6 +1044,34 @@ if (customSelect && selectTrigger && selectedValue && selectSearch) {
   loadSchoolLookupFromArcGIS();
 }
 
+const rightSideCategoryLabelsPlugin = {
+  id: "rightSideCategoryLabelsPlugin",
+
+  afterDatasetsDraw(chart) {
+    const { ctx, chartArea } = chart;
+    const labels = chart.data.labels;
+
+    if (!labels || labels.length === 0) return;
+
+    ctx.save();
+    ctx.font = "11px Arial";
+    ctx.fillStyle = "#666666";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+
+    labels.forEach((label, index) => {
+      const meta = chart.getDatasetMeta(0);
+      const bar = meta.data[index];
+
+      if (!bar) return;
+
+      ctx.fillText(label, chartArea.right - 4, bar.y);
+    });
+
+    ctx.restore();
+  },
+};
+
 /* Race/Ethnicity double bar chart */
 
 const raceEthnicityChartCanvas = document.getElementById("raceEthnicityChart");
@@ -1130,14 +1158,12 @@ if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
             display: false,
           },
           ticks: {
-            font: {
-              family: "Arial",
-              size: 11,
-            },
+            display: false,
           },
         },
       },
     },
+    plugins: [rightSideCategoryLabelsPlugin],
   });
 }
 
@@ -1229,14 +1255,12 @@ if (districtRaceEthnicityChartCanvas && typeof Chart !== "undefined") {
             display: false,
           },
           ticks: {
-            font: {
-              family: "Arial",
-              size: 11,
-            },
+            display: false,
           },
         },
       },
     },
+    plugins: [rightSideCategoryLabelsPlugin],
   });
 }
 
@@ -2483,6 +2507,33 @@ async function exportReportAsPdf({
   }
 }
 
+function cleanFileNamePart(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[<>:"/\\|?*]+/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function buildReportFileName(reportType) {
+  const schoolYear = cleanFileNamePart(reportSchoolYearLabel);
+  const districtName = cleanFileNamePart(
+    selectedDistrictName || selectedReportValue || "District unavailable",
+  );
+  const schoolName = cleanFileNamePart(
+    selectedReportValue || "School unavailable",
+  );
+
+  if (reportType === "school") {
+    return `${schoolYear} Computing Education Resources School Report - ${districtName} - ${schoolName}.pdf`;
+  }
+
+  if (reportType === "district") {
+    return `${schoolYear} Computing Education Resources District Report - ${districtName}.pdf`;
+  }
+
+  return `${schoolYear} Computing Education Resources Statewide Report.pdf`;
+}
+
 /* School export */
 
 const exportReportButton = document.getElementById("exportReportButton");
@@ -2498,7 +2549,7 @@ if (exportReportButton) {
         // "internetAccessMap",
         "incomeMap",
       ],
-      fileName: "constellations-school-report.pdf",
+      fileName: buildReportFileName("school"),
     });
   });
 }
@@ -2520,7 +2571,7 @@ if (exportDistrictReportButton) {
         // "districtInternetAccessMap",
         "districtIncomeMap",
       ],
-      fileName: "constellations-district-report.pdf",
+      fileName: buildReportFileName("district"),
     });
   });
 }

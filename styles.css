@@ -838,6 +838,7 @@ a:hover {
 .participation-card .chart-js-section:first-of-type {
   border-top: none;
   padding-top: 0;
+  margin-top: 8px;
 }
 
 .report-card {
@@ -1366,6 +1367,7 @@ a:hover {
 
 /* Match the major front-card heights */
 
+/*
 #schoolGrid .school-summary-card,
 #districtReportGrid .school-summary-card {
   min-height: 520px;
@@ -1382,6 +1384,7 @@ a:hover {
 #districtReportGrid .two-image-card {
   min-height: 360px;
 }
+*/
 
 /* Prevent hover from visually changing report size */
 
@@ -1404,13 +1407,14 @@ a:hover {
 }
 
 .school-summary-card .metric-number {
+  color: #b39051;
   font-size: 1.35rem;
   line-height: 1;
   white-space: nowrap;
 }
 
 .school-summary-card .metric-label {
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   line-height: 1.15;
   margin-top: 5px;
 }
@@ -1789,4 +1793,145 @@ a:hover {
 
 .pseudo-string {
   color: #8a5a00;
+}
+
+/* Make normal report-card text closer to single-line spacing */
+.report-card p,
+.report-card li,
+.summary-text p,
+.summary-text li,
+.summary-list li,
+.summary-sublist li,
+.info-list li,
+.category-definition-list li {
+  line-height: 1 !important;
+}
+
+/* Reduce extra vertical gaps between list items */
+.summary-list li,
+.summary-sublist li,
+.info-list li,
+.category-definition-list li {
+  margin-bottom: 6px !important;
+}
+
+/* Keep paragraph spacing compact inside cards */
+.report-card p {
+  margin-bottom: 8px !important;
+}
+
+/* Make Summary card text smaller */
+.school-summary-card .summary-list,
+.school-summary-card .summary-list li,
+.school-summary-card .summary-sublist,
+.school-summary-card .summary-sublist li {
+  font-size: 0.825rem;
+  line-height: 1.2;
+}
+
+/* Keep bold numbers/values same size as surrounding text */
+.school-summary-card .summary-list strong,
+.school-summary-card .summary-sublist strong {
+  font-size: inherit;
+}
+
+.school-summary-card .summary-list li,
+.school-summary-card .summary-sublist li {
+  margin-bottom: 4px;
+}
+
+.school-summary-card .summary-sublist {
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
+
+/* Reduce space between Demographic Participation title and first chart title */
+.participation-card > h3 {
+  margin-bottom: 0;
+  line-height: 1.15;
+}
+
+/* Reduce space between Demographic Participation title and first chart title */
+.participation-card > h3 {
+  margin-bottom: 0 !important;
+  line-height: 1.05 !important;
+}
+
+.participation-card > h3 + .chart-js-section {
+  margin-top: 8px !important;
+  padding-top: 0 !important;
+  border-top: none !important;
+}
+
+.participation-card > h3 + .chart-js-section h4 {
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
+  line-height: 1.05 !important;
+}
+
+.participation-card .chart-js-section:first-of-type h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  line-height: 1.15;
+}
+
+/* Reduce space between map-card title and first map title */
+.image-card > h3,
+.two-image-card > h3 {
+  margin-bottom: 0 !important;
+  line-height: 1.05 !important;
+}
+
+.image-card > .two-map-grid,
+.two-image-card > .two-map-grid {
+  margin-top: 8px !important;
+}
+
+.image-card .map-panel:first-child .map-panel-title,
+.two-image-card .map-panel:first-child .map-panel-title {
+  margin-top: 0 !important;
+}
+
+/* Change only main report card titles */
+.report-card h3 {
+  color: #051e39;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+/* Make ArcGIS zoom buttons smaller */
+.card-map .esri-zoom .esri-widget--button {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  font-size: 0.65rem !important;
+  line-height: 24px !important;
+}
+
+.card-map .esri-zoom .esri-icon-plus,
+.card-map .esri-zoom .esri-icon-minus {
+  font-size: 11px !important;
+}
+
+/* Make info popup text match compact report text */
+.card-info-popup,
+.card-info-popup p,
+.card-info-popup li,
+.card-info-popup strong,
+.info-list li,
+.category-definition-list li {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+}
+
+.info-list li,
+.category-definition-list li {
+  margin-bottom: 6px !important;
+}
+
+.category-definition-list {
+  margin-top: 4px !important;
+  margin-bottom: 0 !important;
 }
