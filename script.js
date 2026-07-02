@@ -159,7 +159,8 @@ const sampleSchoolSummaryData = {
     csEnrollmentComparison: "NULL%",
     category1: "15",
     category2: "0",
-    category34: "13",
+    category3: "0",
+    category4: "13",
     teacherStudentRatio: "0.04",
     teacherStudentRatioComparison: "NULL",
   },
@@ -179,7 +180,8 @@ const sampleDistrictSummaryData = {
     csEnrollmentComparison: "NULL%",
     category1: "15",
     category2: "0",
-    category34: "13",
+    category3: "0",
+    category4: "13",
     teacherStudentRatio: "0.04",
     teacherStudentRatioComparison: "NULL",
   },
@@ -210,7 +212,8 @@ function updateSchoolSummaryFromData(data) {
   setTextById("schoolCsEnrollmentComparison", data.csEnrollmentComparison);
   setTextById("schoolCategory1", data.category1);
   setTextById("schoolCategory2", data.category2);
-  setTextById("schoolCategory34", data.category34);
+  setTextById("schoolCategory3", data.category3);
+  setTextById("schoolCategory4", data.category4);
   setTextById("schoolCsTeachersText", data.csTeachers);
   setTextById("schoolTeacherStudentRatio", data.teacherStudentRatio);
   setTextById(
@@ -236,7 +239,8 @@ function updateDistrictSummaryFromData(data) {
   setTextById("districtCsEnrollmentComparison", data.csEnrollmentComparison);
   setTextById("districtCategory1", data.category1);
   setTextById("districtCategory2", data.category2);
-  setTextById("districtCategory34", data.category34);
+  setTextById("districtCategory3", data.category3);
+  setTextById("districtCategory4", data.category4);
   setTextById("districtCsTeachersText", data.csTeachers);
   setTextById("districtTeacherStudentRatio", data.teacherStudentRatio);
   setTextById(
@@ -693,7 +697,8 @@ function buildSchoolSummaryDataFromAttributes(attributes) {
 
     category1: formatWholeNumber(attributes.NumCategor),
     category2: formatWholeNumber(attributes.NumCateg_1),
-    category34: formatWholeNumber(category3 + category4),
+    category3: formatWholeNumber(category3),
+    category4: formatWholeNumber(category4),
 
     teacherStudentRatio: formatDecimal(attributes.RatioCSTeacherToStudent),
     teacherStudentRatioComparison: "NULL",
@@ -901,7 +906,8 @@ function buildDistrictSummaryDataFromFeatures(features) {
 
     category1: formatWholeNumber(totals.category1),
     category2: formatWholeNumber(totals.category2),
-    category34: formatWholeNumber(totals.category3 + totals.category4),
+    category3: formatWholeNumber(totals.category3),
+    category4: formatWholeNumber(totals.category4),
 
     teacherStudentRatio: formatDecimal(teacherStudentRatio),
     teacherStudentRatioComparison: "NULL",
@@ -1044,34 +1050,6 @@ if (customSelect && selectTrigger && selectedValue && selectSearch) {
   loadSchoolLookupFromArcGIS();
 }
 
-const rightSideCategoryLabelsPlugin = {
-  id: "rightSideCategoryLabelsPlugin",
-
-  afterDatasetsDraw(chart) {
-    const { ctx, chartArea } = chart;
-    const labels = chart.data.labels;
-
-    if (!labels || labels.length === 0) return;
-
-    ctx.save();
-    ctx.font = "11px Arial";
-    ctx.fillStyle = "#666666";
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
-
-    labels.forEach((label, index) => {
-      const meta = chart.getDatasetMeta(0);
-      const bar = meta.data[index];
-
-      if (!bar) return;
-
-      ctx.fillText(label, chartArea.right - 4, bar.y);
-    });
-
-    ctx.restore();
-  },
-};
-
 /* Race/Ethnicity double bar chart */
 
 const raceEthnicityChartCanvas = document.getElementById("raceEthnicityChart");
@@ -1158,12 +1136,15 @@ if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
             display: false,
           },
           ticks: {
-            display: false,
+            display: true,
+            font: {
+              family: "Arial",
+              size: 11,
+            },
           },
         },
       },
     },
-    plugins: [rightSideCategoryLabelsPlugin],
   });
 }
 
@@ -1255,12 +1236,15 @@ if (districtRaceEthnicityChartCanvas && typeof Chart !== "undefined") {
             display: false,
           },
           ticks: {
-            display: false,
+            display: true,
+            font: {
+              family: "Arial",
+              size: 11,
+            },
           },
         },
       },
     },
-    plugins: [rightSideCategoryLabelsPlugin],
   });
 }
 
