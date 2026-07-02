@@ -1938,3 +1938,10 @@ a:hover {
   margin-top: 4px !important;
   margin-bottom: 0 !important;
 }
+
+#schoolGrid > .future-suggestion-card,
+#districtReportGrid > .future-suggestion-card,
+#schoolGrid > .report-export-row,
+#districtReportGrid > .report-export-row {
+  grid-column: 1 / -1;
+}
