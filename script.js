@@ -102,21 +102,19 @@ function updateSnapshotTitles() {
 
   if (selectedReportType === "state") {
     if (stateSnapshotHeading) {
-      stateSnapshotHeading.textContent = `${reportSchoolYearLabel} Computing Education Resources Statewide Report`;
+      stateSnapshotHeading.textContent = `${reportSchoolYearLabel} CS Education Access Statewide Report`;
     }
 
     if (stateSnapshotSubtitle) {
       stateSnapshotSubtitle.innerHTML = `
         Georgia Statewide
-        <span>•</span>
-        State Report
       `;
     }
   }
 
   if (selectedReportType === "school") {
     if (schoolSnapshotHeading) {
-      schoolSnapshotHeading.textContent = `${reportSchoolYearLabel} Computing Education Resources School Report`;
+      schoolSnapshotHeading.textContent = `${reportSchoolYearLabel} CS Education Access School Report`;
     }
 
     if (schoolSnapshotSubtitle) {
@@ -132,14 +130,12 @@ function updateSnapshotTitles() {
 
   if (selectedReportType === "district") {
     if (districtSnapshotHeading) {
-      districtSnapshotHeading.textContent = `${reportSchoolYearLabel} Computing Education Resources District Report`;
+      districtSnapshotHeading.textContent = `${reportSchoolYearLabel} CS Education Access District Report`;
     }
 
     if (districtSnapshotSubtitle) {
       districtSnapshotSubtitle.innerHTML = `
         ${selectedDistrictName || selectedReportValue}
-        <span>•</span>
-        District Report
       `;
     }
   }
@@ -665,6 +661,366 @@ function formatDecimal(value, digits = 2) {
   return number.toFixed(digits).replace(/\.?0+$/, "");
 }
 
+/* Benchmark / comparison helpers */
+
+let statewideComparisonFeaturesPromise = null;
+
+const comparisonCourseFields = [
+  { field: "APCSA", label: "AP Computer Science A" },
+  { field: "APCSP", label: "AP Computer Science Principles" },
+  ...otherCourseFields,
+];
+
+const comparisonOutFields = [
+  "SystemName",
+  "SchoolType",
+  "StudentCou",
+  "NumCSEnrol",
+  "NumCSCours",
+  "NumCSTeach",
+  "RatioCStoSchool",
+  "RatioCSTeacherToStudent",
+  ...comparisonCourseFields.map((course) => course.field),
+].join(",");
+
+function toFiniteNumber(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+
+  return number;
+}
+
+function safeDivide(numerator, denominator) {
+  const top = toFiniteNumber(numerator);
+  const bottom = toFiniteNumber(denominator);
+
+  if (top === null || bottom === null || bottom === 0) {
+    return null;
+  }
+
+  return top / bottom;
+}
+
+function getFeatureAttributes(feature) {
+  return feature && feature.attributes ? feature.attributes : {};
+}
+
+function getSumFromFeatures(features, field) {
+  return features.reduce((sum, feature) => {
+    const value = toFiniteNumber(getFeatureAttributes(feature)[field]);
+    return sum + (value || 0);
+  }, 0);
+}
+
+function getAverageFieldFromFeatures(features, field) {
+  const values = features
+    .map((feature) => toFiniteNumber(getFeatureAttributes(feature)[field]))
+    .filter((value) => value !== null);
+
+  if (values.length === 0) {
+    return null;
+  }
+
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function getRatioFromFeatureTotals(features, numeratorField, denominatorField) {
+  const numerator = getSumFromFeatures(features, numeratorField);
+  const denominator = getSumFromFeatures(features, denominatorField);
+
+  return safeDivide(numerator, denominator);
+}
+
+function formatBenchmarkComparison(currentValue, benchmarkValue) {
+  const current = toFiniteNumber(currentValue);
+  const benchmark = toFiniteNumber(benchmarkValue);
+
+  if (current === null || benchmark === null || benchmark === 0) {
+    return "--";
+  }
+
+  const percentDifference = ((current - benchmark) / benchmark) * 100;
+  const absoluteDifference = Math.abs(percentDifference);
+
+  if (absoluteDifference < 0.05) {
+    return "about the same as";
+  }
+
+  const formattedDifference = formatDecimal(absoluteDifference, 1);
+  const direction = percentDifference > 0 ? "higher than" : "lower than";
+
+  return `${formattedDifference}% ${direction}`;
+}
+
+function normalizeToPercentValue(value) {
+  const number = toFiniteNumber(value);
+
+  if (number === null) {
+    return null;
+  }
+
+  if (Math.abs(number) <= 1) {
+    return number * 100;
+  }
+
+  return number;
+}
+
+function formatPercentagePointComparison(currentValue, benchmarkValue) {
+  const currentPercent = normalizeToPercentValue(currentValue);
+  const benchmarkPercent = normalizeToPercentValue(benchmarkValue);
+
+  if (currentPercent === null || benchmarkPercent === null) {
+    return "--";
+  }
+
+  const pointDifference = currentPercent - benchmarkPercent;
+  const absoluteDifference = Math.abs(pointDifference);
+
+  if (absoluteDifference < 0.05) {
+    return "about the same as";
+  }
+
+  const formattedDifference = formatDecimal(absoluteDifference, 1);
+  const direction = pointDifference > 0 ? "higher than" : "lower than";
+
+  return `${formattedDifference} percentage points ${direction}`;
+}
+
+function formatCountDifferenceComparison(
+  currentValue,
+  benchmarkValue,
+  singularUnit = "course",
+  pluralUnit = "courses",
+) {
+  const current = toFiniteNumber(currentValue);
+  const benchmark = toFiniteNumber(benchmarkValue);
+
+  if (current === null || benchmark === null) {
+    return "--";
+  }
+
+  const difference = current - benchmark;
+  const absoluteDifference = Math.abs(difference);
+
+  if (absoluteDifference < 0.05) {
+    return "about the same as";
+  }
+
+  const formattedDifference = formatDecimal(absoluteDifference, 1);
+  const unit = absoluteDifference === 1 ? singularUnit : pluralUnit;
+  const direction = difference > 0 ? "higher than" : "lower than";
+
+  return `${formattedDifference} ${unit} ${direction}`;
+}
+
+function getCourseCountFromFeatures(features) {
+  const courseLabels = new Set();
+
+  features.forEach((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    comparisonCourseFields.forEach((course) => {
+      if (isAvailable(attributes[course.field])) {
+        courseLabels.add(course.label);
+      }
+    });
+  });
+
+  return courseLabels.size;
+}
+
+function getAverageDistrictCourseCount(features) {
+  const districtMap = new Map();
+
+  features.forEach((feature) => {
+    const attributes = getFeatureAttributes(feature);
+    const districtName = attributes.SystemName || "District unavailable";
+
+    if (!districtMap.has(districtName)) {
+      districtMap.set(districtName, []);
+    }
+
+    districtMap.get(districtName).push(feature);
+  });
+
+  const districtCourseCounts = Array.from(districtMap.values()).map(
+    (districtFeatures) => getCourseCountFromFeatures(districtFeatures),
+  );
+
+  if (districtCourseCounts.length === 0) {
+    return null;
+  }
+
+  return (
+    districtCourseCounts.reduce((sum, count) => sum + count, 0) /
+    districtCourseCounts.length
+  );
+}
+
+async function fetchAllComparisonFeaturesFromArcGIS() {
+  if (statewideComparisonFeaturesPromise) {
+    return statewideComparisonFeaturesPromise;
+  }
+
+  statewideComparisonFeaturesPromise = (async () => {
+    const pageSize = 2000;
+    let resultOffset = 0;
+    const allFeatures = [];
+
+    while (true) {
+      const queryParams = new URLSearchParams({
+        where: "1=1",
+        outFields: comparisonOutFields,
+        returnGeometry: "false",
+        resultOffset: String(resultOffset),
+        resultRecordCount: String(pageSize),
+        f: "json",
+      });
+
+      const response = await fetch(
+        `${schoolLookupLayerQueryUrl}?${queryParams}`,
+      );
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(JSON.stringify(data.error));
+      }
+
+      const features = data.features || [];
+      allFeatures.push(...features);
+
+      if (features.length < pageSize) {
+        break;
+      }
+
+      resultOffset += pageSize;
+    }
+
+    return allFeatures;
+  })();
+
+  return statewideComparisonFeaturesPromise;
+}
+
+function getFeaturesForSchoolType(features, schoolType) {
+  if (!schoolType) {
+    return features;
+  }
+
+  return features.filter((feature) => {
+    return getFeatureAttributes(feature).SchoolType === schoolType;
+  });
+}
+
+function getFeaturesForDistrict(features, districtName) {
+  if (!districtName) {
+    return [];
+  }
+
+  return features.filter((feature) => {
+    return getFeatureAttributes(feature).SystemName === districtName;
+  });
+}
+
+function buildSchoolComparisonValues(attributes, statewideFeatures) {
+  const schoolTypeFeatures = getFeaturesForSchoolType(
+    statewideFeatures,
+    attributes.SchoolType,
+  );
+
+  const districtFeatures = getFeaturesForDistrict(
+    statewideFeatures,
+    attributes.SystemName || selectedDistrictName,
+  );
+
+  const comparisonPool =
+    schoolTypeFeatures.length > 0 ? schoolTypeFeatures : statewideFeatures;
+
+  const stateAverageCsCourses = getAverageFieldFromFeatures(
+    comparisonPool,
+    "NumCSCours",
+  );
+
+  const schoolCsEnrollmentRatio = safeDivide(
+    attributes.NumCSEnrol,
+    attributes.StudentCou,
+  );
+
+  const stateCsEnrollmentRatio = getRatioFromFeatureTotals(
+    statewideFeatures,
+    "NumCSEnrol",
+    "StudentCou",
+  );
+
+  const teacherBenchmarkFeatures =
+    districtFeatures.length > 0 ? districtFeatures : statewideFeatures;
+
+  const districtTeacherStudentRatio = getRatioFromFeatureTotals(
+    teacherBenchmarkFeatures,
+    "NumCSTeach",
+    "NumCSEnrol",
+  );
+
+  return {
+    csCoursesComparison: formatCountDifferenceComparison(
+      attributes.NumCSCours,
+      stateAverageCsCourses,
+      "course",
+      "courses",
+    ),
+    csEnrollmentComparison: formatPercentagePointComparison(
+      schoolCsEnrollmentRatio,
+      stateCsEnrollmentRatio,
+    ),
+    teacherStudentRatioComparison: formatDecimal(districtTeacherStudentRatio),
+  };
+}
+
+function buildDistrictComparisonValues(
+  districtFeatures,
+  statewideFeatures,
+  districtCourseCount,
+) {
+  const districtCsEnrollmentRatio = getRatioFromFeatureTotals(
+    districtFeatures,
+    "NumCSEnrol",
+    "StudentCou",
+  );
+
+  const stateCsEnrollmentRatio = getRatioFromFeatureTotals(
+    statewideFeatures,
+    "NumCSEnrol",
+    "StudentCou",
+  );
+
+  const districtTeacherStudentRatio = getRatioFromFeatureTotals(
+    statewideFeatures,
+    "NumCSTeach",
+    "NumCSEnrol",
+  );
+
+  const averageDistrictCourseCount =
+    getAverageDistrictCourseCount(statewideFeatures);
+
+  return {
+    csCoursesComparison: formatCountDifferenceComparison(
+      districtCourseCount,
+      averageDistrictCourseCount,
+      "course",
+      "courses",
+    ),
+    csEnrollmentComparison: formatPercentagePointComparison(
+      districtCsEnrollmentRatio,
+      stateCsEnrollmentRatio,
+    ),
+    teacherStudentRatioComparison: formatDecimal(districtTeacherStudentRatio),
+  };
+}
+
 /* Demographic chart helpers */
 
 let raceEthnicityChart = null;
@@ -832,9 +1188,17 @@ function getOtherCourses(attributes) {
   return availableCourses.join(", ");
 }
 
-function buildSchoolSummaryDataFromAttributes(attributes) {
+function buildSchoolSummaryDataFromAttributes(
+  attributes,
+  statewideFeatures = [],
+) {
   const category3 = Number(attributes.NumCateg_2) || 0;
   const category4 = Number(attributes.NumCateg_3) || 0;
+
+  const comparisonValues = buildSchoolComparisonValues(
+    attributes,
+    statewideFeatures,
+  );
 
   return {
     totalStudents: formatWholeNumber(attributes.StudentCou),
@@ -842,13 +1206,13 @@ function buildSchoolSummaryDataFromAttributes(attributes) {
     csTeachers: formatWholeNumber(attributes.NumCSTeach),
     csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
 
-    csCoursesComparison: "NULL%",
+    csCoursesComparison: comparisonValues.csCoursesComparison,
     apCsa: isAvailable(attributes.APCSA) ? "Available" : "Unavailable",
     apCsp: isAvailable(attributes.APCSP) ? "Available" : "Unavailable",
     otherCourses: getOtherCourses(attributes),
 
     csEnrollmentPercent: formatPercent(attributes.RatioCStoSchool),
-    csEnrollmentComparison: "NULL%",
+    csEnrollmentComparison: comparisonValues.csEnrollmentComparison,
 
     category1: formatWholeNumber(attributes.NumCategor),
     category2: formatWholeNumber(attributes.NumCateg_1),
@@ -856,7 +1220,8 @@ function buildSchoolSummaryDataFromAttributes(attributes) {
     category4: formatWholeNumber(category4),
 
     teacherStudentRatio: formatDecimal(attributes.RatioCSTeacherToStudent),
-    teacherStudentRatioComparison: "NULL",
+    teacherStudentRatioComparison:
+      comparisonValues.teacherStudentRatioComparison,
   };
 }
 
@@ -933,7 +1298,22 @@ async function loadSchoolSummaryFromArcGIS() {
     }
 
     const attributes = feature.attributes;
-    const schoolSummaryData = buildSchoolSummaryDataFromAttributes(attributes);
+
+    let statewideFeatures = [];
+
+    try {
+      statewideFeatures = await fetchAllComparisonFeaturesFromArcGIS();
+    } catch (comparisonError) {
+      console.warn(
+        "Could not load statewide comparison data:",
+        comparisonError,
+      );
+    }
+
+    const schoolSummaryData = buildSchoolSummaryDataFromAttributes(
+      attributes,
+      statewideFeatures,
+    );
 
     updateSchoolSummaryFromData(schoolSummaryData);
     updateSchoolDemographicChartsFromAttributes(attributes);
@@ -994,7 +1374,10 @@ async function fetchDistrictSchoolFeaturesFromArcGIS() {
   return allFeatures;
 }
 
-function buildDistrictSummaryDataFromFeatures(features) {
+function buildDistrictSummaryDataFromFeatures(
+  features,
+  statewideFeatures = [],
+) {
   const totals = {
     totalStudents: 0,
     csTeachers: 0,
@@ -1040,13 +1423,18 @@ function buildDistrictSummaryDataFromFeatures(features) {
   const teacherStudentRatio =
     totals.csEnrollments > 0 ? totals.csTeachers / totals.csEnrollments : null;
 
+  const comparisonValues = buildDistrictComparisonValues(
+    features,
+    statewideFeatures,
+    availableCourseLabels.size,
+  );
   return {
     totalStudents: formatWholeNumber(totals.totalStudents),
     csCourses: formatWholeNumber(availableCourseLabels.size),
     csTeachers: formatWholeNumber(totals.csTeachers),
     csEnrollments: formatWholeNumber(totals.csEnrollments),
 
-    csCoursesComparison: "NULL%",
+    csCoursesComparison: comparisonValues.csCoursesComparison,
     apCsa: availableCourseLabels.has("AP Computer Science A")
       ? "Available"
       : "Unavailable",
@@ -1059,7 +1447,7 @@ function buildDistrictSummaryDataFromFeatures(features) {
         : "None listed",
 
     csEnrollmentPercent: formatPercent(csEnrollmentRatio),
-    csEnrollmentComparison: "NULL%",
+    csEnrollmentComparison: comparisonValues.csEnrollmentComparison,
 
     category1: formatWholeNumber(totals.category1),
     category2: formatWholeNumber(totals.category2),
@@ -1067,7 +1455,8 @@ function buildDistrictSummaryDataFromFeatures(features) {
     category4: formatWholeNumber(totals.category4),
 
     teacherStudentRatio: formatDecimal(teacherStudentRatio),
-    teacherStudentRatioComparison: "NULL",
+    teacherStudentRatioComparison:
+      comparisonValues.teacherStudentRatioComparison,
   };
 }
 
@@ -1091,7 +1480,21 @@ async function loadDistrictSummaryFromArcGIS() {
       return;
     }
 
-    const districtSummaryData = buildDistrictSummaryDataFromFeatures(features);
+    let statewideFeatures = [];
+
+    try {
+      statewideFeatures = await fetchAllComparisonFeaturesFromArcGIS();
+    } catch (comparisonError) {
+      console.warn(
+        "Could not load statewide comparison data:",
+        comparisonError,
+      );
+    }
+
+    const districtSummaryData = buildDistrictSummaryDataFromFeatures(
+      features,
+      statewideFeatures,
+    );
 
     updateDistrictSummaryFromData(districtSummaryData);
     updateDistrictDemographicChartsFromFeatures(features);
@@ -1868,7 +2271,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
-        "Percentage",
+        "Percent of Students Proficient or Above in Mathematics",
       );
     }
 
@@ -1946,7 +2349,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
-        "Percentage",
+        "Percent of Students Proficient or Above in English Language Arts",
       );
     }
 
@@ -2231,7 +2634,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
-        "Income",
+        "Median Household Income",
       );
       createContextMap(
         "districtInternetAccessMap",
@@ -2367,7 +2770,7 @@ if (typeof require !== "undefined") {
           },
         ],
         schoolLocation,
-        "Income",
+        "Median Household Income",
       );
       window.updateReportMapsForSelection();
     });
@@ -2389,6 +2792,11 @@ cardInfoButtons.forEach((button) => {
       if (item !== popup) {
         item.classList.remove("show");
       }
+    });
+
+    // Info icon opens the info card normally, without any highlighted note.
+    document.querySelectorAll(".info-highlight-active").forEach((item) => {
+      item.classList.remove("info-highlight-active");
     });
 
     if (popup) {
@@ -2418,6 +2826,47 @@ document.addEventListener("click", () => {
 document.querySelectorAll(".card-info-popup").forEach((popup) => {
   popup.addEventListener("click", (event) => {
     event.stopPropagation();
+  });
+});
+
+/* Inline asterisk info links */
+
+document.querySelectorAll(".inline-info-link").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const targetId = link.dataset.infoTarget;
+    const card = link.closest(".report-card");
+
+    if (!targetId || !card) {
+      return;
+    }
+
+    const popup = card.querySelector(".card-info-popup");
+    const target = document.getElementById(targetId);
+
+    if (!popup || !target) {
+      return;
+    }
+
+    document.querySelectorAll(".card-info-popup").forEach((item) => {
+      if (item !== popup) {
+        item.classList.remove("show");
+      }
+    });
+
+    document.querySelectorAll(".info-highlight-active").forEach((item) => {
+      item.classList.remove("info-highlight-active");
+    });
+
+    popup.classList.add("show");
+    target.classList.add("info-highlight-active");
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   });
 });
 
@@ -2661,14 +3110,14 @@ function buildReportFileName(reportType) {
   );
 
   if (reportType === "school") {
-    return `${schoolYear} Computing Education Resources School Report - ${districtName} - ${schoolName}.pdf`;
+    return `${schoolYear} CS Education Access School Report - ${districtName} - ${schoolName}.pdf`;
   }
 
   if (reportType === "district") {
-    return `${schoolYear} Computing Education Resources District Report - ${districtName}.pdf`;
+    return `${schoolYear} CS Education Access District Report - ${districtName}.pdf`;
   }
 
-  return `${schoolYear} Computing Education Resources Statewide Report.pdf`;
+  return `${schoolYear} CS Education Access Statewide Report.pdf`;
 }
 
 /* School export */

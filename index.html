@@ -39,21 +39,26 @@
     <main>
       <section class="hero-section">
         <div class="container narrow">
-          <h1>The Constellations Report Generator</h1>
-          <h2>A K–12 Computer Science Resource Tool</h2>
+          <h1>K-12 CS Education Resource Access Report Generator</h1>
+          <!--
+          <h2>A K-12 Computer Science Resource Tool</h2>
+          -->
 
           <p>
-            Welcome to the Constellations Center Report Generator, a tool that
-            allows users to examine schools, districts, and communities across
-            the state of Georgia of their K–12 computer science resources. Once
-            you access the dashboard or create the type of report you are
-            interested in, you can review, download, export, and share your
-            findings with others!
+            Welcome to the Report Generator for our
+            <a
+              href="https://constellations.gatech.edu/computing-community"
+              class="dashboard-link"
+              >dashboard</a
+            >
+            that allows users to discover K-12 computer science resources across
+            the state of Georgia. You can review, download, and share your
+            findings with others using our curated or customized reports!
           </p>
 
           <p class="desktop-note">
-            For optimal layout, the Constellations Report Generator is currently
-            best viewed on a desktop/laptop.
+            For optimal layout, the Report Generator is currently best viewed on
+            a desktop/laptop.
           </p>
         </div>
       </section>
@@ -112,14 +117,10 @@
 
                   <div class="snapshot-title-text">
                     <h2 id="stateSnapshotHeading">
-                      2024 - 2025 Computing Education Resources Statewide Report
+                      2024 - 2025 CS Education Access Statewide Report
                     </h2>
 
-                    <p id="stateSnapshotSubtitle">
-                      Georgia Statewide
-                      <span>•</span>
-                      State Report
-                    </p>
+                    <p id="stateSnapshotSubtitle">Georgia Statewide</p>
                   </div>
                 </div>
               </div>
@@ -151,7 +152,7 @@
 
                   <div class="snapshot-title-text">
                     <h2 id="schoolSnapshotHeading">
-                      2024 - 2025 Computing Education Resources School Report
+                      2024 - 2025 CS Education Access School Report
                     </h2>
 
                     <p id="schoolSnapshotSubtitle">
@@ -232,7 +233,10 @@
                           </li>
                         </ul>
                       </li>
-                      <li>
+                      <li
+                        id="schoolApprovedCourseNote"
+                        class="info-highlight-target"
+                      >
                         *The approved Georgia CS course list is based on the
                         Georgia Department of Education's approved CS courses in
                         Senate Bill 108.
@@ -265,7 +269,7 @@
                   </div>
 
                   <div class="summary-text">
-                    <ol class="summary-list">
+                    <ul class="summary-list">
                       <li>
                         By the end of the 2024 - 2025 school year, this school
                         has
@@ -276,10 +280,17 @@
                       <li>
                         It provides
                         <strong id="schoolCsCoursesText">2</strong> computer
-                        science courses out of the total approved* CS course
-                        list. This is
-                        <strong id="schoolCsCoursesComparison">NULL%</strong>
-                        higher/lower than the state average for high school.
+                        science courses out of the total approved<button
+                          class="inline-info-link"
+                          type="button"
+                          data-info-target="schoolApprovedCourseNote"
+                          aria-label="Show approved Georgia CS course list note"
+                        >
+                          *
+                        </button>
+                        CS course list. This is
+                        <strong id="schoolCsCoursesComparison">--</strong>
+                        the state average for this school type.
                         <ul class="summary-sublist">
                           <li>
                             AP CS A:
@@ -305,8 +316,8 @@
                         is
                         <strong id="schoolCsEnrollmentPercent">2.67%</strong> of
                         the entire student enrollment, which is
-                        <strong id="schoolCsEnrollmentComparison">NULL%</strong>
-                        higher/lower than Georgia's average.
+                        <strong id="schoolCsEnrollmentComparison">--</strong>
+                        Georgia's average.
                       </li>
 
                       <li>
@@ -323,12 +334,12 @@
                         <strong id="schoolCsTeachersText">1</strong>, giving the
                         school a teacher-student ratio of
                         <strong id="schoolTeacherStudentRatio">0.04</strong>,
-                        compared to the state/district average of
+                        compared to the district average of
                         <strong id="schoolTeacherStudentRatioComparison"
-                          >NULL</strong
+                          >--</strong
                         >.
                       </li>
-                    </ol>
+                    </ul>
                   </div>
                 </article>
                 <article class="report-card image-card">
@@ -622,14 +633,10 @@
 
                   <div class="snapshot-title-text">
                     <h2 id="districtSnapshotHeading">
-                      2024 - 2025 Computing Education Resources District Report
+                      2024 - 2025 CS Education Access District Report
                     </h2>
 
-                    <p id="districtSnapshotSubtitle">
-                      Select a district
-                      <span>•</span>
-                      District Report
-                    </p>
+                    <p id="districtSnapshotSubtitle">Select a district</p>
                   </div>
                 </div>
               </div>
@@ -701,7 +708,10 @@
                           </li>
                         </ul>
                       </li>
-                      <li>
+                      <li
+                        id="districtApprovedCourseNote"
+                        class="info-highlight-target"
+                      >
                         *The approved Georgia CS course list is based on the
                         Georgia Department of Education's approved CS courses in
                         Senate Bill 108.
@@ -738,7 +748,7 @@
                   </div>
 
                   <div class="summary-text">
-                    <ol class="summary-list">
+                    <ul class="summary-list">
                       <li>
                         By the end of the 2024 - 2025 school year, this district
                         has
@@ -749,10 +759,17 @@
                       <li>
                         It provides
                         <strong id="districtCsCoursesText">2</strong> computer
-                        science courses out of the total approved Georgia CS
-                        course list. This is
-                        <strong id="districtCsCoursesComparison">NULL%</strong>
-                        higher/lower than the state average for districts.
+                        science courses out of the total approved<button
+                          class="inline-info-link"
+                          type="button"
+                          data-info-target="districtApprovedCourseNote"
+                          aria-label="Show approved Georgia CS course list note"
+                        >
+                          *
+                        </button>
+                        Georgia CS course list. This is
+                        <strong id="districtCsCoursesComparison">--</strong>
+                        the average Georgia district.
                         <ul class="summary-sublist">
                           <li>
                             AP CS A:
@@ -778,10 +795,8 @@
                         is
                         <strong id="districtCsEnrollmentPercent">2.67%</strong>
                         of the entire student enrollment, which is
-                        <strong id="districtCsEnrollmentComparison"
-                          >NULL%</strong
-                        >
-                        higher/lower than Georgia's average.
+                        <strong id="districtCsEnrollmentComparison">--</strong>
+                        Georgia's average.
                       </li>
 
                       <li>
@@ -799,12 +814,12 @@
                         <strong id="districtCsTeachersText">1</strong>, giving
                         the district a teacher-student ratio of
                         <strong id="districtTeacherStudentRatio">0.04</strong>,
-                        compared to the state/district average of
+                        compared to the statewide average of
                         <strong id="districtTeacherStudentRatioComparison"
-                          >NULL</strong
+                          >--</strong
                         >.
                       </li>
-                    </ol>
+                    </ul>
                   </div>
                 </article>
                 <article class="report-card image-card">
