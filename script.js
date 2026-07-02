@@ -665,6 +665,161 @@ function formatDecimal(value, digits = 2) {
   return number.toFixed(digits).replace(/\.?0+$/, "");
 }
 
+/* Demographic chart helpers */
+
+let raceEthnicityChart = null;
+let districtRaceEthnicityChart = null;
+let genderChart = null;
+let districtGenderChart = null;
+
+const raceDemographicFields = [
+  {
+    schoolField: "PercentAsi",
+    csField: "CSPercen_1",
+  },
+  {
+    schoolField: "PercentBla",
+    csField: "CSPercentB",
+  },
+  {
+    schoolField: "PercentHis",
+    csField: "CSPercentH",
+  },
+  {
+    schoolField: "PercentAme",
+    csField: "CSPercentA",
+  },
+  {
+    schoolField: "PercentWhi",
+    csField: "CSPercentW",
+  },
+  {
+    schoolField: "Percent2Or",
+    csField: "CSPercent2",
+  },
+];
+
+const genderDemographicFields = [
+  {
+    schoolField: "PercentMale",
+    csField: "CSPercentM",
+  },
+  {
+    schoolField: "PercentFemale",
+    csField: "CSPercentF",
+  },
+];
+
+function formatChartPercent(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return 0;
+  }
+
+  return Number(number.toFixed(2));
+}
+
+function getSchoolChartDataFromAttributes(attributes, fieldPairs) {
+  return {
+    schoolData: fieldPairs.map((field) =>
+      formatChartPercent(attributes[field.schoolField]),
+    ),
+    csData: fieldPairs.map((field) =>
+      formatChartPercent(attributes[field.csField]),
+    ),
+  };
+}
+
+function getWeightedAveragePercent(features, percentField, weightField) {
+  let weightedTotal = 0;
+  let totalWeight = 0;
+
+  features.forEach((feature) => {
+    const attributes = feature.attributes || {};
+    const percent = Number(attributes[percentField]);
+    const weight = Number(attributes[weightField]);
+
+    if (Number.isFinite(percent) && Number.isFinite(weight) && weight > 0) {
+      weightedTotal += percent * weight;
+      totalWeight += weight;
+    }
+  });
+
+  if (totalWeight === 0) {
+    return 0;
+  }
+
+  return formatChartPercent(weightedTotal / totalWeight);
+}
+
+function getDistrictChartDataFromFeatures(features, fieldPairs) {
+  return {
+    schoolData: fieldPairs.map((field) =>
+      getWeightedAveragePercent(features, field.schoolField, "StudentCou"),
+    ),
+    csData: fieldPairs.map((field) =>
+      getWeightedAveragePercent(features, field.csField, "NumCSEnrol"),
+    ),
+  };
+}
+
+function updateDoubleBarChart(chart, schoolData, csData, maxValue = 100) {
+  if (!chart) {
+    return;
+  }
+
+  chart.data.datasets[0].data = schoolData;
+  chart.data.datasets[1].data = csData;
+
+  chart.options.scales.x.max = maxValue;
+
+  chart.update();
+}
+
+function updateSchoolDemographicChartsFromAttributes(attributes) {
+  const raceData = getSchoolChartDataFromAttributes(
+    attributes,
+    raceDemographicFields,
+  );
+
+  const genderData = getSchoolChartDataFromAttributes(
+    attributes,
+    genderDemographicFields,
+  );
+
+  updateDoubleBarChart(
+    raceEthnicityChart,
+    raceData.schoolData,
+    raceData.csData,
+  );
+  updateDoubleBarChart(genderChart, genderData.schoolData, genderData.csData);
+}
+
+function updateDistrictDemographicChartsFromFeatures(features) {
+  const raceData = getDistrictChartDataFromFeatures(
+    features,
+    raceDemographicFields,
+  );
+
+  const genderData = getDistrictChartDataFromFeatures(
+    features,
+    genderDemographicFields,
+  );
+
+  updateDoubleBarChart(
+    districtRaceEthnicityChart,
+    raceData.schoolData,
+    raceData.csData,
+  );
+
+  updateDoubleBarChart(
+    districtGenderChart,
+    genderData.schoolData,
+    genderData.csData,
+  );
+}
+
 function getOtherCourses(attributes) {
   const availableCourses = otherCourseFields
     .filter((course) => isAvailable(attributes[course.field]))
@@ -773,6 +928,7 @@ async function loadSchoolSummaryFromArcGIS() {
       });
 
       updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+      updateSchoolDemographicChartsFromAttributes({});
       return;
     }
 
@@ -780,6 +936,7 @@ async function loadSchoolSummaryFromArcGIS() {
     const schoolSummaryData = buildSchoolSummaryDataFromAttributes(attributes);
 
     updateSchoolSummaryFromData(schoolSummaryData);
+    updateSchoolDemographicChartsFromAttributes(attributes);
 
     console.log("Loaded school summary from ArcGIS:", {
       successfulWhereClause,
@@ -917,6 +1074,7 @@ function buildDistrictSummaryDataFromFeatures(features) {
 async function loadDistrictSummaryFromArcGIS() {
   if (!selectedDistrictName) {
     updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+    updateDistrictDemographicChartsFromFeatures([]);
     return;
   }
 
@@ -929,12 +1087,14 @@ async function loadDistrictSummaryFromArcGIS() {
         selectedDistrictName,
       );
       updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+      updateDistrictDemographicChartsFromFeatures([]);
       return;
     }
 
     const districtSummaryData = buildDistrictSummaryDataFromFeatures(features);
 
     updateDistrictSummaryFromData(districtSummaryData);
+    updateDistrictDemographicChartsFromFeatures(features);
 
     console.log("Loaded district summary from ArcGIS:", {
       selectedDistrictName,
@@ -1055,7 +1215,7 @@ if (customSelect && selectTrigger && selectedValue && selectSearch) {
 const raceEthnicityChartCanvas = document.getElementById("raceEthnicityChart");
 
 if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
-  new Chart(raceEthnicityChartCanvas, {
+  raceEthnicityChart = new Chart(raceEthnicityChartCanvas, {
     type: "bar",
     data: {
       labels: [
@@ -1070,14 +1230,14 @@ if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
         {
           label: "School",
           // 0.5 is used to represent <1% for the Native American category
-          data: [1, 24, 19, 0.5, 52, 4],
+          data: [0, 0, 0, 0, 0, 0],
           backgroundColor: "#B3A369",
           borderRadius: 8,
           barThickness: 10,
         },
         {
           label: "CS",
-          data: [0, 32, 25, 0, 39, 4],
+          data: [0, 0, 0, 0, 0, 0],
           backgroundColor: "#003057",
           borderRadius: 8,
           barThickness: 10,
@@ -1106,14 +1266,7 @@ if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
               return "";
             },
             label: function (context) {
-              const label = context.dataset.label;
-              const value = context.raw;
-
-              if (value === 0.5 && label === "School") {
-                return label + ": <1%";
-              }
-
-              return label + ": " + value + "%";
+              return context.dataset.label + ": " + context.raw + "%";
             },
           },
         },
@@ -1155,7 +1308,7 @@ const districtRaceEthnicityChartCanvas = document.getElementById(
 );
 
 if (districtRaceEthnicityChartCanvas && typeof Chart !== "undefined") {
-  new Chart(districtRaceEthnicityChartCanvas, {
+  districtRaceEthnicityChart = new Chart(districtRaceEthnicityChartCanvas, {
     type: "bar",
     data: {
       labels: [
@@ -1170,14 +1323,14 @@ if (districtRaceEthnicityChartCanvas && typeof Chart !== "undefined") {
         {
           label: "School",
           // 0.5 is used to represent <1% for the Native American category
-          data: [1, 24, 19, 0.5, 52, 4],
+          data: [0, 0, 0, 0, 0, 0],
           backgroundColor: "#B3A369",
           borderRadius: 8,
           barThickness: 10,
         },
         {
           label: "CS",
-          data: [0, 32, 25, 0, 39, 4],
+          data: [0, 0, 0, 0, 0, 0],
           backgroundColor: "#003057",
           borderRadius: 8,
           barThickness: 10,
@@ -1253,21 +1406,21 @@ if (districtRaceEthnicityChartCanvas && typeof Chart !== "undefined") {
 const genderChartCanvas = document.getElementById("genderChart");
 
 if (genderChartCanvas && typeof Chart !== "undefined") {
-  new Chart(genderChartCanvas, {
+  genderChart = new Chart(genderChartCanvas, {
     type: "bar",
     data: {
       labels: ["Male", "Female"],
       datasets: [
         {
           label: "School",
-          data: [52, 48],
+          data: [0, 0],
           backgroundColor: "#B3A369",
           borderRadius: 8,
           barThickness: 12,
         },
         {
           label: "CS",
-          data: [75, 25],
+          data: [0, 0],
           backgroundColor: "#003057",
           borderRadius: 8,
           barThickness: 12,
@@ -1337,21 +1490,21 @@ const districtGenderChartCanvas = document.getElementById(
 );
 
 if (districtGenderChartCanvas && typeof Chart !== "undefined") {
-  new Chart(districtGenderChartCanvas, {
+  districtGenderChart = new Chart(districtGenderChartCanvas, {
     type: "bar",
     data: {
       labels: ["Male", "Female"],
       datasets: [
         {
           label: "School",
-          data: [52, 48],
+          data: [0, 0],
           backgroundColor: "#B3A369",
           borderRadius: 8,
           barThickness: 12,
         },
         {
           label: "CS",
-          data: [75, 25],
+          data: [0, 0],
           backgroundColor: "#003057",
           borderRadius: 8,
           barThickness: 12,
