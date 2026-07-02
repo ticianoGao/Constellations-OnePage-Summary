@@ -1059,12 +1059,12 @@ if (raceEthnicityChartCanvas && typeof Chart !== "undefined") {
     type: "bar",
     data: {
       labels: [
-        "Asian and Pacific Islander",
+        ["Asian and", "Pacific Islander"],
         "Black",
         "Hispanic",
-        "Native American",
+        ["Native", "American"],
         "White",
-        "Two or More Races",
+        ["Two or", "More Races"],
       ],
       datasets: [
         {
@@ -1159,12 +1159,12 @@ if (districtRaceEthnicityChartCanvas && typeof Chart !== "undefined") {
     type: "bar",
     data: {
       labels: [
-        "Asian and Pacific Islander",
+        ["Asian and", "Pacific Islander"],
         "Black",
         "Hispanic",
-        "Native American",
+        ["Native", "American"],
         "White",
-        "Two or More Races",
+        ["Two or", "More Races"],
       ],
       datasets: [
         {

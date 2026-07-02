@@ -1718,7 +1718,11 @@ a:hover {
 /* What Now / Future Suggestions card */
 .future-suggestion-card {
   min-height: 260px;
-  padding-right: 150px;
+  padding-right: 24px;
+}
+
+.future-suggestion-card h3 {
+  padding-right: 125px;
 }
 
 /* Readiness score badge */
@@ -1755,15 +1759,13 @@ a:hover {
 
 /* Pseudocode style */
 .future-pseudocode-block {
-  margin-top: 16px;
-  margin-right: -126px;
-
+  margin-top: 30px;
+  margin-right: 0;
   background: #f5f7fa;
   border: 1px solid #d9d9d9;
   border-left: 5px solid var(--gold);
   border-radius: 8px;
-
-  padding: 14px 16px;
+  padding: 18px 22px;
 
   font-family: "Courier New", Courier, monospace;
   font-size: 0.76rem;
