@@ -195,6 +195,14 @@ function setTextById(id, value) {
   }
 }
 
+function setHtmlById(id, value) {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.innerHTML = value;
+  }
+}
+
 function updateSchoolSummaryFromData(data) {
   setTextById("schoolTotalStudents", data.totalStudents);
   setTextById("schoolCsCourses", data.csCourses);
@@ -207,9 +215,9 @@ function updateSchoolSummaryFromData(data) {
   setTextById("schoolApprovedCsCoursesVerb", data.approvedCsCoursesVerb);
   setTextById("schoolCsCourseAverageSentence", data.csCourseAverageSentence);
   setTextById("schoolCsCoursesComparison", data.csCoursesComparison);
-  setTextById("schoolApCsa", data.apCsa);
-  setTextById("schoolApCsp", data.apCsp);
-  setTextById("schoolOtherCourses", data.otherCourses);
+  setHtmlById("schoolApCsa", data.apCsa);
+  setHtmlById("schoolApCsp", data.apCsp);
+  setHtmlById("schoolOtherCourses", data.otherCourses);
   setTextById("schoolCsEnrollmentsText", data.csEnrollments);
   setTextById("schoolCsEnrollmentPercent", data.csEnrollmentPercent);
   setTextById("schoolCsEnrollmentComparison", data.csEnrollmentComparison);
@@ -234,9 +242,9 @@ function updateDistrictSummaryFromData(data) {
   setTextById("districtTotalStudentsText", data.totalStudents);
   setTextById("districtCsCoursesText", data.csCourses);
   setTextById("districtCsCoursesComparison", data.csCoursesComparison);
-  setTextById("districtApCsa", data.apCsa);
-  setTextById("districtApCsp", data.apCsp);
-  setTextById("districtOtherCourses", data.otherCourses);
+  setHtmlById("districtApCsa", data.apCsa);
+  setHtmlById("districtApCsp", data.apCsp);
+  setHtmlById("districtOtherCourses", data.otherCourses);
   setTextById("districtCsEnrollmentsText", data.csEnrollments);
   setTextById("districtCsEnrollmentPercent", data.csEnrollmentPercent);
   setTextById("districtCsEnrollmentComparison", data.csEnrollmentComparison);
@@ -632,6 +640,33 @@ function isAvailable(value) {
   return !["no", "n", "0", "false", "null", "none", "unavailable"].includes(
     normalized,
   );
+}
+
+function getApprovedCourseAsterisk(targetId) {
+  return `<button
+    class="inline-info-link"
+    type="button"
+    data-info-target="${targetId}"
+    aria-label="Show approved Georgia CS course list note"
+  >*</button>`;
+}
+
+function formatApprovedAvailability(value, targetId) {
+  if (!isAvailable(value)) {
+    return "Unavailable";
+  }
+
+  return `Available${getApprovedCourseAsterisk(targetId)}`;
+}
+
+function formatApprovedCourseLabels(courseLabels, targetId) {
+  if (!courseLabels || courseLabels.length === 0) {
+    return "None listed";
+  }
+
+  return courseLabels
+    .map((label) => `${label}${getApprovedCourseAsterisk(targetId)}`)
+    .join(", ");
 }
 
 function formatWholeNumber(value) {
@@ -1224,16 +1259,12 @@ function updateDistrictDemographicChartsFromFeatures(features) {
   );
 }
 
-function getOtherCourses(attributes) {
+function getOtherCourses(attributes, targetId) {
   const availableCourses = otherCourseFields
     .filter((course) => isAvailable(attributes[course.field]))
     .map((course) => course.label);
 
-  if (availableCourses.length === 0) {
-    return "None listed";
-  }
-
-  return availableCourses.join(", ");
+  return formatApprovedCourseLabels(availableCourses, targetId);
 }
 
 function buildSchoolSummaryDataFromAttributes(
@@ -1258,9 +1289,15 @@ function buildSchoolSummaryDataFromAttributes(
     csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
 
     csCoursesComparison: comparisonValues.csCoursesComparison,
-    apCsa: isAvailable(attributes.APCSA) ? "Available" : "Unavailable",
-    apCsp: isAvailable(attributes.APCSP) ? "Available" : "Unavailable",
-    otherCourses: getOtherCourses(attributes),
+    apCsa: formatApprovedAvailability(
+      attributes.APCSA,
+      "schoolApprovedCourseNote",
+    ),
+    apCsp: formatApprovedAvailability(
+      attributes.APCSP,
+      "schoolApprovedCourseNote",
+    ),
+    otherCourses: getOtherCourses(attributes, "schoolApprovedCourseNote"),
 
     csEnrollmentPercent: formatPercent(attributes.RatioCStoSchool),
     csEnrollmentComparison: comparisonValues.csEnrollmentComparison,
@@ -1487,15 +1524,15 @@ function buildDistrictSummaryDataFromFeatures(
 
     csCoursesComparison: comparisonValues.csCoursesComparison,
     apCsa: availableCourseLabels.has("AP Computer Science A")
-      ? "Available"
+      ? `Available${getApprovedCourseAsterisk("districtApprovedCourseNote")}`
       : "Unavailable",
     apCsp: availableCourseLabels.has("AP Computer Science Principles")
-      ? "Available"
+      ? `Available${getApprovedCourseAsterisk("districtApprovedCourseNote")}`
       : "Unavailable",
-    otherCourses:
-      otherCoursesAvailable.length > 0
-        ? otherCoursesAvailable.join(", ")
-        : "None listed",
+    otherCourses: formatApprovedCourseLabels(
+      otherCoursesAvailable,
+      "districtApprovedCourseNote",
+    ),
 
     csEnrollmentPercent: formatPercent(csEnrollmentRatio),
     csEnrollmentComparison: comparisonValues.csEnrollmentComparison,
@@ -2882,42 +2919,48 @@ document.querySelectorAll(".card-info-popup").forEach((popup) => {
 
 /* Inline asterisk info links */
 
-document.querySelectorAll(".inline-info-link").forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+/* Inline asterisk info links */
 
-    const targetId = link.dataset.infoTarget;
-    const card = link.closest(".report-card");
+document.addEventListener("click", (event) => {
+  const link = event.target.closest(".inline-info-link");
 
-    if (!targetId || !card) {
-      return;
+  if (!link) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  const targetId = link.dataset.infoTarget;
+  const card = link.closest(".report-card");
+
+  if (!targetId || !card) {
+    return;
+  }
+
+  const popup = card.querySelector(".card-info-popup");
+  const target = document.getElementById(targetId);
+
+  if (!popup || !target) {
+    return;
+  }
+
+  document.querySelectorAll(".card-info-popup").forEach((item) => {
+    if (item !== popup) {
+      item.classList.remove("show");
     }
+  });
 
-    const popup = card.querySelector(".card-info-popup");
-    const target = document.getElementById(targetId);
+  document.querySelectorAll(".info-highlight-active").forEach((item) => {
+    item.classList.remove("info-highlight-active");
+  });
 
-    if (!popup || !target) {
-      return;
-    }
+  popup.classList.add("show");
+  target.classList.add("info-highlight-active");
 
-    document.querySelectorAll(".card-info-popup").forEach((item) => {
-      if (item !== popup) {
-        item.classList.remove("show");
-      }
-    });
-
-    document.querySelectorAll(".info-highlight-active").forEach((item) => {
-      item.classList.remove("info-highlight-active");
-    });
-
-    popup.classList.add("show");
-    target.classList.add("info-highlight-active");
-
-    target.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+  target.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
   });
 });
 
