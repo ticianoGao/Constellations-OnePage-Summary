@@ -1273,18 +1273,36 @@ a:hover {
 
 /* Keep the small Hide/Show button from covering legend titles */
 .card-map .legend-content .esri-legend__layer-caption {
-  padding-right: 48px;
+  padding-right: 38px;
   box-sizing: border-box;
   line-height: 1.15;
 }
 
-/* Give the legend a little more room for long titles */
+/* Make ArcGIS legend boxes more compact */
 .card-map .legend-wrapper {
-  width: 180px;
+  width: fit-content !important;
+  min-width: 126px !important;
+  max-width: 152px !important;
+  padding: 3px 4px !important;
 }
 
 .card-map .legend-content .esri-legend {
-  width: 170px;
+  width: fit-content !important;
+  min-width: 116px !important;
+  max-width: 144px !important;
+}
+
+.card-map .legend-content .esri-legend__service {
+  padding: 2px 3px !important;
+}
+
+.card-map .legend-content .esri-legend__layer-cell {
+  padding: 1px 2px !important;
+}
+
+.card-map .legend-content .esri-legend__symbol {
+  width: 24px !important;
+  height: 16px !important;
 }
 
 /* Reduce spacing inside map/image report cards */
@@ -1573,19 +1591,19 @@ a:hover {
 
 #incomeMap .legend-content .esri-legend,
 #districtIncomeMap .legend-content .esri-legend {
-  width: 190px !important;
+  width: 150px !important;
 }
 
 /* Make all ArcGIS map legends more compact */
 .card-map .legend-wrapper {
   padding: 5px 6px !important;
-  width: 150px !important;
+  width: 100px !important;
 }
 
 /* Keep income legends a little wider because their numbers are longer */
 #incomeMap .legend-wrapper,
 #districtIncomeMap .legend-wrapper {
-  width: 175px !important;
+  width: 150px !important;
 }
 
 /* Shrink all legend text */
