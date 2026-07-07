@@ -159,9 +159,9 @@ const sampleSchoolSummaryData = {
     totalStudents: "1049",
     csCourses: "2",
     approvedCsCourses: "1",
-    approvedCsCoursesVerb: "is",
+    approvedCsCoursesVerb: "was",
     csCourseAverageSentence:
-      "On average, high schools in Georgia have 3 computer science courses available.",
+      "On average, high schools in Georgia had 3 computer science courses available.",
     csTeachers: "1",
     csEnrollments: "28",
     csCoursesComparison: "NULL%",
@@ -818,7 +818,7 @@ function getSchoolTypePluralLabel(schoolType) {
 function getApprovedCourseVerb(value) {
   const number = toFiniteNumber(value);
 
-  return number === 1 ? "is" : "are";
+  return number === 1 ? "was" : "were";
 }
 
 function getCourseUnit(value) {
@@ -832,13 +832,13 @@ function formatCourseAverageSentence(schoolType, averageCourseCount) {
   const schoolTypeLabel = getSchoolTypePluralLabel(schoolType);
 
   if (average === null) {
-    return `On average, ${schoolTypeLabel} in Georgia have -- computer science courses available.`;
+    return `On average, ${schoolTypeLabel} in Georgia had -- computer science courses available.`;
   }
 
   const formattedAverage = formatDecimal(average, 1);
   const courseUnit = getCourseUnit(average);
 
-  return `On average, ${schoolTypeLabel} in Georgia have ${formattedAverage} computer science ${courseUnit} available.`;
+  return `On average, ${schoolTypeLabel} in Georgia had ${formattedAverage} computer science ${courseUnit} available.`;
 }
 
 function safeDivide(numerator, denominator) {
