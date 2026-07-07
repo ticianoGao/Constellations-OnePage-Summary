@@ -2066,3 +2066,20 @@ a:hover {
   line-height: 1.15;
   margin-top: 5px;
 }
+
+.snapshot-district-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.snapshot-district-link:hover {
+  color: var(--gold);
+}

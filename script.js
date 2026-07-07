@@ -118,12 +118,25 @@ function updateSnapshotTitles() {
     }
 
     if (schoolSnapshotSubtitle) {
+      const safeDistrictName = escapeHtml(
+        selectedDistrictName || "District unavailable",
+      );
+      const safeSchoolName = escapeHtml(selectedReportValue);
+      const safeGradeRange = escapeHtml(formatGradeRange(selectedGradeRange));
+
       schoolSnapshotSubtitle.innerHTML = `
-        ${selectedDistrictName || "District unavailable"}
+        <button
+          class="snapshot-district-link"
+          type="button"
+          data-district-name="${safeDistrictName}"
+          aria-label="Open ${safeDistrictName} district report"
+        >
+          ${safeDistrictName}
+        </button>
         <span>•</span>
-        ${selectedReportValue}
+        ${safeSchoolName}
         <span>•</span>
-        ${formatGradeRange(selectedGradeRange)}
+        ${safeGradeRange}
       `;
     }
   }
@@ -200,6 +213,35 @@ function setHtmlById(id, value) {
 
   if (element) {
     element.innerHTML = value;
+  }
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function goToDistrictReport(districtName) {
+  if (!districtName || !selectOptionsList) {
+    return;
+  }
+
+  const districtOption = Array.from(
+    selectOptionsList.querySelectorAll('li[data-type="district"]'),
+  ).find((option) => {
+    return (
+      option.dataset.value === districtName ||
+      option.dataset.district === districtName ||
+      option.dataset.label === districtName
+    );
+  });
+
+  if (districtOption) {
+    selectDropdownOption(districtOption);
   }
 }
 
@@ -3359,4 +3401,15 @@ if (exportDistrictReportButton) {
 
 window.addEventListener("resize", () => {
   requestAnimationFrame(fitSummaryMetricNumbers);
+});
+
+/* District report link click handler */
+document.addEventListener("click", (event) => {
+  const districtLink = event.target.closest(".snapshot-district-link");
+
+  if (!districtLink) {
+    return;
+  }
+
+  goToDistrictReport(districtLink.dataset.districtName);
 });
