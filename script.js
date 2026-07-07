@@ -2993,7 +2993,13 @@ document.addEventListener("click", (event) => {
 
 /* Export report as PDF */
 
-function getInfoTextFromPopup(popup) {
+function cleanPdfText(value) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getInfoLinesFromPopup(popup) {
   const clone = popup.cloneNode(true);
 
   const closeButton = clone.querySelector(".card-info-close");
@@ -3001,7 +3007,58 @@ function getInfoTextFromPopup(popup) {
     closeButton.remove();
   }
 
-  return clone.textContent.replace(/\s+/g, " ").trim();
+  const infoList = clone.querySelector(".info-list");
+
+  if (!infoList) {
+    const fallbackText = cleanPdfText(clone.textContent);
+    return fallbackText ? [{ text: fallbackText, level: 0 }] : [];
+  }
+
+  const lines = [];
+
+  Array.from(infoList.children).forEach((item) => {
+    if (!item.matches("li")) {
+      return;
+    }
+
+    const itemClone = item.cloneNode(true);
+
+    itemClone.querySelectorAll("ul").forEach((nestedList) => {
+      nestedList.remove();
+    });
+
+    const mainText = cleanPdfText(itemClone.textContent);
+
+    if (mainText) {
+      lines.push({
+        text: mainText,
+        level: 0,
+      });
+    }
+
+    Array.from(item.children).forEach((child) => {
+      if (!child.matches("ul")) {
+        return;
+      }
+
+      Array.from(child.children).forEach((nestedItem) => {
+        if (!nestedItem.matches("li")) {
+          return;
+        }
+
+        const nestedText = cleanPdfText(nestedItem.textContent);
+
+        if (nestedText) {
+          lines.push({
+            text: nestedText,
+            level: 1,
+          });
+        }
+      });
+    });
+  });
+
+  return lines;
 }
 
 function collectReportInfoItems(reportElement) {
@@ -3018,15 +3075,15 @@ function collectReportInfoItems(reportElement) {
     const cardTitle =
       card.querySelector("h3")?.textContent.trim() || "Report Information";
 
-    const infoText = getInfoTextFromPopup(popup);
+    const infoLines = getInfoLinesFromPopup(popup);
 
-    if (!infoText) {
+    if (infoLines.length === 0) {
       return;
     }
 
     infoItems.push({
       title: cardTitle,
-      text: infoText,
+      lines: infoLines,
     });
   });
 
@@ -3052,35 +3109,52 @@ function addInfoPageToPdf({
   const bottomMargin = margin;
   let y = margin;
 
+  function addPageIfNeeded(neededHeight) {
+    if (y + neededHeight > pageHeight - bottomMargin) {
+      pdf.addPage([pageWidth, pageHeight], "portrait");
+      y = margin;
+    }
+  }
+
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(18);
   pdf.text("Information Notes", margin, y);
 
-  y += 28;
+  y += 30;
 
   infoItems.forEach((item, index) => {
-    const titleLines = pdf.splitTextToSize(item.title, usableWidth);
-    const bodyLines = pdf.splitTextToSize(item.text, usableWidth - 14);
-
-    const estimatedBlockHeight =
-      titleLines.length * 15 + bodyLines.length * 12 + 22;
-
-    if (y + estimatedBlockHeight > pageHeight - bottomMargin) {
-      pdf.addPage([pageWidth, pageHeight], "portrait");
-      y = margin;
-    }
-
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(12);
-    pdf.text(`${index + 1}. ${item.title}`, margin, y);
 
-    y += 18;
+    const titleLines = pdf.splitTextToSize(
+      `${index + 1}. ${item.title}`,
+      usableWidth,
+    );
+
+    addPageIfNeeded(titleLines.length * 15 + 10);
+
+    pdf.text(titleLines, margin, y);
+    y += titleLines.length * 15 + 8;
 
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
-    pdf.text(bodyLines, margin + 14, y);
 
-    y += bodyLines.length * 12 + 18;
+    item.lines.forEach((lineItem) => {
+      const indent = lineItem.level === 0 ? 14 : 28;
+      const bullet = lineItem.level === 0 ? "• " : "– ";
+
+      const bodyLines = pdf.splitTextToSize(
+        `${bullet}${lineItem.text}`,
+        usableWidth - indent,
+      );
+
+      addPageIfNeeded(bodyLines.length * 12 + 8);
+
+      pdf.text(bodyLines, margin + indent, y);
+      y += bodyLines.length * 12 + 6;
+    });
+
+    y += 14;
   });
 }
 
