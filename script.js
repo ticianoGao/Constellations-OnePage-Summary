@@ -1104,11 +1104,8 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
     "StudentCou",
   );
 
-  const teacherBenchmarkFeatures =
-    districtFeatures.length > 0 ? districtFeatures : statewideFeatures;
-
-  const districtTeacherStudentRatio = getRatioFromFeatureTotals(
-    teacherBenchmarkFeatures,
+  const stateTeacherStudentRatio = getRatioFromFeatureTotals(
+    statewideFeatures,
     "NumCSTeach",
     "NumCSEnrol",
   );
@@ -1128,7 +1125,7 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
       schoolCsEnrollmentRatio,
       stateCsEnrollmentRatio,
     ),
-    teacherStudentRatioComparison: formatDecimal(districtTeacherStudentRatio),
+    teacherStudentRatioComparison: formatDecimal(stateTeacherStudentRatio),
   };
 }
 
