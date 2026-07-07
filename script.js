@@ -2266,6 +2266,169 @@ if (typeof require !== "undefined") {
 
     const selectedLocationIconUrl = "pics/Location_Indicator.png";
 
+    const districtReportMapContainerIds = new Set([
+      "districtMathProficiencyMap",
+      "districtEnglishProficiencyMap",
+      "districtIncomeMap",
+    ]);
+
+    let districtBoundaryFeaturesPromise = null;
+
+    function isDistrictReportMapContainer(containerId) {
+      return districtReportMapContainerIds.has(containerId);
+    }
+
+    function normalizeDistrictName(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/&/g, "and")
+        .replace(
+          /\b(public schools|county schools|city schools|school district|schools)\b/g,
+          "",
+        )
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function getFirstDistrictSchoolPoint(districtName) {
+      if (!districtName) {
+        return null;
+      }
+
+      const school = schoolLookupData.find((item) => {
+        return item.districtName === districtName && item.lon && item.lat;
+      });
+
+      if (!school) {
+        return null;
+      }
+
+      const longitude = Number(school.lon);
+      const latitude = Number(school.lat);
+
+      if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
+        return null;
+      }
+
+      return {
+        longitude,
+        latitude,
+      };
+    }
+
+    async function getAllDistrictBoundaryFeatures() {
+      if (districtBoundaryFeaturesPromise) {
+        return districtBoundaryFeaturesPromise;
+      }
+
+      const districtBoundaryLayer = new FeatureLayer({
+        url: districtLayerUrl,
+        outFields: ["*"],
+      });
+
+      const query = districtBoundaryLayer.createQuery();
+      query.where = "1=1";
+      query.returnGeometry = true;
+      query.outFields = ["*"];
+
+      districtBoundaryFeaturesPromise = districtBoundaryLayer
+        .queryFeatures(query)
+        .then((result) => {
+          const features = result.features || [];
+
+          console.log(
+            "District boundary names from API:",
+            features.slice(0, 25).map((feature) => feature.attributes?.NAME),
+          );
+
+          return features;
+        });
+
+      return districtBoundaryFeaturesPromise;
+    }
+
+    async function getDistrictBoundaryFeatureByPoint(point) {
+      if (!point) {
+        return null;
+      }
+
+      const districtBoundaryLayer = new FeatureLayer({
+        url: districtLayerUrl,
+        outFields: ["*"],
+      });
+
+      const query = districtBoundaryLayer.createQuery();
+
+      query.geometry = new Point({
+        longitude: point.longitude,
+        latitude: point.latitude,
+        spatialReference: {
+          wkid: 4326,
+        },
+      });
+
+      query.spatialRelationship = "intersects";
+      query.returnGeometry = true;
+      query.outFields = ["*"];
+
+      const result = await districtBoundaryLayer.queryFeatures(query);
+
+      return result.features?.[0] || null;
+    }
+
+    async function getSelectedDistrictBoundaryFeature(districtName, location) {
+      if (!districtName) {
+        return null;
+      }
+
+      const features = await getAllDistrictBoundaryFeatures();
+      const targetName = normalizeDistrictName(districtName);
+
+      const nameMatch =
+        features.find((feature) => {
+          return normalizeDistrictName(feature.attributes?.NAME) === targetName;
+        }) || null;
+
+      if (nameMatch) {
+        return nameMatch;
+      }
+
+      console.warn("No district boundary name match for:", districtName);
+
+      const lookupPoint = getFirstDistrictSchoolPoint(districtName) || location;
+      const pointMatch = await getDistrictBoundaryFeatureByPoint(lookupPoint);
+
+      if (pointMatch) {
+        console.log("Matched district boundary by school point:", {
+          selectedDistrict: districtName,
+          matchedBoundaryName: pointMatch.attributes?.NAME,
+        });
+
+        return pointMatch;
+      }
+
+      return null;
+    }
+
+    function buildSelectedDistrictBoundaryGraphic(feature) {
+      return new Graphic({
+        geometry: feature.geometry,
+        symbol: {
+          type: "simple-fill",
+          color: [255, 255, 255, 0.01],
+          outline: {
+            color: "#000000",
+            width: 3,
+          },
+        },
+        popupTemplate: {
+          title: feature.attributes?.NAME || "Selected district",
+          content: "Selected school district boundary",
+        },
+      });
+    }
+
     function buildSelectedLocationMarker(location) {
       const locationPoint = new Point({
         longitude: Number(location.longitude),
@@ -2304,9 +2467,9 @@ if (typeof require !== "undefined") {
 
     async function updateOneReportMapLocation(containerId, location) {
       const view = reportMapViews[containerId];
-      const markerLayer = reportMapMarkerLayers[containerId];
+      const selectionLayer = reportMapMarkerLayers[containerId];
 
-      if (!view || !markerLayer) {
+      if (!view || !selectionLayer) {
         return;
       }
 
@@ -2320,7 +2483,43 @@ if (typeof require !== "undefined") {
         view.resize();
       }
 
-      markerLayer.removeAll();
+      selectionLayer.removeAll();
+
+      const isDistrictReportMap = isDistrictReportMapContainer(containerId);
+
+      if (selectedReportType === "district" && isDistrictReportMap) {
+        const districtName = selectedDistrictName || selectedReportValue;
+
+        const districtFeature = await getSelectedDistrictBoundaryFeature(
+          districtName,
+          location,
+        );
+
+        if (districtFeature) {
+          selectionLayer.add(
+            buildSelectedDistrictBoundaryGraphic(districtFeature),
+          );
+
+          if (districtFeature.geometry?.extent) {
+            await view
+              .goTo(districtFeature.geometry.extent.expand(1.25))
+              .catch(() => {});
+          }
+
+          return;
+        }
+
+        console.warn("No district boundary found for:", districtName);
+
+        await view
+          .goTo({
+            center: [-83.5, 32.7],
+            zoom: 6,
+          })
+          .catch(() => {});
+
+        return;
+      }
 
       if (!location) {
         await view
@@ -2332,7 +2531,7 @@ if (typeof require !== "undefined") {
         return;
       }
 
-      markerLayer.add(buildSelectedLocationMarker(location));
+      selectionLayer.add(buildSelectedLocationMarker(location));
 
       await view
         .goTo({
