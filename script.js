@@ -203,6 +203,29 @@ function setHtmlById(id, value) {
   }
 }
 
+function fitSummaryMetricNumbers() {
+  const metricNumbers = document.querySelectorAll(
+    ".school-summary-card .metric-number",
+  );
+
+  metricNumbers.forEach((element) => {
+    const maxFontSize = 21.6; // 1.35rem
+    const minFontSize = 12;
+
+    element.style.fontSize = `${maxFontSize}px`;
+
+    let currentFontSize = maxFontSize;
+
+    while (
+      element.scrollWidth > element.clientWidth &&
+      currentFontSize > minFontSize
+    ) {
+      currentFontSize -= 0.5;
+      element.style.fontSize = `${currentFontSize}px`;
+    }
+  });
+}
+
 function updateSchoolSummaryFromData(data) {
   setTextById("schoolTotalStudents", data.totalStudents);
   setTextById("schoolCsCourses", data.csCourses);
@@ -231,6 +254,8 @@ function updateSchoolSummaryFromData(data) {
     "schoolTeacherStudentRatioComparison",
     data.teacherStudentRatioComparison,
   );
+
+  requestAnimationFrame(fitSummaryMetricNumbers);
 }
 
 function updateDistrictSummaryFromData(data) {
@@ -258,6 +283,8 @@ function updateDistrictSummaryFromData(data) {
     "districtTeacherStudentRatioComparison",
     data.teacherStudentRatioComparison,
   );
+
+  requestAnimationFrame(fitSummaryMetricNumbers);
 }
 
 function updateSummaryFromSampleData() {
@@ -3255,3 +3282,7 @@ if (exportDistrictReportButton) {
     });
   });
 }
+
+window.addEventListener("resize", () => {
+  requestAnimationFrame(fitSummaryMetricNumbers);
+});

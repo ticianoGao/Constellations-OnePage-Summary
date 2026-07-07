@@ -1428,8 +1428,11 @@ a:hover {
 .school-summary-card .metric-number {
   color: #b39051;
   font-size: 1.35rem;
-  line-height: 1;
+  line-height: 1.05;
   white-space: nowrap;
+  letter-spacing: -0.04em;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .school-summary-card .metric-label {
@@ -2043,4 +2046,23 @@ a:hover {
 .info-highlight-target.info-highlight-active {
   background: rgba(179, 163, 105, 0.22);
   box-shadow: 0 0 0 3px rgba(179, 163, 105, 0.22);
+}
+
+/* Make Summary metric boxes fit inside the card */
+.school-summary-card .summary-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+
+.school-summary-card .metric-box {
+  min-width: 0;
+  padding: 10px 6px;
+  container-type: inline-size;
+}
+
+.school-summary-card .metric-label {
+  font-size: 0.62rem;
+  line-height: 1.15;
+  margin-top: 5px;
 }
