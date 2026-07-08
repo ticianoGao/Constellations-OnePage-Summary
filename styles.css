@@ -2128,3 +2128,32 @@ a:hover {
   color: #222222;
   font-weight: 700;
 }
+
+.summary-comparison-table td.comparison-higher {
+  color: #168038;
+  font-weight: 800;
+}
+
+.summary-comparison-table td.comparison-lower {
+  color: #b00020;
+  font-weight: 800;
+}
+
+.summary-comparison-table td.comparison-same {
+  color: #222222;
+  font-weight: 800;
+}
+
+.exporting-report .snapshot-title-image {
+  width: 300px !important;
+  height: 82px !important;
+  object-fit: contain !important;
+  padding: 5px 10px !important;
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+.exporting-report .snapshot-title-main {
+  gap: 24px !important;
+}

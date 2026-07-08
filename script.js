@@ -216,6 +216,50 @@ function setHtmlById(id, value) {
   }
 }
 
+function parsePercentText(value) {
+  const number = Number(
+    String(value || "")
+      .replace("%", "")
+      .trim(),
+  );
+
+  if (!Number.isFinite(number)) {
+    return null;
+  }
+
+  return number;
+}
+
+function updateComparisonColor(valueCellId, benchmarkCellId) {
+  const valueCell = document.getElementById(valueCellId);
+  const benchmarkCell = document.getElementById(benchmarkCellId);
+
+  if (!valueCell || !benchmarkCell) {
+    return;
+  }
+
+  valueCell.classList.remove(
+    "comparison-higher",
+    "comparison-lower",
+    "comparison-same",
+  );
+
+  const value = parsePercentText(valueCell.textContent);
+  const benchmark = parsePercentText(benchmarkCell.textContent);
+
+  if (value === null || benchmark === null) {
+    return;
+  }
+
+  if (value > benchmark) {
+    valueCell.classList.add("comparison-higher");
+  } else if (value < benchmark) {
+    valueCell.classList.add("comparison-lower");
+  } else {
+    valueCell.classList.add("comparison-same");
+  }
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -308,6 +352,11 @@ function updateSchoolSummaryFromData(data) {
     data.stateTableCsEnrollmentPercent,
   );
 
+  updateComparisonColor(
+    "schoolTableCsEnrollmentPercent",
+    "stateTableCsEnrollmentPercent",
+  );
+
   setTextById("schoolTableCategory1", data.schoolTableCategory1);
   setTextById("districtTableCategory1", data.districtTableCategory1);
   setTextById("stateTableCategory1", data.stateTableCategory1);
@@ -370,6 +419,10 @@ function updateDistrictSummaryFromData(data) {
   setTextById(
     "districtReportStateTableCsEnrollmentPercent",
     data.districtReportStateTableCsEnrollmentPercent,
+  );
+  updateComparisonColor(
+    "districtReportTableCsEnrollmentPercent",
+    "districtReportStateTableCsEnrollmentPercent",
   );
 
   setTextById(
@@ -3661,6 +3714,68 @@ function restoreLiveMaps(replacements) {
   });
 }
 
+function waitForImagesToLoad(container) {
+  const images = Array.from(container.querySelectorAll("img"));
+
+  return Promise.all(
+    images.map((image) => {
+      if (image.complete && image.naturalWidth > 0) {
+        return Promise.resolve();
+      }
+
+      if (image.decode) {
+        return image.decode().catch(() => {});
+      }
+
+      return new Promise((resolve) => {
+        image.onload = resolve;
+        image.onerror = resolve;
+      });
+    }),
+  );
+}
+
+function addCitationPageToPdf({ pdf, pageWidth, pageHeight, margin }) {
+  const usableWidth = pageWidth - margin * 2;
+  let y = margin;
+
+  pdf.addPage([pageWidth, pageHeight], "portrait");
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(18);
+  pdf.text("Citation and Sources", margin, y);
+
+  y += 32;
+
+  function addLabeledText(label, text) {
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(12);
+    pdf.text(label, margin, y);
+
+    const labelWidth = pdf.getTextWidth(label) + 6;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+
+    const lines = pdf.splitTextToSize(text, usableWidth - labelWidth);
+
+    pdf.text(lines, margin + labelWidth, y);
+
+    y += lines.length * 14 + 14;
+  }
+
+  addLabeledText(
+    "Preferred citation:",
+    "Constellations Center for Education in Computing. (2026). K-12 CS Education Resource Access Report Generator. Georgia Institute of Technology.",
+  );
+
+  addLabeledText("Contact:", "Zihan Weng, zweng40@gatech.edu");
+
+  addLabeledText("Data Source:", "GADOE CS Dashboard, GOSA, US Census Bureau");
+
+  addLabeledText("Homepage:", "Computing in the Community Dashboard");
+}
+
 async function exportReportAsPdf({
   button,
   reportElementId,
@@ -3694,11 +3809,12 @@ async function exportReportAsPdf({
     reportElement.classList.add("exporting-report");
 
     await new Promise((resolve) => requestAnimationFrame(resolve));
+    await waitForImagesToLoad(reportElement);
 
     mapReplacements = await replaceMapsWithScreenshots(mapIds);
 
     const canvas = await html2canvas(reportElement, {
-      scale: 2,
+      scale: 3,
       useCORS: true,
       allowTaint: true,
       backgroundColor,
@@ -3729,6 +3845,13 @@ async function exportReportAsPdf({
     addInfoPageToPdf({
       pdf,
       reportElement,
+      pageWidth,
+      pageHeight,
+      margin,
+    });
+
+    addCitationPageToPdf({
+      pdf,
       pageWidth,
       pageHeight,
       margin,
