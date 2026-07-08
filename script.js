@@ -818,6 +818,41 @@ async function loadSchoolLookupFromArcGIS() {
   }
 }
 
+const approvedCourseLabels = new Set([
+  "AP Computer Science A",
+  "AP Computer Science Principles",
+
+  "IB Computer Science Year 1",
+  "IB Computer Science Year 2",
+  "IB Computer Science, Year One",
+  "IB Computer Science, Year Two",
+
+  "Web Development",
+  "Embedded Computing",
+  "Game Design: Animation and Simulation",
+  "Foundations of Artificial Intelligence",
+  "Artificial Intelligence Concepts",
+  "Artificial Intelligence Applications",
+  "Introduction to Software Technology",
+  "Cloud Computing",
+  "Introduction to Hardware Technology",
+  "Coding for Fintech",
+  "Computer Science Principles",
+  "Programming, Games, Apps, and Society",
+  "Introduction to Cybersecurity",
+  "Advanced Cybersecurity",
+
+  "Foundations of Secure Information Systems",
+  "Foundations of Computer Programming",
+  "Foundations of Interactive Design",
+  "MS Computer Science I",
+  "MS Computer Science II",
+]);
+
+function isApprovedCourseLabel(label) {
+  return approvedCourseLabels.has(String(label || "").trim());
+}
+
 const otherCourseFields = [
   { field: "IB_ONE", label: "IB Computer Science, Year One" },
   { field: "IB_TWO", label: "IB Computer Science, Year Two" },
@@ -862,12 +897,16 @@ function getApprovedCourseAsterisk(targetId) {
   >*</button>`;
 }
 
-function formatApprovedAvailability(value, targetId) {
+function formatApprovedAvailability(value, targetId, courseLabel) {
   if (!isAvailable(value)) {
     return "Unavailable";
   }
 
-  return `Available${getApprovedCourseAsterisk(targetId)}`;
+  if (isApprovedCourseLabel(courseLabel)) {
+    return `Available${getApprovedCourseAsterisk(targetId)}`;
+  }
+
+  return "Available";
 }
 
 function formatApprovedCourseLabels(courseLabels, targetId) {
@@ -876,7 +915,13 @@ function formatApprovedCourseLabels(courseLabels, targetId) {
   }
 
   return courseLabels
-    .map((label) => `${label}${getApprovedCourseAsterisk(targetId)}`)
+    .map((label) => {
+      if (isApprovedCourseLabel(label)) {
+        return `${label}${getApprovedCourseAsterisk(targetId)}`;
+      }
+
+      return label;
+    })
     .join(", ");
 }
 
@@ -1626,10 +1671,12 @@ function buildSchoolSummaryDataFromAttributes(
     apCsa: formatApprovedAvailability(
       attributes.APCSA,
       "schoolApprovedCourseNote",
+      "AP Computer Science A",
     ),
     apCsp: formatApprovedAvailability(
       attributes.APCSP,
       "schoolApprovedCourseNote",
+      "AP Computer Science Principles",
     ),
     otherCourses: getOtherCourses(attributes, "schoolApprovedCourseNote"),
 
@@ -1865,12 +1912,16 @@ function buildDistrictSummaryDataFromFeatures(
     ...enrollmentTableValues,
 
     csCoursesComparison: comparisonValues.csCoursesComparison,
-    apCsa: availableCourseLabels.has("AP Computer Science A")
-      ? `Available${getApprovedCourseAsterisk("districtApprovedCourseNote")}`
-      : "Unavailable",
-    apCsp: availableCourseLabels.has("AP Computer Science Principles")
-      ? `Available${getApprovedCourseAsterisk("districtApprovedCourseNote")}`
-      : "Unavailable",
+    apCsa: formatApprovedAvailability(
+      availableCourseLabels.has("AP Computer Science A"),
+      "districtApprovedCourseNote",
+      "AP Computer Science A",
+    ),
+    apCsp: formatApprovedAvailability(
+      availableCourseLabels.has("AP Computer Science Principles"),
+      "districtApprovedCourseNote",
+      "AP Computer Science Principles",
+    ),
     otherCourses: formatApprovedCourseLabels(
       otherCoursesAvailable,
       "districtApprovedCourseNote",
