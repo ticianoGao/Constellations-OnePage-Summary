@@ -3665,7 +3665,7 @@ function addInfoPageToPdf({
   const infoItems = collectReportInfoItems(reportElement);
 
   if (infoItems.length === 0) {
-    return;
+    return null;
   }
 
   pdf.addPage([pageWidth, pageHeight], "portrait");
@@ -3721,6 +3721,7 @@ function addInfoPageToPdf({
 
     y += 14;
   });
+  return y;
 }
 
 async function replaceMapsWithScreenshots(mapIds) {
@@ -3786,11 +3787,29 @@ function waitForImagesToLoad(container) {
   );
 }
 
-function addCitationPageToPdf({ pdf, pageWidth, pageHeight, margin }) {
+function addCitationPageToPdf({
+  pdf,
+  pageWidth,
+  pageHeight,
+  margin,
+  startY = null,
+}) {
   const usableWidth = pageWidth - margin * 2;
-  let y = margin;
+  const bottomMargin = margin;
+  let y = startY === null ? margin : startY + 8;
 
-  pdf.addPage([pageWidth, pageHeight], "portrait");
+  function addPageIfNeeded(neededHeight) {
+    if (y + neededHeight > pageHeight - bottomMargin) {
+      pdf.addPage([pageWidth, pageHeight], "portrait");
+      y = margin;
+    }
+  }
+
+  if (startY === null) {
+    pdf.addPage([pageWidth, pageHeight], "portrait");
+  }
+
+  addPageIfNeeded(150);
 
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(18);
@@ -3893,7 +3912,7 @@ async function exportReportAsPdf({
 
     pdf.addImage(imageData, "PNG", margin, margin, usableWidth, imageHeight);
 
-    addInfoPageToPdf({
+    const notesEndY = addInfoPageToPdf({
       pdf,
       reportElement,
       pageWidth,
@@ -3906,6 +3925,7 @@ async function exportReportAsPdf({
       pageWidth,
       pageHeight,
       margin,
+      startY: notesEndY,
     });
 
     pdf.save(fileName);
