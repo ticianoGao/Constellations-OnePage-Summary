@@ -290,6 +290,40 @@ function updateSchoolSummaryFromData(data) {
   setTextById("schoolCategory2", data.category2);
   setTextById("schoolCategory3", data.category3);
   setTextById("schoolCategory4", data.category4);
+
+  setTextById("schoolTableCsEnrollments", data.schoolTableCsEnrollments);
+  setTextById("districtTableCsEnrollments", data.districtTableCsEnrollments);
+  setTextById("stateTableCsEnrollments", data.stateTableCsEnrollments);
+
+  setTextById(
+    "schoolTableCsEnrollmentPercent",
+    data.schoolTableCsEnrollmentPercent,
+  );
+  setTextById(
+    "districtTableCsEnrollmentPercent",
+    data.districtTableCsEnrollmentPercent,
+  );
+  setTextById(
+    "stateTableCsEnrollmentPercent",
+    data.stateTableCsEnrollmentPercent,
+  );
+
+  setTextById("schoolTableCategory1", data.schoolTableCategory1);
+  setTextById("districtTableCategory1", data.districtTableCategory1);
+  setTextById("stateTableCategory1", data.stateTableCategory1);
+
+  setTextById("schoolTableCategory2", data.schoolTableCategory2);
+  setTextById("districtTableCategory2", data.districtTableCategory2);
+  setTextById("stateTableCategory2", data.stateTableCategory2);
+
+  setTextById("schoolTableCategory3", data.schoolTableCategory3);
+  setTextById("districtTableCategory3", data.districtTableCategory3);
+  setTextById("stateTableCategory3", data.stateTableCategory3);
+
+  setTextById("schoolTableCategory4", data.schoolTableCategory4);
+  setTextById("districtTableCategory4", data.districtTableCategory4);
+  setTextById("stateTableCategory4", data.stateTableCategory4);
+
   setTextById("schoolCsTeachersText", data.csTeachers);
   setTextById("schoolTeacherStudentRatio", data.teacherStudentRatio);
   setTextById(
@@ -319,6 +353,61 @@ function updateDistrictSummaryFromData(data) {
   setTextById("districtCategory2", data.category2);
   setTextById("districtCategory3", data.category3);
   setTextById("districtCategory4", data.category4);
+
+  setTextById(
+    "districtReportTableCsEnrollments",
+    data.districtReportTableCsEnrollments,
+  );
+  setTextById(
+    "districtReportStateTableCsEnrollments",
+    data.districtReportStateTableCsEnrollments,
+  );
+
+  setTextById(
+    "districtReportTableCsEnrollmentPercent",
+    data.districtReportTableCsEnrollmentPercent,
+  );
+  setTextById(
+    "districtReportStateTableCsEnrollmentPercent",
+    data.districtReportStateTableCsEnrollmentPercent,
+  );
+
+  setTextById(
+    "districtReportTableCategory1",
+    data.districtReportTableCategory1,
+  );
+  setTextById(
+    "districtReportStateTableCategory1",
+    data.districtReportStateTableCategory1,
+  );
+
+  setTextById(
+    "districtReportTableCategory2",
+    data.districtReportTableCategory2,
+  );
+  setTextById(
+    "districtReportStateTableCategory2",
+    data.districtReportStateTableCategory2,
+  );
+
+  setTextById(
+    "districtReportTableCategory3",
+    data.districtReportTableCategory3,
+  );
+  setTextById(
+    "districtReportStateTableCategory3",
+    data.districtReportStateTableCategory3,
+  );
+
+  setTextById(
+    "districtReportTableCategory4",
+    data.districtReportTableCategory4,
+  );
+  setTextById(
+    "districtReportStateTableCategory4",
+    data.districtReportStateTableCategory4,
+  );
+
   setTextById("districtCsTeachersText", data.csTeachers);
   setTextById("districtTeacherStudentRatio", data.teacherStudentRatio);
   setTextById(
@@ -789,6 +878,10 @@ const comparisonOutFields = [
   "NumCSEnrol",
   "NumCSCours",
   "NumCSTeach",
+  "NumCategor",
+  "NumCateg_1",
+  "NumCateg_2",
+  "NumCateg_3",
   "RatioCStoSchool",
   "RatioCSTeacherToStudent",
   ...comparisonCourseFields.map((course) => course.field),
@@ -880,6 +973,121 @@ function getRatioFromFeatureTotals(features, numeratorField, denominatorField) {
   const denominator = getSumFromFeatures(features, denominatorField);
 
   return safeDivide(numerator, denominator);
+}
+
+function getEnrollmentTableValuesFromAttributes(attributes) {
+  const csEnrollmentRatioFromField = toFiniteNumber(attributes.RatioCStoSchool);
+
+  const csEnrollmentRatio =
+    csEnrollmentRatioFromField !== null
+      ? csEnrollmentRatioFromField
+      : safeDivide(attributes.NumCSEnrol, attributes.StudentCou);
+
+  return {
+    csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
+    csEnrollmentPercent: formatPercent(csEnrollmentRatio),
+    category1: formatWholeNumber(attributes.NumCategor),
+    category2: formatWholeNumber(attributes.NumCateg_1),
+    category3: formatWholeNumber(attributes.NumCateg_2),
+    category4: formatWholeNumber(attributes.NumCateg_3),
+  };
+}
+
+function getEnrollmentTableValuesFromFeatures(features) {
+  if (!features || features.length === 0) {
+    return {
+      csEnrollments: "--",
+      csEnrollmentPercent: "--",
+      category1: "--",
+      category2: "--",
+      category3: "--",
+      category4: "--",
+    };
+  }
+
+  const totalStudents = getSumFromFeatures(features, "StudentCou");
+  const csEnrollments = getSumFromFeatures(features, "NumCSEnrol");
+  const category1 = getSumFromFeatures(features, "NumCategor");
+  const category2 = getSumFromFeatures(features, "NumCateg_1");
+  const category3 = getSumFromFeatures(features, "NumCateg_2");
+  const category4 = getSumFromFeatures(features, "NumCateg_3");
+
+  return {
+    csEnrollments: formatWholeNumber(csEnrollments),
+    csEnrollmentPercent: formatPercent(
+      safeDivide(csEnrollments, totalStudents),
+    ),
+    category1: formatWholeNumber(category1),
+    category2: formatWholeNumber(category2),
+    category3: formatWholeNumber(category3),
+    category4: formatWholeNumber(category4),
+  };
+}
+
+function buildSchoolEnrollmentTableValues(attributes, statewideFeatures = []) {
+  const districtFeatures = getFeaturesForDistrict(
+    statewideFeatures,
+    attributes.SystemName || selectedDistrictName,
+  );
+
+  const schoolValues = getEnrollmentTableValuesFromAttributes(attributes);
+  const districtValues = getEnrollmentTableValuesFromFeatures(districtFeatures);
+  const stateValues = getEnrollmentTableValuesFromFeatures(statewideFeatures);
+
+  return {
+    schoolTableCsEnrollments: schoolValues.csEnrollments,
+    districtTableCsEnrollments: districtValues.csEnrollments,
+    stateTableCsEnrollments: stateValues.csEnrollments,
+
+    schoolTableCsEnrollmentPercent: schoolValues.csEnrollmentPercent,
+    districtTableCsEnrollmentPercent: districtValues.csEnrollmentPercent,
+    stateTableCsEnrollmentPercent: stateValues.csEnrollmentPercent,
+
+    schoolTableCategory1: schoolValues.category1,
+    districtTableCategory1: districtValues.category1,
+    stateTableCategory1: stateValues.category1,
+
+    schoolTableCategory2: schoolValues.category2,
+    districtTableCategory2: districtValues.category2,
+    stateTableCategory2: stateValues.category2,
+
+    schoolTableCategory3: schoolValues.category3,
+    districtTableCategory3: districtValues.category3,
+    stateTableCategory3: stateValues.category3,
+
+    schoolTableCategory4: schoolValues.category4,
+    districtTableCategory4: districtValues.category4,
+    stateTableCategory4: stateValues.category4,
+  };
+}
+
+function buildDistrictEnrollmentTableValues(
+  districtFeatures,
+  statewideFeatures = [],
+) {
+  const districtValues = getEnrollmentTableValuesFromFeatures(districtFeatures);
+  const stateValues = getEnrollmentTableValuesFromFeatures(statewideFeatures);
+
+  return {
+    districtReportTableCsEnrollments: districtValues.csEnrollments,
+    districtReportStateTableCsEnrollments: stateValues.csEnrollments,
+
+    districtReportTableCsEnrollmentPercent: districtValues.csEnrollmentPercent,
+    districtReportStateTableCsEnrollmentPercent:
+      stateValues.csEnrollmentPercent,
+
+    districtReportTableCategory1: districtValues.category1,
+    districtReportStateTableCategory1: stateValues.category1,
+
+    districtReportTableCategory2: districtValues.category2,
+    districtReportStateTableCategory2: stateValues.category2,
+
+    districtReportTableCategory3: districtValues.category3,
+    districtReportStateTableCategory3: stateValues.category3,
+
+    districtReportTableCategory4: districtValues.category4,
+    districtReportStateTableCategory4: stateValues.category4,
+  };
 }
 
 function formatBenchmarkComparison(currentValue, benchmarkValue) {
@@ -1345,6 +1553,11 @@ function buildSchoolSummaryDataFromAttributes(
     statewideFeatures,
   );
 
+  const enrollmentTableValues = buildSchoolEnrollmentTableValues(
+    attributes,
+    statewideFeatures,
+  );
+
   return {
     totalStudents: formatWholeNumber(attributes.StudentCou),
     csCourses: formatWholeNumber(attributes.NumCSCours),
@@ -1353,6 +1566,8 @@ function buildSchoolSummaryDataFromAttributes(
     csCourseAverageSentence: comparisonValues.csCourseAverageSentence,
     csTeachers: formatWholeNumber(attributes.NumCSTeach),
     csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
+
+    ...enrollmentTableValues,
 
     csCoursesComparison: comparisonValues.csCoursesComparison,
     apCsa: formatApprovedAvailability(
@@ -1582,11 +1797,19 @@ function buildDistrictSummaryDataFromFeatures(
     statewideFeatures,
     availableCourseLabels.size,
   );
+
+  const enrollmentTableValues = buildDistrictEnrollmentTableValues(
+    features,
+    statewideFeatures,
+  );
+
   return {
     totalStudents: formatWholeNumber(totals.totalStudents),
     csCourses: formatWholeNumber(availableCourseLabels.size),
     csTeachers: formatWholeNumber(totals.csTeachers),
     csEnrollments: formatWholeNumber(totals.csEnrollments),
+
+    ...enrollmentTableValues,
 
     csCoursesComparison: comparisonValues.csCoursesComparison,
     apCsa: availableCourseLabels.has("AP Computer Science A")

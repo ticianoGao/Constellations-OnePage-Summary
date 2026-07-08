@@ -2083,3 +2083,48 @@ a:hover {
 .snapshot-district-link:hover {
   color: var(--gold);
 }
+
+.summary-table-list-item {
+  margin-top: 12px;
+}
+
+.summary-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+.summary-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.summary-comparison-table th,
+.summary-comparison-table td {
+  border: 1px solid #d9d9d9;
+  padding: 8px 7px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.summary-comparison-table thead th {
+  background: #f5f7fa;
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.summary-comparison-table tbody th {
+  background: #fafafa;
+  color: #444444;
+  text-align: left;
+  font-weight: 700;
+  width: 42%;
+}
+
+.summary-comparison-table td {
+  color: #222222;
+  font-weight: 700;
+}
