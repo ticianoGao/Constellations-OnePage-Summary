@@ -174,8 +174,8 @@ const sampleSchoolSummaryData = {
     category2: "0",
     category3: "0",
     category4: "13",
-    teacherStudentRatio: "0.04",
-    teacherStudentRatioComparison: "NULL",
+    studentTeacherRatio: "28",
+    studentTeacherRatioComparison: "NULL",
   },
 };
 
@@ -195,8 +195,8 @@ const sampleDistrictSummaryData = {
     category2: "0",
     category3: "0",
     category4: "13",
-    teacherStudentRatio: "0.04",
-    teacherStudentRatioComparison: "NULL",
+    studentTeacherRatio: "28",
+    studentTeacherRatioComparison: "NULL",
   },
 };
 
@@ -374,10 +374,10 @@ function updateSchoolSummaryFromData(data) {
   setTextById("stateTableCategory4", data.stateTableCategory4);
 
   setTextById("schoolCsTeachersText", data.csTeachers);
-  setTextById("schoolTeacherStudentRatio", data.teacherStudentRatio);
+  setTextById("schoolStudentTeacherRatio", data.studentTeacherRatio);
   setTextById(
-    "schoolTeacherStudentRatioComparison",
-    data.teacherStudentRatioComparison,
+    "schoolStudentTeacherRatioComparison",
+    data.studentTeacherRatioComparison,
   );
 
   requestAnimationFrame(fitSummaryMetricNumbers);
@@ -462,10 +462,10 @@ function updateDistrictSummaryFromData(data) {
   );
 
   setTextById("districtCsTeachersText", data.csTeachers);
-  setTextById("districtTeacherStudentRatio", data.teacherStudentRatio);
+  setTextById("districtStudentTeacherRatio", data.studentTeacherRatio);
   setTextById(
-    "districtTeacherStudentRatioComparison",
-    data.teacherStudentRatioComparison,
+    "districtStudentTeacherRatioComparison",
+    data.studentTeacherRatioComparison,
   );
 
   requestAnimationFrame(fitSummaryMetricNumbers);
@@ -1410,10 +1410,10 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
     "StudentCou",
   );
 
-  const stateTeacherStudentRatio = getRatioFromFeatureTotals(
+  const stateStudentTeacherRatio = getRatioFromFeatureTotals(
     statewideFeatures,
-    "NumCSTeach",
     "NumCSEnrol",
+    "NumCSTeach",
   );
 
   return {
@@ -1431,7 +1431,7 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
       schoolCsEnrollmentRatio,
       stateCsEnrollmentRatio,
     ),
-    teacherStudentRatioComparison: formatDecimal(stateTeacherStudentRatio),
+    studentTeacherRatioComparison: formatDecimal(stateStudentTeacherRatio),
   };
 }
 
@@ -1452,10 +1452,10 @@ function buildDistrictComparisonValues(
     "StudentCou",
   );
 
-  const districtTeacherStudentRatio = getRatioFromFeatureTotals(
+  const stateStudentTeacherRatio = getRatioFromFeatureTotals(
     statewideFeatures,
-    "NumCSTeach",
     "NumCSEnrol",
+    "NumCSTeach",
   );
 
   const averageDistrictCourseCount =
@@ -1472,7 +1472,7 @@ function buildDistrictComparisonValues(
       districtCsEnrollmentRatio,
       stateCsEnrollmentRatio,
     ),
-    teacherStudentRatioComparison: formatDecimal(districtTeacherStudentRatio),
+    studentTeacherRatioComparison: formatDecimal(stateStudentTeacherRatio),
   };
 }
 
@@ -1688,9 +1688,11 @@ function buildSchoolSummaryDataFromAttributes(
     category3: formatWholeNumber(category3),
     category4: formatWholeNumber(category4),
 
-    teacherStudentRatio: formatDecimal(attributes.RatioCSTeacherToStudent),
-    teacherStudentRatioComparison:
-      comparisonValues.teacherStudentRatioComparison,
+    studentTeacherRatio: formatDecimal(
+      safeDivide(attributes.NumCSEnrol, attributes.NumCSTeach),
+    ),
+    studentTeacherRatioComparison:
+      comparisonValues.studentTeacherRatioComparison,
   };
 }
 
@@ -1889,8 +1891,8 @@ function buildDistrictSummaryDataFromFeatures(
       ? totals.csEnrollments / totals.totalStudents
       : null;
 
-  const teacherStudentRatio =
-    totals.csEnrollments > 0 ? totals.csTeachers / totals.csEnrollments : null;
+  const studentTeacherRatio =
+    totals.csTeachers > 0 ? totals.csEnrollments / totals.csTeachers : null;
 
   const comparisonValues = buildDistrictComparisonValues(
     features,
@@ -1935,9 +1937,9 @@ function buildDistrictSummaryDataFromFeatures(
     category3: formatWholeNumber(totals.category3),
     category4: formatWholeNumber(totals.category4),
 
-    teacherStudentRatio: formatDecimal(teacherStudentRatio),
-    teacherStudentRatioComparison:
-      comparisonValues.teacherStudentRatioComparison,
+    studentTeacherRatio: formatDecimal(studentTeacherRatio),
+    studentTeacherRatioComparison:
+      comparisonValues.studentTeacherRatioComparison,
   };
 }
 
