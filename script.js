@@ -168,7 +168,7 @@ const sampleSchoolSummaryData = {
     apCsa: "Unavailable",
     apCsp: "Available",
     otherCourses: "Introduction to Digital Technology",
-    csEnrollmentPercent: "2.67%",
+    csEnrollmentPercent: "37.46",
     csEnrollmentComparison: "NULL%",
     category1: "15",
     category2: "0",
@@ -189,7 +189,7 @@ const sampleDistrictSummaryData = {
     apCsa: "Unavailable",
     apCsp: "Available",
     otherCourses: "Introduction to Digital Technology",
-    csEnrollmentPercent: "2.67%",
+    csEnrollmentPercent: "37.46",
     csEnrollmentComparison: "NULL%",
     category1: "15",
     category2: "0",
@@ -251,9 +251,11 @@ function updateComparisonColor(valueCellId, benchmarkCellId) {
     return;
   }
 
-  if (value > benchmark) {
+  // A lower Enrollment Intensity indicates more CS enrollment
+  // relative to the size of the student population.
+  if (value < benchmark) {
     valueCell.classList.add("comparison-higher");
-  } else if (value < benchmark) {
+  } else if (value > benchmark) {
     valueCell.classList.add("comparison-lower");
   } else {
     valueCell.classList.add("comparison-same");
@@ -1043,6 +1045,16 @@ function safeDivide(numerator, denominator) {
   return top / bottom;
 }
 
+function formatEnrollmentIntensity(totalEnrollment, csEnrollments) {
+  const intensity = safeDivide(totalEnrollment, csEnrollments);
+
+  if (intensity === null) {
+    return "--";
+  }
+
+  return formatDecimal(intensity, 2);
+}
+
 function getFeatureAttributes(feature) {
   return feature && feature.attributes ? feature.attributes : {};
 }
@@ -1074,16 +1086,16 @@ function getRatioFromFeatureTotals(features, numeratorField, denominatorField) {
 }
 
 function getEnrollmentTableValuesFromAttributes(attributes) {
-  const csEnrollmentRatioFromField = toFiniteNumber(attributes.RatioCStoSchool);
-
-  const csEnrollmentRatio =
-    csEnrollmentRatioFromField !== null
-      ? csEnrollmentRatioFromField
-      : safeDivide(attributes.NumCSEnrol, attributes.StudentCou);
-
   return {
     csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
-    csEnrollmentPercent: formatPercent(csEnrollmentRatio),
+
+    // Enrollment Intensity =
+    // total student enrollment / CS course enrollments
+    csEnrollmentPercent: formatEnrollmentIntensity(
+      attributes.StudentCou,
+      attributes.NumCSEnrol,
+    ),
+
     category1: formatWholeNumber(attributes.NumCategor),
     category2: formatWholeNumber(attributes.NumCateg_1),
     category3: formatWholeNumber(attributes.NumCateg_2),
@@ -1112,9 +1124,14 @@ function getEnrollmentTableValuesFromFeatures(features) {
 
   return {
     csEnrollments: formatWholeNumber(csEnrollments),
-    csEnrollmentPercent: formatPercent(
-      safeDivide(csEnrollments, totalStudents),
+
+    // Enrollment Intensity =
+    // total student enrollment / CS course enrollments
+    csEnrollmentPercent: formatEnrollmentIntensity(
+      totalStudents,
+      csEnrollments,
     ),
+
     category1: formatWholeNumber(category1),
     category2: formatWholeNumber(category2),
     category3: formatWholeNumber(category3),
@@ -1399,15 +1416,15 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
     "NumCSCours",
   );
 
-  const schoolCsEnrollmentRatio = safeDivide(
-    attributes.NumCSEnrol,
+  const schoolEnrollmentIntensity = safeDivide(
     attributes.StudentCou,
+    attributes.NumCSEnrol,
   );
 
-  const stateCsEnrollmentRatio = getRatioFromFeatureTotals(
+  const stateEnrollmentIntensity = getRatioFromFeatureTotals(
     statewideFeatures,
-    "NumCSEnrol",
     "StudentCou",
+    "NumCSEnrol",
   );
 
   const stateStudentTeacherRatio = getRatioFromFeatureTotals(
@@ -1427,9 +1444,9 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
       attributes.SchoolType,
       stateAverageCsCourses,
     ),
-    csEnrollmentComparison: formatPercentagePointComparison(
-      schoolCsEnrollmentRatio,
-      stateCsEnrollmentRatio,
+    csEnrollmentComparison: formatBenchmarkComparison(
+      schoolEnrollmentIntensity,
+      stateEnrollmentIntensity,
     ),
     studentTeacherRatioComparison: formatDecimal(stateStudentTeacherRatio),
   };
@@ -1440,16 +1457,16 @@ function buildDistrictComparisonValues(
   statewideFeatures,
   districtCourseCount,
 ) {
-  const districtCsEnrollmentRatio = getRatioFromFeatureTotals(
+  const districtEnrollmentIntensity = getRatioFromFeatureTotals(
     districtFeatures,
-    "NumCSEnrol",
     "StudentCou",
+    "NumCSEnrol",
   );
 
-  const stateCsEnrollmentRatio = getRatioFromFeatureTotals(
+  const stateEnrollmentIntensity = getRatioFromFeatureTotals(
     statewideFeatures,
-    "NumCSEnrol",
     "StudentCou",
+    "NumCSEnrol",
   );
 
   const stateStudentTeacherRatio = getRatioFromFeatureTotals(
@@ -1468,9 +1485,9 @@ function buildDistrictComparisonValues(
       "course",
       "courses",
     ),
-    csEnrollmentComparison: formatPercentagePointComparison(
-      districtCsEnrollmentRatio,
-      stateCsEnrollmentRatio,
+    csEnrollmentComparison: formatBenchmarkComparison(
+      districtEnrollmentIntensity,
+      stateEnrollmentIntensity,
     ),
     studentTeacherRatioComparison: formatDecimal(stateStudentTeacherRatio),
   };
@@ -1680,7 +1697,10 @@ function buildSchoolSummaryDataFromAttributes(
     ),
     otherCourses: getOtherCourses(attributes, "schoolApprovedCourseNote"),
 
-    csEnrollmentPercent: formatPercent(attributes.RatioCStoSchool),
+    csEnrollmentPercent: formatEnrollmentIntensity(
+      attributes.StudentCou,
+      attributes.NumCSEnrol,
+    ),
     csEnrollmentComparison: comparisonValues.csEnrollmentComparison,
 
     category1: formatWholeNumber(attributes.NumCategor),
@@ -1886,10 +1906,10 @@ function buildDistrictSummaryDataFromFeatures(
     );
   });
 
-  const csEnrollmentRatio =
-    totals.totalStudents > 0
-      ? totals.csEnrollments / totals.totalStudents
-      : null;
+  const enrollmentIntensity = safeDivide(
+    totals.totalStudents,
+    totals.csEnrollments,
+  );
 
   const studentTeacherRatio =
     totals.csTeachers > 0 ? totals.csEnrollments / totals.csTeachers : null;
@@ -1929,7 +1949,10 @@ function buildDistrictSummaryDataFromFeatures(
       "districtApprovedCourseNote",
     ),
 
-    csEnrollmentPercent: formatPercent(csEnrollmentRatio),
+    csEnrollmentPercent:
+      enrollmentIntensity === null
+        ? "--"
+        : formatDecimal(enrollmentIntensity, 2),
     csEnrollmentComparison: comparisonValues.csEnrollmentComparison,
 
     category1: formatWholeNumber(totals.category1),
