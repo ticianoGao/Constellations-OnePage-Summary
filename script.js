@@ -251,11 +251,11 @@ function updateComparisonColor(valueCellId, benchmarkCellId) {
     return;
   }
 
-  // A lower Enrollment Intensity indicates more CS enrollment
+  // A higher Enrollment Intensity indicates more CS enrollment
   // relative to the size of the student population.
-  if (value < benchmark) {
+  if (value > benchmark) {
     valueCell.classList.add("comparison-higher");
-  } else if (value > benchmark) {
+  } else if (value < benchmark) {
     valueCell.classList.add("comparison-lower");
   } else {
     valueCell.classList.add("comparison-same");
@@ -1046,13 +1046,13 @@ function safeDivide(numerator, denominator) {
 }
 
 function formatEnrollmentIntensity(totalEnrollment, csEnrollments) {
-  const intensity = safeDivide(totalEnrollment, csEnrollments);
+  const enrollmentRate = safeDivide(csEnrollments, totalEnrollment);
 
-  if (intensity === null) {
+  if (enrollmentRate === null) {
     return "--";
   }
 
-  return formatDecimal(intensity, 2);
+  return `${formatDecimal(enrollmentRate * 100, 2)}%`;
 }
 
 function getFeatureAttributes(feature) {
@@ -1417,14 +1417,14 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
   );
 
   const schoolEnrollmentIntensity = safeDivide(
-    attributes.StudentCou,
     attributes.NumCSEnrol,
+    attributes.StudentCou,
   );
 
   const stateEnrollmentIntensity = getRatioFromFeatureTotals(
     statewideFeatures,
-    "StudentCou",
     "NumCSEnrol",
+    "StudentCou",
   );
 
   const stateStudentTeacherRatio = getRatioFromFeatureTotals(
@@ -1459,14 +1459,14 @@ function buildDistrictComparisonValues(
 ) {
   const districtEnrollmentIntensity = getRatioFromFeatureTotals(
     districtFeatures,
-    "StudentCou",
     "NumCSEnrol",
+    "StudentCou",
   );
 
   const stateEnrollmentIntensity = getRatioFromFeatureTotals(
     statewideFeatures,
-    "StudentCou",
     "NumCSEnrol",
+    "StudentCou",
   );
 
   const stateStudentTeacherRatio = getRatioFromFeatureTotals(
@@ -1907,8 +1907,8 @@ function buildDistrictSummaryDataFromFeatures(
   });
 
   const enrollmentIntensity = safeDivide(
-    totals.totalStudents,
     totals.csEnrollments,
+    totals.totalStudents,
   );
 
   const studentTeacherRatio =
@@ -1952,7 +1952,7 @@ function buildDistrictSummaryDataFromFeatures(
     csEnrollmentPercent:
       enrollmentIntensity === null
         ? "--"
-        : formatDecimal(enrollmentIntensity, 2),
+        : `${formatDecimal(enrollmentIntensity * 100, 2)}%`,
     csEnrollmentComparison: comparisonValues.csEnrollmentComparison,
 
     category1: formatWholeNumber(totals.category1),
