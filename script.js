@@ -168,7 +168,7 @@ const sampleSchoolSummaryData = {
     apCsa: "Unavailable",
     apCsp: "Available",
     otherCourses: "Introduction to Digital Technology",
-    csEnrollmentPercent: "37.46",
+    csEnrollmentPercent: "2.67%",
     csEnrollmentComparison: "NULL%",
     category1: "15",
     category2: "0",
@@ -189,7 +189,7 @@ const sampleDistrictSummaryData = {
     apCsa: "Unavailable",
     apCsp: "Available",
     otherCourses: "Introduction to Digital Technology",
-    csEnrollmentPercent: "37.46",
+    csEnrollmentPercent: "2.67%",
     csEnrollmentComparison: "NULL%",
     category1: "15",
     category2: "0",
@@ -251,8 +251,8 @@ function updateComparisonColor(valueCellId, benchmarkCellId) {
     return;
   }
 
-  // A higher Enrollment Intensity indicates more CS enrollment
-  // relative to the size of the student population.
+  // A higher CS Enrollment/Total Enrollment percentage indicates
+  // more CS course enrollments relative to the student population.
   if (value > benchmark) {
     valueCell.classList.add("comparison-higher");
   } else if (value < benchmark) {
@@ -1089,8 +1089,8 @@ function getEnrollmentTableValuesFromAttributes(attributes) {
   return {
     csEnrollments: formatWholeNumber(attributes.NumCSEnrol),
 
-    // Enrollment Intensity =
-    // total student enrollment / CS course enrollments
+    // CS Enrollment/Total Enrollment =
+    // CS course enrollments / total student enrollment
     csEnrollmentPercent: formatEnrollmentIntensity(
       attributes.StudentCou,
       attributes.NumCSEnrol,
@@ -1125,8 +1125,8 @@ function getEnrollmentTableValuesFromFeatures(features) {
   return {
     csEnrollments: formatWholeNumber(csEnrollments),
 
-    // Enrollment Intensity =
-    // total student enrollment / CS course enrollments
+    // CS Enrollment/Total Enrollment =
+    // CS course enrollments / total student enrollment
     csEnrollmentPercent: formatEnrollmentIntensity(
       totalStudents,
       csEnrollments,
