@@ -1055,6 +1055,209 @@ function formatEnrollmentIntensity(totalEnrollment, csEnrollments) {
   return `${formatDecimal(enrollmentRate * 100, 2)}%`;
 }
 
+/* Readiness Component B:
+   CS enrollments / total enrollment compared with the
+   75th percentile among comparable schools.
+*/
+
+function toReadinessNumber(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const number = Number(value);
+
+  return Number.isFinite(number) ? number : null;
+}
+
+function clampReadinessScore(value) {
+  const number = toReadinessNumber(value);
+
+  // Unavailable components receive 0.
+  if (number === null) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, number));
+}
+
+function getEnrollmentSizeGroup(totalEnrollment) {
+  const enrollment = toReadinessNumber(totalEnrollment);
+
+  if (enrollment === null || enrollment < 0) {
+    return null;
+  }
+
+  // This assigns exactly 500 students to the small group,
+  // avoiding a gap between the size categories.
+  if (enrollment <= 500) {
+    return "small";
+  }
+
+  if (enrollment <= 1000) {
+    return "medium";
+  }
+
+  return "large";
+}
+
+function calculatePercentile(values, percentile) {
+  const sortedValues = values
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b);
+
+  if (sortedValues.length === 0) {
+    return null;
+  }
+
+  const position = (sortedValues.length - 1) * percentile;
+  const lowerIndex = Math.floor(position);
+  const upperIndex = Math.ceil(position);
+
+  if (lowerIndex === upperIndex) {
+    return sortedValues[lowerIndex];
+  }
+
+  const weight = position - lowerIndex;
+
+  return (
+    sortedValues[lowerIndex] * (1 - weight) + sortedValues[upperIndex] * weight
+  );
+}
+
+function getReadinessEnrollmentRatio(attributes) {
+  const totalEnrollment = toReadinessNumber(attributes.StudentCou);
+  const csEnrollments = toReadinessNumber(attributes.NumCSEnrol);
+
+  if (
+    totalEnrollment === null ||
+    totalEnrollment <= 0 ||
+    csEnrollments === null ||
+    csEnrollments < 0
+  ) {
+    return null;
+  }
+
+  return csEnrollments / totalEnrollment;
+}
+
+function calculateSchoolReadinessB(attributes, statewideFeatures = []) {
+  const schoolRatio = getReadinessEnrollmentRatio(attributes);
+  const schoolType = attributes.SchoolType;
+  const schoolSizeGroup = getEnrollmentSizeGroup(attributes.StudentCou);
+
+  if (
+    schoolRatio === null ||
+    !schoolType ||
+    !schoolSizeGroup ||
+    !Array.isArray(statewideFeatures)
+  ) {
+    return {
+      score: 0,
+      schoolRatio,
+      peerBenchmark: null,
+      peerCount: 0,
+    };
+  }
+
+  const peerRatios = statewideFeatures
+    .map((feature) => feature.attributes || {})
+    .filter((peerAttributes) => {
+      return (
+        peerAttributes.SchoolType === schoolType &&
+        getEnrollmentSizeGroup(peerAttributes.StudentCou) === schoolSizeGroup
+      );
+    })
+    .map((peerAttributes) => {
+      return getReadinessEnrollmentRatio(peerAttributes);
+    })
+    .filter((value) => value !== null);
+
+  const peerBenchmark = calculatePercentile(peerRatios, 0.75);
+
+  // No valid benchmark means the B component receives 0.
+  if (peerBenchmark === null) {
+    return {
+      score: 0,
+      schoolRatio,
+      peerBenchmark: null,
+      peerCount: peerRatios.length,
+    };
+  }
+
+  let score = 0;
+
+  if (peerBenchmark === 0) {
+    // A positive ratio exceeds a peer benchmark of zero.
+    score = schoolRatio > 0 ? 100 : 0;
+  } else {
+    score = clampReadinessScore((schoolRatio / peerBenchmark) * 100);
+  }
+
+  return {
+    score,
+    schoolRatio,
+    peerBenchmark,
+    peerCount: peerRatios.length,
+  };
+}
+
+function setReadinessComponentScore(reportPrefix, componentLetter, score) {
+  const normalizedScore = clampReadinessScore(score);
+
+  const scoreElement = document.getElementById(
+    `${reportPrefix}ReadinessComponent${componentLetter}`,
+  );
+
+  const barElement = document.getElementById(
+    `${reportPrefix}ReadinessComponent${componentLetter}Bar`,
+  );
+
+  if (scoreElement) {
+    scoreElement.textContent = formatDecimal(normalizedScore, 1);
+  }
+
+  if (barElement) {
+    barElement.style.width = `${normalizedScore}%`;
+  }
+}
+
+function updateSchoolReadinessB(attributes, statewideFeatures = []) {
+  const result = calculateSchoolReadinessB(attributes, statewideFeatures);
+
+  setReadinessComponentScore("school", "B", result.score);
+
+  console.log("School readiness component B:", {
+    score: result.score,
+    schoolRatio: result.schoolRatio,
+    peerBenchmark: result.peerBenchmark,
+    peerCount: result.peerCount,
+  });
+}
+
+function updateDistrictReadinessB(districtFeatures, statewideFeatures = []) {
+  const schoolScores = (districtFeatures || []).map((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    return calculateSchoolReadinessB(attributes, statewideFeatures).score;
+  });
+
+  // Unavailable district data receives 0.
+  const districtScore =
+    schoolScores.length === 0
+      ? 0
+      : schoolScores.reduce((sum, score) => sum + score, 0) /
+        schoolScores.length;
+
+  setReadinessComponentScore("district", "B", districtScore);
+
+  console.log("District readiness component B:", {
+    score: districtScore,
+    schoolCount: schoolScores.length,
+    schoolScores,
+  });
+}
+
 function getFeatureAttributes(feature) {
   return feature && feature.attributes ? feature.attributes : {};
 }
@@ -1743,6 +1946,7 @@ async function querySchoolSummaryByWhere(whereClause) {
 async function loadSchoolSummaryFromArcGIS() {
   if (!selectedReportValue) {
     updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+    setReadinessComponentScore("school", "B", 0);
     return;
   }
 
@@ -1785,6 +1989,7 @@ async function loadSchoolSummaryFromArcGIS() {
 
       updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
       updateSchoolDemographicChartsFromAttributes({});
+      setReadinessComponentScore("school", "B", 0);
       return;
     }
 
@@ -1809,6 +2014,8 @@ async function loadSchoolSummaryFromArcGIS() {
     updateSchoolSummaryFromData(schoolSummaryData);
     updateSchoolDemographicChartsFromAttributes(attributes);
 
+    updateSchoolReadinessB(attributes, statewideFeatures);
+
     console.log("Loaded school summary from ArcGIS:", {
       successfulWhereClause,
       attributes,
@@ -1816,6 +2023,7 @@ async function loadSchoolSummaryFromArcGIS() {
   } catch (error) {
     console.error("Could not load school summary from ArcGIS:", error);
     updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+    setReadinessComponentScore("school", "B", 0);
   }
 }
 
@@ -1970,6 +2178,7 @@ async function loadDistrictSummaryFromArcGIS() {
   if (!selectedDistrictName) {
     updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
     updateDistrictDemographicChartsFromFeatures([]);
+    setReadinessComponentScore("district", "B", 0);
     return;
   }
 
@@ -1983,6 +2192,7 @@ async function loadDistrictSummaryFromArcGIS() {
       );
       updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
       updateDistrictDemographicChartsFromFeatures([]);
+      setReadinessComponentScore("district", "B", 0);
       return;
     }
 
@@ -2005,6 +2215,8 @@ async function loadDistrictSummaryFromArcGIS() {
     updateDistrictSummaryFromData(districtSummaryData);
     updateDistrictDemographicChartsFromFeatures(features);
 
+    updateDistrictReadinessB(features, statewideFeatures);
+
     console.log("Loaded district summary from ArcGIS:", {
       selectedDistrictName,
       schoolCount: features.length,
@@ -2013,6 +2225,7 @@ async function loadDistrictSummaryFromArcGIS() {
   } catch (error) {
     console.error("Could not load district summary from ArcGIS:", error);
     updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+    setReadinessComponentScore("district", "B", 0);
   }
 }
 
