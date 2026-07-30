@@ -1227,6 +1227,42 @@ function getComparableReadinessPeers(attributes, statewideFeatures = []) {
 /* A — Course Access */
 
 function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
+  const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
+
+  /*
+    Elementary access:
+    Any reported CS course demonstrates course access.
+
+    Course quantity is evaluated separately in Component C,
+    so A and C do not use the same formula.
+  */
+  if (schoolType === "E") {
+    const schoolCourseCount = toReadinessNumber(attributes.NumCSCours);
+
+    if (schoolCourseCount === null || schoolCourseCount < 0) {
+      return {
+        score: 0,
+        schoolValue: null,
+        peerBenchmark: null,
+        peerCount: 0,
+        method: "elementaryCourseAccess",
+      };
+    }
+
+    return {
+      score: schoolCourseCount > 0 ? 100 : 0,
+      schoolValue: schoolCourseCount,
+      peerBenchmark: null,
+      peerCount: 0,
+      method: "elementaryCourseAccess",
+    };
+  }
+
+  /*
+    Middle, high, and K-12 access:
+    Compare approved-course count with the 75th percentile
+    among comparable schools.
+  */
   const schoolApprovedCourses = toReadinessNumber(attributes.NumApprove);
 
   if (schoolApprovedCourses === null || schoolApprovedCourses < 0) {
@@ -1235,6 +1271,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
       schoolValue: null,
       peerBenchmark: null,
       peerCount: 0,
+      method: "approvedCourseBenchmark",
     };
   }
 
@@ -1242,7 +1279,9 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
     .map((peerAttributes) => {
       return toReadinessNumber(peerAttributes.NumApprove);
     })
-    .filter((value) => value !== null && value >= 0);
+    .filter((value) => {
+      return value !== null && value >= 0;
+    });
 
   const peerBenchmark = calculatePercentile(peerValues, 0.75);
 
@@ -1252,6 +1291,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
       schoolValue: schoolApprovedCourses,
       peerBenchmark: null,
       peerCount: peerValues.length,
+      method: "approvedCourseBenchmark",
     };
   }
 
@@ -1267,14 +1307,9 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
     schoolValue: schoolApprovedCourses,
     peerBenchmark,
     peerCount: peerValues.length,
+    method: "approvedCourseBenchmark",
   };
 }
-
-/* C — Course Progression
-
-   Keep this at 0 until the approved-course fields are assigned
-   to foundational, intermediate, advanced, and pathway milestones.
-*/
 
 /* C — Course Progression */
 
@@ -1344,7 +1379,7 @@ function getApprovedProgressionCourseCount(attributes) {
   }).length;
 }
 
-function calculateSchoolReadinessC(attributes) {
+function calculateSchoolReadinessC(attributes, statewideFeatures = []) {
   const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
 
   const approvedCourseCount = getApprovedProgressionCourseCount(attributes);
@@ -1388,45 +1423,57 @@ function calculateSchoolReadinessC(attributes) {
         met: approvedCourseCount >= 3,
       },
     ];
-  } else if (schoolType === "M") {
+  } else if (schoolType === "M" || schoolType === "E") {
     /*
-    Temporary middle-school progression proxy.
+    Middle and elementary schools use total CS course count
+    as a course-breadth proxy because individual course names
+    and sequence information are not consistently available.
 
-    The current layer provides the total number of approved
-    courses but does not provide mapped fields for each of the
-    five individual approved middle-school courses.
-
-    Each milestone is worth 25 points.
+    Schools are compared only with peers of the same school
+    type and enrollment-size group.
   */
 
-    milestones = [
-      {
-        key: "oneApprovedCourse",
-        met: approvedCourseCount >= 1,
-      },
-      {
-        key: "twoApprovedCourses",
-        met: approvedCourseCount >= 2,
-      },
-      {
-        key: "threeApprovedCourses",
-        met: approvedCourseCount >= 3,
-      },
-      {
-        key: "fourApprovedCourses",
-        met: approvedCourseCount >= 4,
-      },
-    ];
-  } else if (schoolType === "E") {
-    /*
-    No elementary-specific approved-course taxonomy or
-    progression fields are currently available.
+    const schoolCourseCount = toReadinessNumber(attributes.NumCSCours);
 
-    Following the unavailable-data policy, elementary
-    Course Progression receives 0.
-  */
+    const peerCourseCounts = getComparableReadinessPeers(
+      attributes,
+      statewideFeatures,
+    )
+      .map((peerAttributes) => {
+        return toReadinessNumber(peerAttributes.NumCSCours);
+      })
+      .filter((value) => {
+        return value !== null && value >= 0;
+      });
 
-    milestones = [];
+    const peerBenchmark = calculatePercentile(peerCourseCounts, 0.75);
+
+    if (schoolCourseCount === null || peerBenchmark === null) {
+      return {
+        score: 0,
+        schoolType,
+        courseCount: schoolCourseCount,
+        peerBenchmark,
+        peerCount: peerCourseCounts.length,
+        method: "courseBreadthProxy",
+      };
+    }
+
+    const score =
+      peerBenchmark === 0
+        ? schoolCourseCount > 0
+          ? 100
+          : 0
+        : clampReadinessScore((schoolCourseCount / peerBenchmark) * 100);
+
+    return {
+      score,
+      schoolType,
+      courseCount: schoolCourseCount,
+      peerBenchmark,
+      peerCount: peerCourseCounts.length,
+      method: "courseBreadthProxy",
+    };
   }
 
   /*
@@ -1643,7 +1690,7 @@ function calculateSchoolReadinessScores(attributes, statewideFeatures = []) {
 
     B: calculateSchoolReadinessB(attributes, statewideFeatures).score,
 
-    C: calculateSchoolReadinessC(attributes).score,
+    C: calculateSchoolReadinessC(attributes, statewideFeatures).score,
 
     D: calculateSchoolReadinessD(attributes, statewideFeatures).score,
 
@@ -2318,11 +2365,35 @@ function updateDistrictDemographicChartsFromFeatures(features) {
 }
 
 function getOtherCourses(attributes, targetId) {
+  /*
+    Include every individually mapped course that is available,
+    regardless of whether it is on the GA DOE approved list.
+  */
   const availableCourses = otherCourseFields
-    .filter((course) => isAvailable(attributes[course.field]))
-    .map((course) => course.label);
+    .filter((course) => {
+      return isAvailable(attributes[course.field]);
+    })
+    .map((course) => {
+      return course.label;
+    });
 
-  return formatApprovedCourseLabels(availableCourses, targetId);
+  if (availableCourses.length > 0) {
+    return formatApprovedCourseLabels(availableCourses, targetId);
+  }
+
+  /*
+    NumCSCours may report courses even when the layer does not
+    provide their individual names.
+  */
+  const reportedCourseCount = toReadinessNumber(attributes.NumCSCours);
+
+  if (reportedCourseCount !== null && reportedCourseCount > 0) {
+    return `${formatWholeNumber(
+      reportedCourseCount,
+    )} courses reported; course names unavailable in the current dataset`;
+  }
+
+  return "None reported";
 }
 
 function buildSchoolSummaryDataFromAttributes(

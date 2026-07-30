@@ -2334,3 +2334,23 @@ a:hover {
   font-weight: 800;
   text-align: right;
 }
+
+/* Slightly taller academic maps in the district report */
+#districtMathProficiencyMap,
+#districtEnglishProficiencyMap {
+  height: 287px;
+}
+
+/* Slightly taller income map in the school report */
+#incomeMap {
+  height: 282px;
+}
+
+.future-suggestion-subtitle {
+  margin-top: -4px;
+  margin-bottom: 18px;
+  color: #666666;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
