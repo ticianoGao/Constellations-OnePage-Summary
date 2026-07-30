@@ -859,7 +859,7 @@ const otherCourseFields = [
   { field: "IB_ONE", label: "IB Computer Science, Year One" },
   { field: "IB_TWO", label: "IB Computer Science, Year Two" },
   { field: "CSP", label: "Computer Science Principles" },
-  { field: "PGAS", label: "Programming, Games, Apps and Society" },
+  { field: "PGAS", label: "Programming, Games, Apps, and Society" },
   { field: "WEBDEV", label: "Web Development" },
   { field: "EMBCOMP", label: "Embedded Computing" },
   { field: "GDAAS", label: "Game Design: Animation and Simulation" },
@@ -1276,9 +1276,171 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
    to foundational, intermediate, advanced, and pathway milestones.
 */
 
-function calculateSchoolReadinessC() {
+/* C — Course Progression */
+
+/*
+  Current-data progression proxies.
+
+  These mappings use the individual course fields currently available
+  in the ArcGIS layer. Update these arrays later if additional course
+  fields or explicit pathway-completion fields become available.
+*/
+
+const readinessProgressionCourseFields = {
+  foundational: ["INTROSW", "INTROHARD", "CSP", "CYBERSEC"],
+
+  intermediate: ["PGAS", "WEBDEV", "EMBCOMP", "GDAAS", "FINTECH"],
+
+  advanced: ["APCSA", "APCSP", "IB_ONE", "IB_TWO", "ADVCYBER"],
+};
+
+function normalizeReadinessSchoolType(value) {
+  const schoolType = String(value || "")
+    .trim()
+    .toUpperCase();
+
+  if (["E", "ELEMENTARY", "ELEMENTARY SCHOOL"].includes(schoolType)) {
+    return "E";
+  }
+
+  if (["M", "MIDDLE", "MIDDLE SCHOOL"].includes(schoolType)) {
+    return "M";
+  }
+
+  if (["H", "HIGH", "HIGH SCHOOL"].includes(schoolType)) {
+    return "H";
+  }
+
+  if (["K12", "K-12", "K–12"].includes(schoolType)) {
+    return "K12";
+  }
+
+  return null;
+}
+
+function hasAnyProgressionCourse(attributes, courseFields) {
+  return courseFields.some((field) => {
+    return isAvailable(attributes[field]);
+  });
+}
+
+function getApprovedProgressionCourseCount(attributes) {
+  const reportedCount = toReadinessNumber(attributes.NumApprove);
+
+  if (reportedCount !== null && reportedCount >= 0) {
+    return reportedCount;
+  }
+
+  /*
+    Fallback when NumApprove is unavailable:
+    count approved individual course fields available
+    in the current layer.
+  */
+  return comparisonCourseFields.filter((course) => {
+    return (
+      isApprovedCourseLabel(course.label) &&
+      isAvailable(attributes[course.field])
+    );
+  }).length;
+}
+
+function calculateSchoolReadinessC(attributes) {
+  const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
+
+  const approvedCourseCount = getApprovedProgressionCourseCount(attributes);
+
+  let milestones = [];
+
+  /*
+    High schools and K-12 schools
+
+    25 points:
+    1. Foundational course
+    2. Intermediate/programming course
+    3. Advanced course
+    4. At least three approved courses
+  */
+  if (schoolType === "H" || schoolType === "K12") {
+    milestones = [
+      {
+        key: "foundational",
+        met: hasAnyProgressionCourse(
+          attributes,
+          readinessProgressionCourseFields.foundational,
+        ),
+      },
+      {
+        key: "intermediate",
+        met: hasAnyProgressionCourse(
+          attributes,
+          readinessProgressionCourseFields.intermediate,
+        ),
+      },
+      {
+        key: "advanced",
+        met: hasAnyProgressionCourse(
+          attributes,
+          readinessProgressionCourseFields.advanced,
+        ),
+      },
+      {
+        key: "threeCourseSequence",
+        met: approvedCourseCount >= 3,
+      },
+    ];
+  } else if (schoolType === "M") {
+    /*
+    Temporary middle-school progression proxy.
+
+    The current layer provides the total number of approved
+    courses but does not provide mapped fields for each of the
+    five individual approved middle-school courses.
+
+    Each milestone is worth 25 points.
+  */
+
+    milestones = [
+      {
+        key: "oneApprovedCourse",
+        met: approvedCourseCount >= 1,
+      },
+      {
+        key: "twoApprovedCourses",
+        met: approvedCourseCount >= 2,
+      },
+      {
+        key: "threeApprovedCourses",
+        met: approvedCourseCount >= 3,
+      },
+      {
+        key: "fourApprovedCourses",
+        met: approvedCourseCount >= 4,
+      },
+    ];
+  } else if (schoolType === "E") {
+    /*
+    No elementary-specific approved-course taxonomy or
+    progression fields are currently available.
+
+    Following the unavailable-data policy, elementary
+    Course Progression receives 0.
+  */
+
+    milestones = [];
+  }
+
+  /*
+    Unknown or unavailable school type results in zero,
+    following the unavailable-data scoring rule.
+  */
+  const milestonesMet = milestones.filter((milestone) => milestone.met).length;
+
   return {
-    score: 0,
+    score: milestonesMet * 25,
+    schoolType,
+    approvedCourseCount,
+    milestones,
+    milestonesMet,
   };
 }
 
@@ -1481,7 +1643,7 @@ function calculateSchoolReadinessScores(attributes, statewideFeatures = []) {
 
     B: calculateSchoolReadinessB(attributes, statewideFeatures).score,
 
-    C: calculateSchoolReadinessC(attributes, statewideFeatures).score,
+    C: calculateSchoolReadinessC(attributes).score,
 
     D: calculateSchoolReadinessD(attributes, statewideFeatures).score,
 
