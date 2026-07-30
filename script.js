@@ -2814,6 +2814,20 @@ if (typeof require !== "undefined") {
       });
     }
 
+    // This is for median household income map for school report, zoom out a bit more
+    function getReportMapZoom(containerId) {
+      if (selectedReportType === "district") {
+        return 6;
+      }
+
+      // Zoom out slightly more for the school income map.
+      if (containerId === "incomeMap") {
+        return 8;
+      }
+
+      return 7;
+    }
+
     async function updateOneReportMapLocation(containerId, location) {
       const view = reportMapViews[containerId];
       const selectionLayer = reportMapMarkerLayers[containerId];
@@ -2885,7 +2899,7 @@ if (typeof require !== "undefined") {
       await view
         .goTo({
           center: [Number(location.longitude), Number(location.latitude)],
-          zoom: selectedReportType === "district" ? 6 : 7,
+          zoom: getReportMapZoom(containerId),
         })
         .catch(() => {});
     }
@@ -3136,7 +3150,7 @@ if (typeof require !== "undefined") {
         center: schoolLocation
           ? [schoolLocation.longitude, schoolLocation.latitude]
           : [-83.5, 32.7],
-        zoom: schoolLocation ? 7 : 6,
+        zoom: schoolLocation ? getReportMapZoom(containerId) : 6,
         constraints: {
           rotationEnabled: false,
         },

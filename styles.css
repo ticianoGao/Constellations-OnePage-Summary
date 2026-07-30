@@ -2174,41 +2174,153 @@ a:hover {
   line-height: inherit;
 }
 
-/* Standalone school readiness score card */
-#schoolGrid .readiness-score-card {
-  min-height: 170px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+/* Remove badge spacing from the school help card */
+#schoolGrid > .future-suggestion-card h3,
+#districtReportGrid > .future-suggestion-card h3 {
+  padding-right: 0;
 }
 
-#schoolGrid .readiness-score-card h3 {
-  width: 100%;
-  margin-bottom: 18px;
-}
-
-#schoolGrid .readiness-score-card-value {
-  min-width: 132px;
-  padding: 18px 24px;
-
-  background: #f5f7fa;
-  border: 1px solid #d9d9d9;
-  border-radius: 10px;
-
-  font-family: Arial, Helvetica, sans-serif;
-  text-align: center;
-}
-
-#schoolGrid .readiness-score-card-value strong {
+/* School readiness score card */
+.readiness-score-card {
+  min-height: 390px;
+  padding: 0;
   display: block;
+  overflow: hidden;
+  text-align: left;
+}
+
+/* Shared small uppercase heading */
+.readiness-section-label {
+  display: block;
+  color: #444444;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+/* Top overall-score section */
+.readiness-overall-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.readiness-overall-heading {
+  min-width: 0;
+}
+
+.readiness-overall-heading h3 {
+  margin: 6px 0 0;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.readiness-overall-score {
+  flex-shrink: 0;
   color: var(--blue);
-  font-size: 2.2rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 2.8rem;
+  font-weight: 700;
   line-height: 1;
 }
 
-/* Remove badge spacing from the school help card */
-#schoolGrid > .future-suggestion-card h3 {
-  padding-right: 0;
+/* Bottom component section */
+.readiness-breakdown-section {
+  padding: 22px 24px 24px;
+}
+
+.readiness-breakdown-heading {
+  margin-bottom: 18px;
+}
+
+.readiness-breakdown-heading p {
+  margin: 7px 0 0;
+  color: #666666;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* A–D component list */
+.readiness-component-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.readiness-component-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 44px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid #eeeeee;
+}
+
+.readiness-component-row:first-child {
+  border-top: none;
+}
+
+.readiness-component-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+
+  background: var(--blue);
+  border-radius: 50%;
+
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.readiness-component-main {
+  min-width: 0;
+}
+
+.readiness-component-label {
+  display: block;
+  margin-bottom: 6px;
+
+  color: #333333;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* Placeholder progress bar */
+.readiness-component-track {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+
+  background: #e8ebef;
+  border-radius: 999px;
+}
+
+.readiness-component-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+
+  background: var(--gold);
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+
+.readiness-component-score {
+  color: var(--blue);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: right;
 }

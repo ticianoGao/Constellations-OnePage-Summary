@@ -481,10 +481,123 @@
                 </article>
                 -->
                 <article class="report-card readiness-score-card">
-                  <h3>Readiness Score</h3>
+                  <!-- Overall readiness score -->
+                  <div class="readiness-overall-section">
+                    <div class="readiness-overall-heading">
+                      <h3>Overall Readiness Score</h3>
+                    </div>
 
-                  <div class="readiness-score-card-value">
-                    <strong id="schoolReadinessScore">--</strong>
+                    <strong
+                      class="readiness-overall-score"
+                      id="schoolReadinessScore"
+                    >
+                      --
+                    </strong>
+                  </div>
+
+                  <!-- Readiness score components -->
+                  <div class="readiness-breakdown-section">
+                    <div class="readiness-component-list">
+                      <!-- Component A -->
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">A</span>
+
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Course Access
+                          </span>
+
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="schoolReadinessComponentABar"
+                            ></span>
+                          </div>
+                        </div>
+
+                        <strong
+                          class="readiness-component-score"
+                          id="schoolReadinessComponentA"
+                        >
+                          --
+                        </strong>
+                      </div>
+
+                      <!-- Component B -->
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">B</span>
+
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Student Participation
+                          </span>
+
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="schoolReadinessComponentBBar"
+                            ></span>
+                          </div>
+                        </div>
+
+                        <strong
+                          class="readiness-component-score"
+                          id="schoolReadinessComponentB"
+                        >
+                          --
+                        </strong>
+                      </div>
+
+                      <!-- Component C -->
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">C</span>
+
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Teacher Capacity
+                          </span>
+
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="schoolReadinessComponentCBar"
+                            ></span>
+                          </div>
+                        </div>
+
+                        <strong
+                          class="readiness-component-score"
+                          id="schoolReadinessComponentC"
+                        >
+                          --
+                        </strong>
+                      </div>
+
+                      <!-- Component D -->
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">D</span>
+
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Program Support
+                          </span>
+
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="schoolReadinessComponentDBar"
+                            ></span>
+                          </div>
+                        </div>
+
+                        <strong
+                          class="readiness-component-score"
+                          id="schoolReadinessComponentD"
+                        >
+                          --
+                        </strong>
+                      </div>
+                    </div>
                   </div>
                 </article>
               </div>
@@ -1142,61 +1255,172 @@
                     </div>
                   </div>
                 </article>
-                <article class="report-card future-suggestion-card">
-                  <div class="readiness-score-badge">
-                    <span>Readiness Score</span>
-                    <strong id="districtReadinessScore">--</strong>
+                <article class="report-card readiness-score-card">
+                  <!-- Overall readiness score -->
+                  <div class="readiness-overall-section">
+                    <div class="readiness-overall-heading">
+                      <h3>Overall Readiness Score</h3>
+                    </div>
+
+                    <strong
+                      class="readiness-overall-score"
+                      id="districtReadinessScore"
+                    >
+                      --
+                    </strong>
                   </div>
 
-                  <h3>How can we help?</h3>
+                  <!-- Readiness score components -->
+                  <div class="readiness-breakdown-section">
+                    <div class="readiness-component-list">
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">A</span>
 
-                  <div class="future-pseudocode-block">
-                    <div class="pseudo-line">
-                      <span class="pseudo-keyword">IF</span>
-                      report_type ==
-                      <span class="pseudo-string">"District"</span>
-                    </div>
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Course Access
+                          </span>
 
-                    <div class="pseudo-line pseudo-indent">
-                      scan schools with limited CS course access
-                    </div>
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="districtReadinessComponentABar"
+                            ></span>
+                          </div>
+                        </div>
 
-                    <div class="pseudo-line pseudo-indent">
-                      identify district-wide support priorities
-                    </div>
+                        <strong
+                          class="readiness-component-score"
+                          id="districtReadinessComponentA"
+                        >
+                          --
+                        </strong>
+                      </div>
 
-                    <div class="pseudo-line pseudo-indent">
-                      check AP CS A / AP CS Principles availability
-                    </div>
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">B</span>
 
-                    <div class="pseudo-line pseudo-indent">
-                      list possible advanced CS pathway opportunities
-                    </div>
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Student Participation
+                          </span>
 
-                    <div class="pseudo-line">
-                      <span class="pseudo-keyword">ELIF</span>
-                      school_level ==
-                      <span class="pseudo-string">"Middle School"</span>
-                    </div>
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="districtReadinessComponentBBar"
+                            ></span>
+                          </div>
+                        </div>
 
-                    <div class="pseudo-line pseudo-indent">
-                      check foundational CS course access
-                    </div>
+                        <strong
+                          class="readiness-component-score"
+                          id="districtReadinessComponentB"
+                        >
+                          --
+                        </strong>
+                      </div>
 
-                    <div class="pseudo-line pseudo-indent">
-                      list feeder-pathway planning suggestions
-                    </div>
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">C</span>
 
-                    <div class="pseudo-line">
-                      <span class="pseudo-keyword">ELSE</span>
-                    </div>
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Teacher Capacity
+                          </span>
 
-                    <div class="pseudo-line pseudo-indent">
-                      suggest age-appropriate CS exposure opportunities
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="districtReadinessComponentCBar"
+                            ></span>
+                          </div>
+                        </div>
+
+                        <strong
+                          class="readiness-component-score"
+                          id="districtReadinessComponentC"
+                        >
+                          --
+                        </strong>
+                      </div>
+
+                      <div class="readiness-component-row">
+                        <span class="readiness-component-letter">D</span>
+
+                        <div class="readiness-component-main">
+                          <span class="readiness-component-label">
+                            Program Support
+                          </span>
+
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="districtReadinessComponentDBar"
+                            ></span>
+                          </div>
+                        </div>
+
+                        <strong
+                          class="readiness-component-score"
+                          id="districtReadinessComponentD"
+                        >
+                          --
+                        </strong>
+                      </div>
                     </div>
                   </div>
                 </article>
               </div>
+              <article class="report-card future-suggestion-card">
+                <h3>How can we help?</h3>
+
+                <div class="future-pseudocode-block">
+                  <div class="pseudo-line">
+                    <span class="pseudo-keyword">IF</span>
+                    report_type ==
+                    <span class="pseudo-string">"District"</span>
+                  </div>
+
+                  <div class="pseudo-line pseudo-indent">
+                    scan schools with limited CS course access
+                  </div>
+
+                  <div class="pseudo-line pseudo-indent">
+                    identify district-wide support priorities
+                  </div>
+
+                  <div class="pseudo-line pseudo-indent">
+                    check AP CS A / AP CS Principles availability
+                  </div>
+
+                  <div class="pseudo-line pseudo-indent">
+                    list possible advanced CS pathway opportunities
+                  </div>
+
+                  <div class="pseudo-line">
+                    <span class="pseudo-keyword">ELIF</span>
+                    school_level ==
+                    <span class="pseudo-string">"Middle School"</span>
+                  </div>
+
+                  <div class="pseudo-line pseudo-indent">
+                    check foundational CS course access
+                  </div>
+
+                  <div class="pseudo-line pseudo-indent">
+                    list feeder-pathway planning suggestions
+                  </div>
+
+                  <div class="pseudo-line">
+                    <span class="pseudo-keyword">ELSE</span>
+                  </div>
+
+                  <div class="pseudo-line pseudo-indent">
+                    suggest age-appropriate CS exposure opportunities
+                  </div>
+                </div>
+              </article>
 
               <div class="report-export-row">
                 <button
