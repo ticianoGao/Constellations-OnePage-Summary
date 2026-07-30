@@ -2255,7 +2255,7 @@ a:hover {
 
 .readiness-component-row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 44px;
+  grid-template-columns: minmax(0, 1fr) 44px;
   gap: 10px;
   align-items: center;
   padding: 8px 0;
@@ -2264,22 +2264,6 @@ a:hover {
 
 .readiness-component-row:first-child {
   border-top: none;
-}
-
-.readiness-component-letter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-
-  background: var(--blue);
-  border-radius: 50%;
-
-  color: #ffffff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.72rem;
-  font-weight: 800;
 }
 
 .readiness-component-main {

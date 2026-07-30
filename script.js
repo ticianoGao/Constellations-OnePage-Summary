@@ -3204,7 +3204,7 @@ async function loadSchoolSummaryFromArcGIS() {
     updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
     resetReadinessScores("school");
     resetSchoolRecommendations(
-      "The selected school’s recommendation data could not be loaded.",
+      "The selected school's recommendation data could not be loaded.",
     );
   }
 }
