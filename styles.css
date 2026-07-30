@@ -2262,9 +2262,9 @@ a:hover {
   border-top: 1px solid #eeeeee;
 }
 
-/* School readiness comparison columns:
-   component information | school | state average */
-.school-readiness-component-list .readiness-component-row {
+/* School and district readiness comparison columns */
+.school-readiness-component-list .readiness-component-row,
+.district-readiness-component-list .readiness-component-row {
   grid-template-columns: minmax(0, 1fr) 48px 72px;
 }
 
