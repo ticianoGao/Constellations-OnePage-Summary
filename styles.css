@@ -2262,8 +2262,31 @@ a:hover {
   border-top: 1px solid #eeeeee;
 }
 
+/* School readiness comparison columns:
+   component information | school | state average */
+.school-readiness-component-list .readiness-component-row {
+  grid-template-columns: minmax(0, 1fr) 48px 72px;
+}
+
 .readiness-component-row:first-child {
   border-top: none;
+}
+
+.readiness-component-column-headings {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px 72px;
+  gap: 10px;
+  align-items: end;
+  padding: 0 0 5px;
+}
+
+.readiness-component-column-headings span {
+  color: #666666;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: right;
 }
 
 .readiness-component-main {
@@ -2306,6 +2329,14 @@ a:hover {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1rem;
   font-weight: 800;
+  text-align: right;
+}
+
+.readiness-component-state-average {
+  color: #666666;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
   text-align: right;
 }
 

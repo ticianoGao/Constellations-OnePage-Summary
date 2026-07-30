@@ -1708,6 +1708,94 @@ function calculateSchoolReadinessScores(attributes, statewideFeatures = []) {
   };
 }
 
+const schoolTypeReadinessAverageCache = new WeakMap();
+
+function calculateSchoolTypeStateAverageReadinessScores(
+  attributes,
+  statewideFeatures = [],
+) {
+  const targetSchoolType = normalizeReadinessSchoolType(attributes.SchoolType);
+
+  if (
+    !targetSchoolType ||
+    !Array.isArray(statewideFeatures) ||
+    statewideFeatures.length === 0
+  ) {
+    return null;
+  }
+
+  let cachedAveragesByType =
+    schoolTypeReadinessAverageCache.get(statewideFeatures);
+
+  if (!cachedAveragesByType) {
+    cachedAveragesByType = new Map();
+
+    schoolTypeReadinessAverageCache.set(
+      statewideFeatures,
+      cachedAveragesByType,
+    );
+  }
+
+  if (cachedAveragesByType.has(targetSchoolType)) {
+    return cachedAveragesByType.get(targetSchoolType);
+  }
+
+  const matchingSchoolFeatures = statewideFeatures.filter((feature) => {
+    const peerAttributes = getFeatureAttributes(feature);
+
+    return (
+      normalizeReadinessSchoolType(peerAttributes.SchoolType) ===
+      targetSchoolType
+    );
+  });
+
+  if (matchingSchoolFeatures.length === 0) {
+    return null;
+  }
+
+  const totals = {
+    A: 0,
+    B: 0,
+    C: 0,
+    D: 0,
+    E: 0,
+  };
+
+  matchingSchoolFeatures.forEach((feature) => {
+    const peerAttributes = getFeatureAttributes(feature);
+
+    const peerScores = calculateSchoolReadinessScores(
+      peerAttributes,
+      statewideFeatures,
+    );
+
+    readinessComponentLetters.forEach((letter) => {
+      totals[letter] += clampReadinessScore(peerScores[letter]);
+    });
+  });
+
+  const averages = {};
+
+  readinessComponentLetters.forEach((letter) => {
+    averages[letter] = totals[letter] / matchingSchoolFeatures.length;
+  });
+
+  cachedAveragesByType.set(targetSchoolType, averages);
+
+  return averages;
+}
+
+function updateSchoolStateAverageReadinessDisplay(scores) {
+  readinessComponentLetters.forEach((letter) => {
+    const displayValue =
+      scores && Number.isFinite(scores[letter])
+        ? formatDecimal(scores[letter], 1)
+        : "--";
+
+    setTextById(`schoolReadinessStateAverage${letter}`, displayValue);
+  });
+}
+
 function updateReadinessScoreDisplay(reportPrefix, scores) {
   readinessComponentLetters.forEach((letter) => {
     setReadinessComponentScore(reportPrefix, letter, scores[letter]);
@@ -1731,15 +1819,27 @@ function resetReadinessScores(reportPrefix) {
     D: 0,
     E: 0,
   });
+
+  if (reportPrefix === "school") {
+    updateSchoolStateAverageReadinessDisplay(null);
+  }
 }
 
 function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
   const scores = calculateSchoolReadinessScores(attributes, statewideFeatures);
 
+  const stateAverageScores = calculateSchoolTypeStateAverageReadinessScores(
+    attributes,
+    statewideFeatures,
+  );
+
+  updateSchoolStateAverageReadinessDisplay(stateAverageScores);
+
   const overallScore = updateReadinessScoreDisplay("school", scores);
 
   console.log("School readiness scores:", {
     ...scores,
+    stateAverageScores,
     overallScore,
   });
 
