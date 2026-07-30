@@ -1744,7 +1744,7 @@ a:hover {
 }
 
 .future-suggestion-card h3 {
-  padding-right: 125px;
+  padding-right: 0;
 }
 
 /* Readiness score badge */
@@ -1779,45 +1779,47 @@ a:hover {
   line-height: 1;
 }
 
-/* Pseudocode style */
-.future-pseudocode-block {
-  margin-top: 30px;
-  margin-right: 0;
+/* Dynamic recommendation list */
+.recommendation-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.recommendation-item {
+  padding: 16px 18px;
   background: #f5f7fa;
   border: 1px solid #d9d9d9;
   border-left: 5px solid var(--gold);
   border-radius: 8px;
-  padding: 18px 22px;
-
-  font-family: "Courier New", Courier, monospace;
-  font-size: 0.76rem;
-  line-height: 1.5;
-  color: #222222;
 }
 
-.pseudo-line {
-  margin-bottom: 4px;
-}
-
-.pseudo-line:last-child {
-  margin-bottom: 0;
-}
-
-.pseudo-indent {
-  padding-left: 24px;
-}
-
-.pseudo-gap {
-  margin-top: 12px;
-}
-
-.pseudo-keyword {
+.recommendation-item h4 {
+  margin: 0 0 7px;
   color: var(--blue);
-  font-weight: 800;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.25;
 }
 
-.pseudo-string {
-  color: #8a5a00;
+.recommendation-item p {
+  margin: 0;
+  color: #444444;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5 !important;
+}
+
+.recommendation-empty {
+  margin: 0;
+  padding: 16px 18px;
+  color: #666666;
+  background: #f5f7fa;
+  border: 1px dashed #b8b8b8;
+  border-radius: 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.45 !important;
 }
 
 /* Make normal report-card text closer to single-line spacing */
@@ -2160,18 +2162,6 @@ a:hover {
 
 .exporting-report .snapshot-title-card {
   padding-left: 12px !important;
-}
-
-.future-pseudocode-block {
-  font-size: 0.72rem;
-  line-height: 1.3;
-  padding: 12px 16px;
-}
-
-.future-pseudocode-block pre,
-.future-pseudocode-block code {
-  font-size: inherit;
-  line-height: inherit;
 }
 
 /* Remove badge spacing from the school help card */

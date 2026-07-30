@@ -28,7 +28,13 @@ const selectedValue = document.getElementById("selectedValue");
 const selectSearch = document.getElementById("selectSearch");
 const selectOptionsList = document.getElementById("selectOptions");
 
-const reportSchoolYearLabel = "2024 – 2025";
+const schoolRecommendations = document.getElementById("schoolRecommendations");
+
+const districtRecommendations = document.getElementById(
+  "districtRecommendations",
+);
+
+const reportSchoolYearLabel = "2024 - 2025";
 
 let selectedReportValue = "Georgia Statewide";
 let selectedReportType = "state";
@@ -989,6 +995,10 @@ const comparisonOutFields = [
 ].join(",");
 
 function toFiniteNumber(value) {
+  if (value === null || value === undefined || String(value).trim() === "") {
+    return null;
+  }
+
   const number = Number(value);
 
   if (!Number.isFinite(number)) {
@@ -1732,6 +1742,8 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
     ...scores,
     overallScore,
   });
+
+  return overallScore;
 }
 
 function updateDistrictReadinessScores(
@@ -2113,6 +2125,623 @@ function getFeaturesForDistrict(features, districtName) {
   });
 }
 
+/* Building CS Opportunities Together recommendation logic */
+
+// Suggestions.docx does not define the numerical high-readiness cutoff.
+// Change this value if a different threshold is approved.
+const highReadinessRecommendationThreshold = 75;
+
+const schoolWhyCsMattersText = {
+  E: "Early computing experiences help our students build creativity, recognize patterns, solve problems, and explain their thinking. Schools and families can work together to support these skills through classroom activities, clubs, and age-appropriate learning at home.",
+  M: "Middle school is an important time for our students to explore computing, grow their confidence, and discover new interests. Supportive and welcoming opportunities can help every student see that computing is something they can learn and enjoy.",
+  H: "High school computing courses help our students build practical problem-solving skills while exploring future opportunities in college, technical education, and a wide range of careers. These experiences can help students better understand how computing connects to the subjects and goals they already care about.",
+  K12: "Providing computing experiences across grade levels gives our students the chance to grow their skills over time, from early exploration and creativity to more advanced problem-solving, programming, and real-world applications.",
+};
+
+const majorCityDistrictPatterns = [
+  "atlanta public",
+  "richmond county",
+  "muscogee county",
+  "savannah-chatham",
+  "bibb county",
+  "clarke county",
+];
+
+function hasRecommendationNumber(value) {
+  if (value === null || value === undefined || String(value).trim() === "") {
+    return false;
+  }
+
+  return Number.isFinite(Number(value));
+}
+
+function getRecommendationNumber(value) {
+  return hasRecommendationNumber(value) ? Number(value) : null;
+}
+
+function addRecommendation(recommendations, category, text) {
+  if (!text) {
+    return;
+  }
+
+  recommendations.push({
+    category,
+    text,
+  });
+}
+
+function renderRecommendations(container, recommendations, emptyMessage) {
+  if (!container) {
+    return;
+  }
+
+  if (!recommendations || recommendations.length === 0) {
+    container.innerHTML = `
+      <p class="recommendation-empty">${escapeHtml(emptyMessage)}</p>
+    `;
+    return;
+  }
+
+  container.innerHTML = recommendations
+    .map((recommendation) => {
+      return `
+        <section class="recommendation-item">
+          <h4>${escapeHtml(recommendation.category)}</h4>
+          <p>${escapeHtml(recommendation.text)}</p>
+        </section>
+      `;
+    })
+    .join("");
+}
+
+function getSchoolComparisonPool(attributes, statewideFeatures = []) {
+  const schoolTypeFeatures = getFeaturesForSchoolType(
+    statewideFeatures,
+    attributes.SchoolType,
+  );
+
+  return schoolTypeFeatures.length > 0 ? schoolTypeFeatures : statewideFeatures;
+}
+
+function getAverageDistrictFieldTotal(features, fieldName) {
+  const districtTotals = new Map();
+
+  features.forEach((feature) => {
+    const attributes = getFeatureAttributes(feature);
+    const districtName = attributes.SystemName;
+
+    if (!districtName) {
+      return;
+    }
+
+    const value = getRecommendationNumber(attributes[fieldName]);
+
+    if (!districtTotals.has(districtName)) {
+      districtTotals.set(districtName, 0);
+    }
+
+    if (value !== null) {
+      districtTotals.set(
+        districtName,
+        districtTotals.get(districtName) + value,
+      );
+    }
+  });
+
+  if (districtTotals.size === 0) {
+    return null;
+  }
+
+  return (
+    Array.from(districtTotals.values()).reduce((sum, value) => {
+      return sum + value;
+    }, 0) / districtTotals.size
+  );
+}
+
+function getAverageCourseCountForSchoolGroup(features) {
+  return getAverageFieldFromFeatures(features, "NumCSCours");
+}
+
+function isAtlantaSchool(attributes) {
+  const districtName = String(
+    attributes.SystemName || selectedDistrictName || "",
+  ).toLowerCase();
+
+  return districtName.includes("atlanta public");
+}
+
+function isInMajorCity(attributes) {
+  const districtName = String(
+    attributes.SystemName || selectedDistrictName || "",
+  ).toLowerCase();
+
+  return majorCityDistrictPatterns.some((pattern) => {
+    return districtName.includes(pattern);
+  });
+}
+
+function hasIncompleteSchoolRecommendationData(
+  attributes,
+  statewideFeatures = [],
+) {
+  const requiredNumberFields = [
+    "StudentCou",
+    "NumCSCours",
+    "NumCSTeach",
+    "NumCSEnrol",
+  ];
+
+  return (
+    !normalizeReadinessSchoolType(attributes.SchoolType) ||
+    requiredNumberFields.some((fieldName) => {
+      return !hasRecommendationNumber(attributes[fieldName]);
+    }) ||
+    !Array.isArray(statewideFeatures) ||
+    statewideFeatures.length === 0
+  );
+}
+
+function buildSchoolRecommendations(
+  attributes,
+  statewideFeatures = [],
+  overallReadinessScore = null,
+) {
+  const recommendations = [];
+
+  const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
+
+  const comparisonPool = getSchoolComparisonPool(attributes, statewideFeatures);
+
+  addRecommendation(
+    recommendations,
+    "Why CS Matters",
+    schoolWhyCsMattersText[schoolType] || schoolWhyCsMattersText.K12,
+  );
+
+  const courseCount = getRecommendationNumber(attributes.NumCSCours);
+
+  const stateAverageCourseCount =
+    getAverageCourseCountForSchoolGroup(comparisonPool);
+
+  if (courseCount === 0) {
+    if (schoolType === "E") {
+      addRecommendation(
+        recommendations,
+        "Course Access",
+        "Every school starts somewhere. A full CS course may not need to be your first step. We can help you explore playful, age-appropriate computing activities that can fit into existing classes, enrichment periods, library programs, or family events.",
+      );
+    } else {
+      addRecommendation(
+        recommendations,
+        "Course Access",
+        "Every school starts somewhere. We can help you explore a manageable first step—such as an introductory course, an after-school program, or an online option through Georgia Virtual School—while planning the curriculum, staffing, and support needed to build a local program.",
+      );
+    }
+  }
+
+  if (courseCount === 1) {
+    addRecommendation(
+      recommendations,
+      "Course Access",
+      "Your school has already created an important starting point. We can help you explore how to strengthen the course, make more students aware of it, and create a next step for students who want to continue learning.",
+    );
+
+    if (schoolType === "H") {
+      addRecommendation(
+        recommendations,
+        "Student Leadership",
+        "Your school may be ready to establish a Computer Science Honor Society, if it does not already have one, where students can develop leadership skills, engage in service, and build a stronger sense of belonging in computing.",
+      );
+    }
+  }
+
+  if (
+    courseCount !== null &&
+    stateAverageCourseCount !== null &&
+    courseCount > stateAverageCourseCount
+  ) {
+    addRecommendation(
+      recommendations,
+      "Course Pathway",
+      "Your school has built a strong foundation. We can help you review how the courses connect, identify any gaps in the pathway, and consider how more students can participate and progress.",
+    );
+  }
+
+  if (
+    schoolType === "H" &&
+    isAvailable(attributes.APCSA) &&
+    isAvailable(attributes.APCSP)
+  ) {
+    addRecommendation(
+      recommendations,
+      "Advanced Opportunities",
+      "Some students may be ready for college-level computing. We can help families explore advanced options such as Georgia Tech’s online dual-enrollment CS courses (Distance Computer Science Program) and understand the eligibility and prerequisite requirements.",
+    );
+  }
+
+  const teacherCount = getRecommendationNumber(attributes.NumCSTeach);
+
+  if (teacherCount === 0) {
+    addRecommendation(
+      recommendations,
+      "Teacher Capacity",
+      "Starting or expanding a computing program often begins with supporting educators. Our data do not currently identify a CS teacher at your school. Reach out to us, and we can help you explore professional learning, curriculum options, instructional resources, and a realistic plan for building local teaching capacity. Constellations is recognized by CS4GA as a professional-learning provider supporting Georgia CS teachers.",
+    );
+  } else if (teacherCount === 1) {
+    addRecommendation(
+      recommendations,
+      "Teacher Capacity",
+      "Your CS program may depend heavily on one educator. Reach out to us, and we can help you strengthen the program through professional learning, peer connections, curriculum and instructional resources, and preparation for additional educators. Constellations is recognized by CS4GA as a professional-learning provider supporting Georgia CS teachers.",
+    );
+  }
+
+  if (
+    Number.isFinite(overallReadinessScore) &&
+    overallReadinessScore >= highReadinessRecommendationThreshold
+  ) {
+    addRecommendation(
+      recommendations,
+      "Readiness",
+      "Your school appears positioned to lead. Consider documenting what is working, strengthening the program further, and sharing successful practices with nearby schools.",
+    );
+  }
+
+  if (schoolType === "H" && isAtlantaSchool(attributes)) {
+    addRecommendation(
+      recommendations,
+      "Local Opportunity",
+      "Some of your students may benefit from opportunities such as BridgeUP STEM at the Constellations. BridgeUP is designed for eligible Atlanta-area students in grades 10–12 who are first-generation or low-income and have had limited access to coding. It can help families explore current or future program cycles and determine whether the opportunity matches their interests and eligibility.",
+    );
+  }
+
+  if (!isInMajorCity(attributes)) {
+    addRecommendation(
+      recommendations,
+      "Geographic Access",
+      "Your school may be part of a broader geographic gap in computing access. You may want to consider strengthening your school’s CS opportunities by exploring virtual learning through Georgia Virtual School courses, partnering with nearby schools, working with local libraries or universities, or creating after-school programs for students.",
+    );
+  }
+
+  const schoolParticipation = safeDivide(
+    attributes.NumCSEnrol,
+    attributes.StudentCou,
+  );
+
+  const matchingSchoolTypeParticipation = getRatioFromFeatureTotals(
+    comparisonPool,
+    "NumCSEnrol",
+    "StudentCou",
+  );
+
+  if (
+    schoolParticipation !== null &&
+    matchingSchoolTypeParticipation !== null &&
+    schoolParticipation < matchingSchoolTypeParticipation
+  ) {
+    addRecommendation(
+      recommendations,
+      "Participation",
+      "Offering courses does not always mean students are aware of or able to access them. We can help you examine possible barriers related to scheduling, recruitment, prerequisites, and student awareness.",
+    );
+  }
+
+  if (hasIncompleteSchoolRecommendationData(attributes, statewideFeatures)) {
+    addRecommendation(
+      recommendations,
+      "Data Review",
+      "Some information may need to be confirmed before choosing the next step. We can help your school review the available data and identify what should be verified regarding courses, teachers, or student access.",
+    );
+  }
+
+  return recommendations;
+}
+
+function hasIncompleteDistrictRecommendationData(
+  districtFeatures,
+  statewideFeatures = [],
+) {
+  const requiredNumberFields = [
+    "StudentCou",
+    "NumCSCours",
+    "NumCSTeach",
+    "NumCSEnrol",
+  ];
+
+  return (
+    !Array.isArray(districtFeatures) ||
+    districtFeatures.length === 0 ||
+    !Array.isArray(statewideFeatures) ||
+    statewideFeatures.length === 0 ||
+    districtFeatures.some((feature) => {
+      const attributes = getFeatureAttributes(feature);
+
+      return requiredNumberFields.some((fieldName) => {
+        return !hasRecommendationNumber(attributes[fieldName]);
+      });
+    })
+  );
+}
+
+function buildDistrictRecommendations(
+  districtFeatures,
+  statewideFeatures = [],
+) {
+  const recommendations = [];
+
+  addRecommendation(
+    recommendations,
+    "Why CS Matters",
+    "Computer science helps our students build creativity, problem-solving skills, and confidence while preparing them to participate in a world increasingly shaped by technology. By building connected opportunities across grade levels, districts can help more students discover computing and continue developing their skills over time.",
+  );
+
+  const districtCourseCount = getCourseCountFromFeatures(districtFeatures);
+
+  const averageDistrictCourseCount =
+    getAverageDistrictCourseCount(statewideFeatures);
+
+  if (
+    averageDistrictCourseCount !== null &&
+    districtCourseCount < averageDistrictCourseCount
+  ) {
+    addRecommendation(
+      recommendations,
+      "Course Access",
+      "Your district currently provides fewer CS opportunities than the statewide average. We can help you identify where the largest gaps exist and explore a manageable, phased approach to expanding access.",
+    );
+  } else if (
+    averageDistrictCourseCount !== null &&
+    districtCourseCount > averageDistrictCourseCount
+  ) {
+    addRecommendation(
+      recommendations,
+      "Course Access",
+      "Your district has built a strong foundation for CS education. We can help you look beyond course availability to examine pathways, participation, teacher capacity, and long-term program sustainability.",
+    );
+  }
+
+  const highSchoolFeatures = districtFeatures.filter((feature) => {
+    const schoolType = normalizeReadinessSchoolType(
+      getFeatureAttributes(feature).SchoolType,
+    );
+
+    return schoolType === "H" || schoolType === "K12";
+  });
+
+  const earlyGradeFeatures = districtFeatures.filter((feature) => {
+    const schoolType = normalizeReadinessSchoolType(
+      getFeatureAttributes(feature).SchoolType,
+    );
+
+    return ["E", "M", "K12"].includes(schoolType);
+  });
+
+  const hasHighSchool = highSchoolFeatures.length > 0;
+
+  const hasDistrictApCourse = highSchoolFeatures.some((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    return isAvailable(attributes.APCSA) || isAvailable(attributes.APCSP);
+  });
+
+  if (hasHighSchool && !hasDistrictApCourse) {
+    addRecommendation(
+      recommendations,
+      "Advanced Opportunities",
+      "Prepared high school students may benefit from advanced or dual-enrollment opportunities. District counselors may want to share information about Georgia Tech’s Distance Computer Science Program, which offers online, asynchronous college-level CS courses to eligible students.",
+    );
+  } else if (hasHighSchool && hasDistrictApCourse) {
+    addRecommendation(
+      recommendations,
+      "Advanced Opportunities",
+      "For students ready to continue beyond existing high-school courses, consider promoting advanced and dual-enrollment options such as Georgia Tech’s Distance Computer Science Program.",
+    );
+  }
+
+  const districtTeacherTotal = districtFeatures.reduce((sum, feature) => {
+    const teacherCount = getRecommendationNumber(
+      getFeatureAttributes(feature).NumCSTeach,
+    );
+
+    return sum + (teacherCount === null ? 0 : teacherCount);
+  }, 0);
+
+  const averageDistrictTeacherTotal = getAverageDistrictFieldTotal(
+    statewideFeatures,
+    "NumCSTeach",
+  );
+
+  if (
+    averageDistrictTeacherTotal !== null &&
+    districtTeacherTotal < averageDistrictTeacherTotal
+  ) {
+    addRecommendation(
+      recommendations,
+      "Teacher Capacity",
+      "Building sustainable CS programs begins with supporting educators. Constellations can support districts through professional learning, instructional resources, and capacity-building for Georgia CS teachers.",
+    );
+  } else if (
+    averageDistrictTeacherTotal !== null &&
+    districtTeacherTotal > averageDistrictTeacherTotal
+  ) {
+    addRecommendation(
+      recommendations,
+      "Teacher Capacity",
+      "Your district has built a strong base of CS educators. Consider creating a professional learning community where teachers can align courses, share materials, mentor new educators, and document successful practices. Constellations can support this work by strengthening professional learning, teacher collaboration, and instructional capacity across the district.",
+    );
+  }
+
+  const districtParticipation = getRatioFromFeatureTotals(
+    districtFeatures,
+    "NumCSEnrol",
+    "StudentCou",
+  );
+
+  const statewideParticipation = getRatioFromFeatureTotals(
+    statewideFeatures,
+    "NumCSEnrol",
+    "StudentCou",
+  );
+
+  if (
+    districtParticipation !== null &&
+    statewideParticipation !== null &&
+    districtParticipation < statewideParticipation
+  ) {
+    addRecommendation(
+      recommendations,
+      "Participation",
+      "Offering courses does not always mean students are aware of or able to access them. Consider examining possible barriers related to scheduling, recruitment, prerequisites, and student awareness.",
+    );
+  } else if (
+    districtParticipation !== null &&
+    statewideParticipation !== null &&
+    districtParticipation >= statewideParticipation
+  ) {
+    addRecommendation(
+      recommendations,
+      "Participation",
+      "A high share of students participate in CS in your district, suggesting strong student interest and access. Consider sustaining what is working, ensuring participation remains inclusive, and creating clear pathways for students who want to continue learning.",
+    );
+  }
+
+  const statewideHighSchoolFeatures = statewideFeatures.filter((feature) => {
+    const schoolType = normalizeReadinessSchoolType(
+      getFeatureAttributes(feature).SchoolType,
+    );
+
+    return schoolType === "H" || schoolType === "K12";
+  });
+
+  const statewideEarlyGradeFeatures = statewideFeatures.filter((feature) => {
+    const schoolType = normalizeReadinessSchoolType(
+      getFeatureAttributes(feature).SchoolType,
+    );
+
+    return ["E", "M", "K12"].includes(schoolType);
+  });
+
+  const districtHighSchoolAverageCourseCount =
+    getAverageCourseCountForSchoolGroup(highSchoolFeatures);
+
+  const stateHighSchoolAverageCourseCount = getAverageCourseCountForSchoolGroup(
+    statewideHighSchoolFeatures,
+  );
+
+  const districtEarlyGradeAverageCourseCount =
+    getAverageCourseCountForSchoolGroup(earlyGradeFeatures);
+
+  const stateEarlyGradeAverageCourseCount = getAverageCourseCountForSchoolGroup(
+    statewideEarlyGradeFeatures,
+  );
+
+  const hasStrongHighSchoolOffering =
+    districtHighSchoolAverageCourseCount !== null &&
+    stateHighSchoolAverageCourseCount !== null &&
+    districtHighSchoolAverageCourseCount > 0 &&
+    districtHighSchoolAverageCourseCount >= stateHighSchoolAverageCourseCount;
+
+  const hasEarlyGradeCourse =
+    districtEarlyGradeAverageCourseCount !== null &&
+    districtEarlyGradeAverageCourseCount > 0;
+
+  const hasLimitedEarlyGradeOffering =
+    districtEarlyGradeAverageCourseCount !== null &&
+    stateEarlyGradeAverageCourseCount !== null &&
+    districtEarlyGradeAverageCourseCount < stateEarlyGradeAverageCourseCount;
+
+  const hasLimitedHighSchoolContinuation =
+    districtHighSchoolAverageCourseCount !== null &&
+    stateHighSchoolAverageCourseCount !== null &&
+    districtHighSchoolAverageCourseCount < stateHighSchoolAverageCourseCount;
+
+  if (
+    hasHighSchool &&
+    hasStrongHighSchoolOffering &&
+    hasLimitedEarlyGradeOffering
+  ) {
+    addRecommendation(
+      recommendations,
+      "School-Level Pathways",
+      "Your district has created high-school opportunities, but students may have limited exposure before they reach high school.",
+    );
+  }
+
+  if (
+    hasHighSchool &&
+    hasEarlyGradeCourse &&
+    hasLimitedHighSchoolContinuation
+  ) {
+    addRecommendation(
+      recommendations,
+      "School-Level Pathways",
+      "Students in your district may begin exploring computing without having a clear opportunity to continue in advanced levels.",
+    );
+  }
+
+  if (
+    hasIncompleteDistrictRecommendationData(districtFeatures, statewideFeatures)
+  ) {
+    addRecommendation(
+      recommendations,
+      "Data Review",
+      "Some information may need to be confirmed before determining your district’s next steps. We can help you review unexpected patterns and identify which course, teacher, school, or participation records should be verified.",
+    );
+  }
+
+  return recommendations;
+}
+
+function updateSchoolRecommendations(
+  attributes,
+  statewideFeatures = [],
+  overallReadinessScore = null,
+) {
+  const recommendations = buildSchoolRecommendations(
+    attributes,
+    statewideFeatures,
+    overallReadinessScore,
+  );
+
+  renderRecommendations(
+    schoolRecommendations,
+    recommendations,
+    "Select a school to view tailored recommendations.",
+  );
+}
+
+function updateDistrictRecommendations(
+  districtFeatures,
+  statewideFeatures = [],
+) {
+  const recommendations = buildDistrictRecommendations(
+    districtFeatures,
+    statewideFeatures,
+  );
+
+  renderRecommendations(
+    districtRecommendations,
+    recommendations,
+    "Select a district to view tailored recommendations.",
+  );
+}
+
+function resetSchoolRecommendations(message) {
+  renderRecommendations(
+    schoolRecommendations,
+    [],
+    message || "Select a school to view tailored recommendations.",
+  );
+}
+
+function resetDistrictRecommendations(message) {
+  renderRecommendations(
+    districtRecommendations,
+    [],
+    message || "Select a district to view tailored recommendations.",
+  );
+}
+
 function buildSchoolComparisonValues(attributes, statewideFeatures) {
   const schoolTypeFeatures = getFeaturesForSchoolType(
     statewideFeatures,
@@ -2138,13 +2767,13 @@ function buildSchoolComparisonValues(attributes, statewideFeatures) {
   );
 
   const stateEnrollmentIntensity = getRatioFromFeatureTotals(
-    statewideFeatures,
+    comparisonPool,
     "NumCSEnrol",
     "StudentCou",
   );
 
   const stateStudentTeacherRatio = getRatioFromFeatureTotals(
-    statewideFeatures,
+    comparisonPool,
     "NumCSEnrol",
     "NumCSTeach",
   );
@@ -2484,6 +3113,7 @@ async function loadSchoolSummaryFromArcGIS() {
   if (!selectedReportValue) {
     updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
     resetReadinessScores("school");
+    resetSchoolRecommendations();
     return;
   }
 
@@ -2527,6 +3157,9 @@ async function loadSchoolSummaryFromArcGIS() {
       updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
       updateSchoolDemographicChartsFromAttributes({});
       resetReadinessScores("school");
+      resetSchoolRecommendations(
+        "The selected school’s recommendation data could not be loaded.",
+      );
       return;
     }
 
@@ -2551,7 +3184,16 @@ async function loadSchoolSummaryFromArcGIS() {
     updateSchoolSummaryFromData(schoolSummaryData);
     updateSchoolDemographicChartsFromAttributes(attributes);
 
-    updateSchoolReadinessScores(attributes, statewideFeatures);
+    const overallReadinessScore = updateSchoolReadinessScores(
+      attributes,
+      statewideFeatures,
+    );
+
+    updateSchoolRecommendations(
+      attributes,
+      statewideFeatures,
+      overallReadinessScore,
+    );
 
     console.log("Loaded school summary from ArcGIS:", {
       successfulWhereClause,
@@ -2561,6 +3203,9 @@ async function loadSchoolSummaryFromArcGIS() {
     console.error("Could not load school summary from ArcGIS:", error);
     updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
     resetReadinessScores("school");
+    resetSchoolRecommendations(
+      "The selected school’s recommendation data could not be loaded.",
+    );
   }
 }
 
@@ -2716,6 +3361,7 @@ async function loadDistrictSummaryFromArcGIS() {
     updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
     updateDistrictDemographicChartsFromFeatures([]);
     resetReadinessScores("district");
+    resetDistrictRecommendations();
     return;
   }
 
@@ -2730,6 +3376,9 @@ async function loadDistrictSummaryFromArcGIS() {
       updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
       updateDistrictDemographicChartsFromFeatures([]);
       resetReadinessScores("district");
+      resetDistrictRecommendations(
+        "The selected district’s recommendation data could not be loaded.",
+      );
       return;
     }
 
@@ -2753,6 +3402,7 @@ async function loadDistrictSummaryFromArcGIS() {
     updateDistrictDemographicChartsFromFeatures(features);
 
     updateDistrictReadinessScores(features, statewideFeatures);
+    updateDistrictRecommendations(features, statewideFeatures);
 
     console.log("Loaded district summary from ArcGIS:", {
       selectedDistrictName,
@@ -2763,6 +3413,9 @@ async function loadDistrictSummaryFromArcGIS() {
     console.error("Could not load district summary from ArcGIS:", error);
     updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
     resetReadinessScores("district");
+    resetDistrictRecommendations(
+      "The selected district’s recommendation data could not be loaded.",
+    );
   }
 }
 
