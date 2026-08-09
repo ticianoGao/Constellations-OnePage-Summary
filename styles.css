@@ -2364,3 +2364,40 @@ a:hover {
   font-size: 0.9rem;
   line-height: 1.45;
 }
+
+/* Readiness Score formula in info popup */
+.readiness-formula {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-top: 14px;
+  width: 100%;
+  color: #111111;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+}
+
+.readiness-formula-label {
+  white-space: nowrap;
+}
+
+.readiness-fraction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  line-height: 1.15;
+}
+
+.readiness-numerator {
+  width: 100%;
+  padding: 0 4px 3px;
+  border-bottom: 1px solid #111111;
+  text-align: center;
+  white-space: normal;
+}
+
+.readiness-denominator {
+  padding-top: 3px;
+}
