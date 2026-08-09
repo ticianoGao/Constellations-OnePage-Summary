@@ -2230,6 +2230,11 @@ a:hover {
   line-height: 1;
 }
 
+/* Move readiness score left to make room for info button */
+.readiness-score-card .readiness-overall-score {
+  margin-right: 40px;
+}
+
 /* Bottom component section */
 .readiness-breakdown-section {
   padding: 16px 24px 18px;
