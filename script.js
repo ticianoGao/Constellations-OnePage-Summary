@@ -2078,14 +2078,23 @@ function getEnrollmentTableValuesFromFeatures(features) {
 }
 
 function buildSchoolEnrollmentTableValues(attributes, statewideFeatures = []) {
-  const districtFeatures = getFeaturesForDistrict(
+  // Only compare with schools of the same school type
+  const schoolTypeFeatures = getFeaturesForSchoolType(
     statewideFeatures,
+    attributes.SchoolType,
+  );
+
+  // Within the selected district, only include schools of the same type
+  const districtFeatures = getFeaturesForDistrict(
+    schoolTypeFeatures,
     attributes.SystemName || selectedDistrictName,
   );
 
   const schoolValues = getEnrollmentTableValuesFromAttributes(attributes);
+
   const districtValues = getEnrollmentTableValuesFromFeatures(districtFeatures);
-  const stateValues = getEnrollmentTableValuesFromFeatures(statewideFeatures);
+
+  const stateValues = getEnrollmentTableValuesFromFeatures(schoolTypeFeatures);
 
   return {
     schoolTableCsEnrollments: schoolValues.csEnrollments,
