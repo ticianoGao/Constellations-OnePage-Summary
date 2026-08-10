@@ -1785,7 +1785,7 @@ a:hover {
 /* Dynamic recommendation list */
 .recommendation-list {
   display: grid;
-  gap: 14px;
+  gap: 4px;
   margin-top: 20px;
 }
 
