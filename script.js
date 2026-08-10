@@ -5148,7 +5148,29 @@ cardInfoCloseButtons.forEach((button) => {
     }
   });
 });
+/* Readiness component info links */
 
+document.querySelectorAll(".readiness-component-info-link").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const targetId = link.dataset.readinessInfoTarget;
+    const popup = document.getElementById(targetId);
+
+    if (!popup) {
+      return;
+    }
+
+    document.querySelectorAll(".card-info-popup").forEach((item) => {
+      if (item !== popup) {
+        item.classList.remove("show");
+      }
+    });
+
+    popup.classList.add("show");
+  });
+});
 document.addEventListener("click", () => {
   document.querySelectorAll(".card-info-popup").forEach((popup) => {
     popup.classList.remove("show");

@@ -2309,6 +2309,32 @@ a:hover {
   line-height: 1.25;
 }
 
+/* Clickable readiness component titles */
+.readiness-component-info-link {
+  width: fit-content;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: var(--blue);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.readiness-component-info-link:hover {
+  color: var(--gold-dark);
+}
+
+/* Individual readiness component info popup */
+.readiness-component-popup h4 {
+  margin: 0 0 10px;
+  color: var(--blue);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 /* Placeholder progress bar */
 .readiness-component-track {
   width: 100%;

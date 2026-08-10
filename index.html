@@ -557,7 +557,208 @@
                       </li>
                     </ul>
                   </div>
+                  <!-- School readiness component info popups -->
 
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="schoolCourseAccessInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Course Access</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures the extent to which the school provides
+                        students with access to computer science coursework.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        For elementary schools, the score is 100 if at least one
+                        CS course is offered and 0 if no CS course is offered.
+                      </li>
+
+                      <li>
+                        For middle, high, and K-12 schools, the number of
+                        Georgia DOE-approved CS courses is compared with the
+                        75th percentile among Georgia schools of the same school
+                        type and enrollment-size group.
+                      </li>
+
+                      <li>
+                        Score = (School approved CS courses ÷ Peer benchmark) ×
+                        100, capped at 100.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="schoolEnrollmentInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>CS Enrollment/Total Enrollment</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures the level of CS course enrollment relative to
+                        the size of the school's student population.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        CS Enrollment/Total Enrollment is calculated as total CS
+                        course enrollments divided by total student enrollment.
+                      </li>
+
+                      <li>
+                        This rate is compared with the 75th percentile among
+                        Georgia schools of the same school type and
+                        enrollment-size group.
+                      </li>
+
+                      <li>
+                        Score = (School enrollment rate ÷ Peer benchmark) × 100,
+                        capped at 100.
+                      </li>
+
+                      <li>
+                        CS enrollment counts course enrollments rather than
+                        unique students, so students enrolled in multiple CS
+                        courses may be counted more than once.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="schoolProgressionInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Course Progression</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures whether students have opportunities to progress
+                        from introductory CS experiences to broader or more
+                        advanced coursework.
+                      </li>
+
+                      <li>
+                        <strong>High and K-12 schools:</strong>
+                        The score is based on four milestones worth 25 points
+                        each: at least one foundational course, at least one
+                        intermediate or programming course, at least one
+                        advanced course, and at least three Georgia DOE-approved
+                        CS courses.
+                      </li>
+
+                      <li>High/K-12 Score = Number of milestones met × 25.</li>
+
+                      <li>
+                        <strong>Elementary and middle schools:</strong>
+                        Because detailed course-sequence information is not
+                        consistently available, total CS course count is
+                        currently used as a proxy for course breadth.
+                      </li>
+
+                      <li>
+                        The school's course count is compared with the 75th
+                        percentile among Georgia schools of the same school type
+                        and enrollment-size group.
+                      </li>
+
+                      <li>
+                        Score = (School CS course count ÷ Peer benchmark) × 100,
+                        capped at 100.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="schoolCapacityInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Instructional Capacity</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures the school's CS teaching capacity relative to
+                        the amount of CS course enrollment it serves.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        The school's CS enrollment-to-teacher ratio is
+                        calculated as total CS course enrollments divided by the
+                        number of CS teachers.
+                      </li>
+
+                      <li>
+                        Because a lower enrollment-to-teacher ratio represents
+                        greater instructional capacity, the school is compared
+                        with the 25th percentile ratio among Georgia schools of
+                        the same school type and enrollment-size group.
+                      </li>
+
+                      <li>
+                        Score = (Peer benchmark ratio ÷ School ratio) × 100,
+                        capped at 100.
+                      </li>
+
+                      <li>
+                        Schools with no reported CS enrollment, no reported CS
+                        teacher, or unavailable data currently receive a score
+                        of 0.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="schoolEquityInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Participation Equity</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures how closely the demographic composition of CS
+                        enrollment reflects the demographic composition of the
+                        school's overall student population.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        Separate parity scores are calculated for race/ethnicity
+                        and gender by comparing each group's share of CS
+                        enrollment with its share of overall school enrollment.
+                      </li>
+
+                      <li>
+                        A score of 100 indicates that the CS enrollment
+                        distribution closely matches the school's overall
+                        student distribution. Larger differences between the two
+                        distributions result in lower scores.
+                      </li>
+
+                      <li>
+                        The final Participation Equity score is the average of
+                        the available race/ethnicity and gender parity scores.
+                      </li>
+
+                      <li>
+                        A demographic dimension is not used when an estimated
+                        nonzero reporting group contains fewer than 15 students.
+                      </li>
+                    </ul>
+                  </div>
                   <!-- Overall readiness score -->
                   <div class="readiness-overall-section">
                     <div class="readiness-overall-heading">
@@ -1456,6 +1657,209 @@
                             <span class="readiness-denominator">5</span>
                           </span>
                         </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <!-- District readiness component info popups -->
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="districtCourseAccessInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Course Access</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures the extent to which schools across the district
+                        provide students with access to computer science
+                        coursework.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        A Course Access score is first calculated for every
+                        school in the district using the same methodology as the
+                        school report.
+                      </li>
+
+                      <li>
+                        Elementary schools receive 100 if at least one CS course
+                        is offered and 0 otherwise. Middle, high, and K-12
+                        schools compare their number of Georgia DOE-approved CS
+                        courses with the 75th percentile among comparable
+                        Georgia schools.
+                      </li>
+
+                      <li>
+                        The district Course Access score is the average of the
+                        Course Access scores for all schools in the district.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="districtEnrollmentInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>CS Enrollment/Total Enrollment</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures the level of CS course enrollment across
+                        schools in the district relative to school enrollment.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        Each school's CS Enrollment/Total Enrollment score is
+                        calculated by dividing CS course enrollments by total
+                        student enrollment and comparing that rate with the 75th
+                        percentile among Georgia schools of the same school type
+                        and enrollment-size group.
+                      </li>
+
+                      <li>
+                        The district score is the average of these individual
+                        school scores.
+                      </li>
+
+                      <li>
+                        CS enrollment counts course enrollments rather than
+                        unique students, so students enrolled in multiple CS
+                        courses may be counted more than once.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="districtProgressionInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Course Progression</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures the extent to which schools in the district
+                        provide students with opportunities to move from
+                        introductory CS experiences to broader or more advanced
+                        coursework.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        A Course Progression score is first calculated for each
+                        school using the methodology appropriate for that
+                        school's type.
+                      </li>
+
+                      <li>
+                        High and K-12 schools receive 25 points for each of four
+                        milestones: a foundational course, an intermediate or
+                        programming course, an advanced course, and at least
+                        three Georgia DOE-approved CS courses.
+                      </li>
+
+                      <li>
+                        Elementary and middle schools use total CS course count
+                        as a current proxy for course breadth and compare that
+                        value with the 75th percentile among comparable Georgia
+                        schools.
+                      </li>
+
+                      <li>
+                        The district Course Progression score is the average of
+                        the Course Progression scores for all schools in the
+                        district.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="districtCapacityInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Instructional Capacity</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures CS teaching capacity across schools in the
+                        district relative to the amount of CS course enrollment
+                        being served.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        Each school's CS enrollment-to-teacher ratio is compared
+                        with the 25th-percentile ratio among Georgia schools of
+                        the same school type and enrollment-size group.
+                      </li>
+
+                      <li>
+                        Because lower enrollment-to-teacher ratios represent
+                        greater instructional capacity, lower ratios receive
+                        higher scores.
+                      </li>
+
+                      <li>
+                        The district Instructional Capacity score is the average
+                        of the Instructional Capacity scores for all schools in
+                        the district.
+                      </li>
+
+                      <li>
+                        Schools with no reported CS enrollment, no reported CS
+                        teacher, or unavailable data currently receive a score
+                        of 0.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div
+                    class="card-info-popup readiness-component-popup"
+                    id="districtEquityInfo"
+                  >
+                    <button class="card-info-close" type="button">×</button>
+                    <h4>Participation Equity</h4>
+
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures how closely CS enrollment participation within
+                        schools across the district reflects each school's
+                        overall student population.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        Race/ethnicity and gender parity scores are calculated
+                        separately for each school by comparing the demographic
+                        distribution of CS enrollment with the school's overall
+                        demographic distribution.
+                      </li>
+
+                      <li>
+                        Each school's available race/ethnicity and gender parity
+                        scores are averaged to produce its Participation Equity
+                        score.
+                      </li>
+
+                      <li>
+                        The district Participation Equity score is the average
+                        of the Participation Equity scores for all schools in
+                        the district.
+                      </li>
+
+                      <li>
+                        A demographic dimension is not used when an estimated
+                        nonzero reporting group contains fewer than 15 students.
                       </li>
                     </ul>
                   </div>
