@@ -1126,6 +1126,7 @@ a:hover {
 .report-export-row {
   display: flex;
   justify-content: flex-start;
+  gap: 10px;
   padding-top: 10px;
 }
 
@@ -2429,4 +2430,14 @@ a:hover {
 
 .readiness-denominator {
   padding-top: 3px;
+}
+
+.print-export-button {
+  background: #ffffff;
+  color: var(--blue);
+}
+
+.print-export-button:hover {
+  background: #f2f4f6;
+  color: var(--blue-dark);
 }

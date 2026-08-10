@@ -5553,6 +5553,8 @@ async function exportReportAsPdf({
     return;
   }
 
+  const originalButtonText = button.textContent;
+
   button.disabled = true;
   button.textContent = "Generating...";
 
@@ -5622,7 +5624,154 @@ async function exportReportAsPdf({
 
     reportElement.classList.remove("exporting-report");
     button.disabled = false;
-    button.textContent = "Export";
+    button.textContent = originalButtonText;
+  }
+}
+
+async function exportReportAsPrintPdf({
+  button,
+  reportElementId,
+  mapIds,
+  fileName,
+  backgroundColor = "#eeeeee",
+  paperFormat = "letter",
+}) {
+  const reportElement = document.getElementById(reportElementId);
+
+  if (!reportElement || !reportElement.classList.contains("show")) {
+    alert("Please select a report before exporting.");
+    return;
+  }
+
+  if (typeof html2canvas === "undefined") {
+    alert("html2canvas is not loaded. Check the script tag in index.html.");
+    return;
+  }
+
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("jsPDF is not loaded. Check the script tag in index.html.");
+    return;
+  }
+
+  const originalButtonText = button.textContent;
+
+  button.disabled = true;
+  button.textContent = "Generating...";
+
+  let mapReplacements = [];
+
+  try {
+    reportElement.classList.add("exporting-report");
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await waitForImagesToLoad(reportElement);
+
+    mapReplacements = await replaceMapsWithScreenshots(mapIds);
+
+    const canvas = await html2canvas(reportElement, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+    });
+
+    const { jsPDF } = window.jspdf;
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "pt",
+      format: paperFormat,
+    });
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const margin = 30;
+    const usableWidth = pageWidth - margin * 2;
+    const usableHeight = pageHeight - margin * 2;
+
+    const pdfScale = usableWidth / canvas.width;
+    const sourcePageHeight = usableHeight / pdfScale;
+
+    let sourceY = 0;
+    let pageIndex = 0;
+
+    while (sourceY < canvas.height) {
+      const remainingHeight = canvas.height - sourceY;
+      const sliceHeight = Math.min(sourcePageHeight, remainingHeight);
+
+      const pageCanvas = document.createElement("canvas");
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = Math.ceil(sliceHeight);
+
+      const context = pageCanvas.getContext("2d");
+
+      context.drawImage(
+        canvas,
+        0,
+        sourceY,
+        canvas.width,
+        sliceHeight,
+        0,
+        0,
+        canvas.width,
+        sliceHeight,
+      );
+
+      const pageImageData = pageCanvas.toDataURL("image/png");
+      const renderedHeight = sliceHeight * pdfScale;
+
+      if (pageIndex > 0) {
+        pdf.addPage(paperFormat, "portrait");
+      }
+
+      pdf.addImage(
+        pageImageData,
+        "PNG",
+        margin,
+        margin,
+        usableWidth,
+        renderedHeight,
+      );
+
+      sourceY += sliceHeight;
+      pageIndex += 1;
+    }
+
+    const notesEndY = addInfoPageToPdf({
+      pdf,
+      reportElement,
+      pageWidth,
+      pageHeight,
+      margin,
+    });
+
+    addCitationPageToPdf({
+      pdf,
+      pageWidth,
+      pageHeight,
+      margin,
+      startY: notesEndY,
+    });
+
+    pdf.save(fileName);
+  } catch (error) {
+    console.error("Print PDF export failed:", error);
+
+    alert(
+      "The print PDF could not be generated. Please check the console for details.",
+    );
+  } finally {
+    restoreLiveMaps(mapReplacements);
+
+    reportElement.classList.remove("exporting-report");
+
+    button.disabled = false;
+    button.textContent = originalButtonText;
   }
 }
 
@@ -5653,6 +5802,10 @@ function buildReportFileName(reportType) {
   return `${schoolYear} CS Education Access Statewide Report.pdf`;
 }
 
+function buildPrintReportFileName(reportType) {
+  return buildReportFileName(reportType).replace(/\.pdf$/i, " - Print.pdf");
+}
+
 /* School export */
 
 const exportReportButton = document.getElementById("exportReportButton");
@@ -5669,6 +5822,22 @@ if (exportReportButton) {
         "incomeMap",
       ],
       fileName: buildReportFileName("school"),
+    });
+  });
+}
+
+const printSchoolReportButton = document.getElementById(
+  "printSchoolReportButton",
+);
+
+if (printSchoolReportButton) {
+  printSchoolReportButton.addEventListener("click", () => {
+    exportReportAsPrintPdf({
+      button: printSchoolReportButton,
+      reportElementId: "schoolGrid",
+      mapIds: ["mathProficiencyMap", "englishProficiencyMap", "incomeMap"],
+      fileName: buildPrintReportFileName("school"),
+      paperFormat: "letter",
     });
   });
 }
@@ -5709,3 +5878,23 @@ document.addEventListener("click", (event) => {
 
   goToDistrictReport(districtLink.dataset.districtName);
 });
+
+const printDistrictReportButton = document.getElementById(
+  "printDistrictReportButton",
+);
+
+if (printDistrictReportButton) {
+  printDistrictReportButton.addEventListener("click", () => {
+    exportReportAsPrintPdf({
+      button: printDistrictReportButton,
+      reportElementId: "districtReportGrid",
+      mapIds: [
+        "districtMathProficiencyMap",
+        "districtEnglishProficiencyMap",
+        "districtIncomeMap",
+      ],
+      fileName: buildPrintReportFileName("district"),
+      paperFormat: "letter",
+    });
+  });
+}
