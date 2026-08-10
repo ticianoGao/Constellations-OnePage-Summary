@@ -5700,9 +5700,44 @@ async function exportReportAsPrintPdf({
     let sourceY = 0;
     let pageIndex = 0;
 
+    /*
+  For the district report, prevent the Academic Proficiency
+  card from starting at the very bottom of page 1.
+*/
+    let districtAcademicStartY = null;
+
+    if (reportElementId === "districtReportGrid") {
+      const academicCard = reportElement.querySelector(
+        ".district-academic-card",
+      );
+
+      if (academicCard) {
+        const reportRect = reportElement.getBoundingClientRect();
+        const academicRect = academicCard.getBoundingClientRect();
+
+        const canvasScaleY = canvas.height / reportRect.height;
+
+        districtAcademicStartY =
+          (academicRect.top - reportRect.top) * canvasScaleY;
+      }
+    }
+
     while (sourceY < canvas.height) {
       const remainingHeight = canvas.height - sourceY;
-      const sliceHeight = Math.min(sourcePageHeight, remainingHeight);
+
+      let sliceHeight = Math.min(sourcePageHeight, remainingHeight);
+
+      /*
+    If page 1 would cut into the Academic Proficiency card,
+    stop page 1 immediately before that card.
+  */
+      if (
+        pageIndex === 0 &&
+        districtAcademicStartY !== null &&
+        districtAcademicStartY < sourcePageHeight
+      ) {
+        sliceHeight = Math.max(1, districtAcademicStartY - 2);
+      }
 
       const pageCanvas = document.createElement("canvas");
       pageCanvas.width = canvas.width;
