@@ -2441,3 +2441,20 @@ a:hover {
   background: #f2f4f6;
   color: var(--blue-dark);
 }
+
+/* Full-width district Academic Proficiency card */
+#districtReportGrid > .district-academic-card {
+  grid-column: 1 / -1;
+}
+
+/* Place the two proficiency maps side by side */
+#districtReportGrid .district-academic-card .two-map-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+#districtReportGrid .district-academic-card .map-panel {
+  min-width: 0;
+}
