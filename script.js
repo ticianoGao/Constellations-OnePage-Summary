@@ -1110,6 +1110,7 @@ function clampReadinessScore(value) {
   return Math.max(0, Math.min(100, number));
 }
 
+/* taking away the size comparison part for component B of readiness score
 function getEnrollmentSizeGroup(totalEnrollment) {
   const enrollment = toReadinessNumber(totalEnrollment);
 
@@ -1129,6 +1130,7 @@ function getEnrollmentSizeGroup(totalEnrollment) {
 
   return "large";
 }
+*/
 
 function calculatePercentile(values, percentile) {
   const sortedValues = values
@@ -1173,12 +1175,10 @@ function getReadinessEnrollmentRatio(attributes) {
 function calculateSchoolReadinessB(attributes, statewideFeatures = []) {
   const schoolRatio = getReadinessEnrollmentRatio(attributes);
   const schoolType = attributes.SchoolType;
-  const schoolSizeGroup = getEnrollmentSizeGroup(attributes.StudentCou);
 
   if (
     schoolRatio === null ||
     !schoolType ||
-    !schoolSizeGroup ||
     !Array.isArray(statewideFeatures)
   ) {
     return {
@@ -1192,10 +1192,7 @@ function calculateSchoolReadinessB(attributes, statewideFeatures = []) {
   const peerRatios = statewideFeatures
     .map((feature) => feature.attributes || {})
     .filter((peerAttributes) => {
-      return (
-        peerAttributes.SchoolType === schoolType &&
-        getEnrollmentSizeGroup(peerAttributes.StudentCou) === schoolSizeGroup
-      );
+      return peerAttributes.SchoolType === schoolType;
     })
     .map((peerAttributes) => {
       return getReadinessEnrollmentRatio(peerAttributes);
@@ -1232,23 +1229,19 @@ function calculateSchoolReadinessB(attributes, statewideFeatures = []) {
 }
 
 const readinessComponentLetters = ["A", "B", "C", "D", "E"];
-const readinessMinimumGroupSize = 15;
+const readinessMinimumGroupSize = 1;
 
 function getComparableReadinessPeers(attributes, statewideFeatures = []) {
   const schoolType = attributes.SchoolType;
-  const schoolSizeGroup = getEnrollmentSizeGroup(attributes.StudentCou);
 
-  if (!schoolType || !schoolSizeGroup || !Array.isArray(statewideFeatures)) {
+  if (!schoolType || !Array.isArray(statewideFeatures)) {
     return [];
   }
 
   return statewideFeatures
     .map((feature) => getFeatureAttributes(feature))
     .filter((peerAttributes) => {
-      return (
-        peerAttributes.SchoolType === schoolType &&
-        getEnrollmentSizeGroup(peerAttributes.StudentCou) === schoolSizeGroup
-      );
+      return peerAttributes.SchoolType === schoolType;
     });
 }
 
@@ -1458,7 +1451,7 @@ function calculateSchoolReadinessC(attributes, statewideFeatures = []) {
     and sequence information are not consistently available.
 
     Schools are compared only with peers of the same school
-    type and enrollment-size group.
+    type.
   */
 
     const schoolCourseCount = toReadinessNumber(attributes.NumCSCours);
