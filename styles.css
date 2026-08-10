@@ -888,7 +888,10 @@ a:hover {
   top: 6px;
   left: 6px;
   right: 6px;
+  bottom: 6px;
   z-index: 20;
+
+  overflow-y: auto;
 
   background: #ffffff;
   border: 1px solid #d9d9d9;
@@ -2364,7 +2367,7 @@ a:hover {
 }
 
 .readiness-component-state-average {
-  color: var(--blue);
+  color: #777777;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1rem;
   font-weight: 800;
