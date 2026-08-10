@@ -533,6 +533,7 @@
                         indicate stronger and more broadly accessible CS
                         resources for students.
                       </li>
+                      <!--
                       <li>
                         The <strong>CS Readiness Score</strong> is calculated by
                         combining five indicators—<strong
@@ -555,14 +556,36 @@
                           </span>
                         </div>
                       </li>
+                      -->
+                      <li>
+                        For <strong>high and K-12 schools</strong>, the
+                        <strong>CS Readiness Score</strong> combines five
+                        indicators: CS access, participation, course
+                        progression, instructional capacity, and participation
+                        equity.
+                      </li>
+
+                      <li>
+                        For <strong>elementary and middle schools</strong>,
+                        Course Progression is currently not scored because the
+                        available data do not consistently measure course
+                        sequence or progression at these school levels. Their CS
+                        Readiness Score therefore uses four indicators: CS
+                        access, participation, instructional capacity, and
+                        participation equity.
+                      </li>
+                      <li>
+                        <strong>Overall score:</strong>
+                        The CS Readiness Score is the average of all applicable
+                        component scores.
+                      </li>
                       <li>
                         <strong>State average:</strong>
-                        For school reports, the state average for each component
-                        is calculated using all Georgia schools of the same
-                        school type as the selected school. For example, when an
-                        elementary school is selected, the state average
-                        represents the average component score across all
-                        elementary schools in Georgia.
+                        For school reports, the state average for each
+                        applicable component is calculated using all Georgia
+                        schools of the same school type as the selected school.
+                        Components that are not applicable to that school type
+                        are shown as N/A.
                       </li>
                     </ul>
                   </div>
@@ -663,16 +686,14 @@
                         advanced course, and at least three Georgia DOE-approved
                         CS courses.
                       </li>
-
-                      <li>High/K-12 Score = Number of milestones met x 25.</li>
-
+                      <!--
                       <li>
                         <strong>Elementary and middle schools:</strong>
                         Because detailed course-sequence information is not
                         consistently available, total CS course count is
                         currently used as a proxy for course breadth.
                       </li>
-
+                      
                       <li>
                         The school's course count is compared with the 75th
                         percentile among Georgia schools of the same school
@@ -682,6 +703,19 @@
                       <li>
                         Score = (School CS course count ÷ Peer benchmark) x 100,
                         capped at 100.
+                      </li>
+                      -->
+                      <li>
+                        <strong>Elementary and middle schools:</strong>
+                        Course Progression is currently not scored because the
+                        available data do not consistently measure course
+                        sequence or progression at these school levels.
+                      </li>
+
+                      <li>
+                        <strong>For elementary and middle schools:</strong>
+                        Course Progression is shown as N/A and is excluded from
+                        the overall CS Readiness Score.
                       </li>
                     </ul>
                   </div>
@@ -759,11 +793,6 @@
                       <li>
                         The final Participation Equity score is the average of
                         the available race/ethnicity and gender parity scores.
-                      </li>
-
-                      <li>
-                        A demographic dimension is not used when an estimated
-                        nonzero reporting group contains fewer than 15 students.
                       </li>
                     </ul>
                   </div>
@@ -1434,7 +1463,7 @@
                   <!-- ADD: Info popup -->
                   <div class="card-info-popup">
                     <button class="card-info-close" type="button">x</button>
-
+                    <!--
                     <ul class="info-list">
                       <li>
                         The CS Readiness Score is a 0-100 measure of how well a
@@ -1477,6 +1506,51 @@
                         Each district contributes equally to the state average,
                         regardless of the number of schools or students in the
                         district.
+                      </li>
+                    </ul>
+                    -->
+                    <ul class="info-list">
+                      <li>
+                        The CS Readiness Score is a 0-100 measure of how well a
+                        district is prepared to provide students with meaningful
+                        computer science learning opportunities and resources.
+                        Higher scores indicate stronger and more broadly
+                        accessible CS resources for students.
+                      </li>
+
+                      <li>
+                        The <strong>CS Readiness Score</strong> combines CS
+                        access, participation, course progression, instructional
+                        capacity, and participation equity when those components
+                        are applicable.
+                      </li>
+
+                      <li>
+                        Course Progression is calculated only from high and K-12
+                        schools because the available data do not consistently
+                        measure course sequence or progression for elementary
+                        and middle schools.
+                      </li>
+
+                      <li>
+                        If a district has no applicable high or K-12 schools,
+                        Course Progression is shown as N/A and is excluded from
+                        the district's overall CS Readiness Score.
+                      </li>
+
+                      <li>
+                        <strong>Overall score:</strong>
+                        The district CS Readiness Score is the average of all
+                        applicable component scores.
+                      </li>
+
+                      <li>
+                        <strong>State average:</strong>
+                        For district reports, the state average for each
+                        component is calculated across districts where that
+                        component is applicable. Each contributing district is
+                        weighted equally, regardless of the number of schools or
+                        students in the district.
                       </li>
                     </ul>
                   </div>
@@ -1561,7 +1635,7 @@
                   >
                     <button class="card-info-close" type="button">×</button>
                     <h4>Course Progression</h4>
-
+                    <!--
                     <ul class="info-list">
                       <li>
                         <strong>Description:</strong>
@@ -1596,6 +1670,48 @@
                         The district Course Progression score is the average of
                         the Course Progression scores for all schools in the
                         district.
+                      </li>
+                    </ul>
+                    -->
+                    <ul class="info-list">
+                      <li>
+                        <strong>Description:</strong>
+                        Measures the extent to which applicable schools in the
+                        district provide students with opportunities to move
+                        from introductory CS experiences to broader or more
+                        advanced coursework.
+                      </li>
+
+                      <li>
+                        <strong>How it is calculated:</strong>
+                        A Course Progression score is calculated for each high
+                        and K-12 school in the district.
+                      </li>
+
+                      <li>
+                        High and K-12 schools receive 25 points for each of four
+                        milestones: a foundational course, an intermediate or
+                        programming course, an advanced course, and at least
+                        three Georgia DOE-approved CS courses.
+                      </li>
+
+                      <li>
+                        Elementary and middle schools are not assigned a Course
+                        Progression score because the available data do not
+                        consistently measure course sequence or progression at
+                        these school levels.
+                      </li>
+
+                      <li>
+                        The district Course Progression score is the average of
+                        the available Course Progression scores for high and
+                        K-12 schools in the district.
+                      </li>
+
+                      <li>
+                        If no applicable high or K-12 schools are available,
+                        Course Progression is shown as N/A and is excluded from
+                        the district's overall CS Readiness Score.
                       </li>
                     </ul>
                   </div>
@@ -1675,11 +1791,6 @@
                         The district Participation Equity score is the average
                         of the Participation Equity scores for all schools in
                         the district.
-                      </li>
-
-                      <li>
-                        A demographic dimension is not used when an estimated
-                        nonzero reporting group contains fewer than 15 students.
                       </li>
                     </ul>
                   </div>
