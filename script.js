@@ -2073,6 +2073,30 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
   const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
   const hideProgression = schoolType === "E" || schoolType === "M";
 
+  /* Course Access info depends on school type */
+  const courseAccessElementaryInfo = document.getElementById(
+    "schoolCourseAccessElementaryInfo",
+  );
+
+  const courseAccessOtherInfo = document.getElementById(
+    "schoolCourseAccessOtherInfo",
+  );
+
+  const isElementarySchool = schoolType === "E";
+  const usesApprovedCourseBenchmark = ["M", "H", "K12"].includes(schoolType);
+
+  if (courseAccessElementaryInfo) {
+    courseAccessElementaryInfo.hidden = !isElementarySchool;
+    courseAccessElementaryInfo.style.display = isElementarySchool ? "" : "none";
+  }
+
+  if (courseAccessOtherInfo) {
+    courseAccessOtherInfo.hidden = !usesApprovedCourseBenchmark;
+    courseAccessOtherInfo.style.display = usesApprovedCourseBenchmark
+      ? ""
+      : "none";
+  }
+
   const highSchoolInfo = document.getElementById("schoolReadinessHighInfo");
   const earlySchoolInfo = document.getElementById("schoolReadinessEarlyInfo");
 
