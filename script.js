@@ -2069,6 +2069,26 @@ function resetReadinessScores(reportPrefix) {
 function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
   const scores = calculateSchoolReadinessScores(attributes, statewideFeatures);
 
+  // Hide Course Progression for Elementary and Middle school reports
+  const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
+  const hideProgression = schoolType === "E" || schoolType === "M";
+
+  const progressionRow = document
+    .getElementById("schoolReadinessComponentC")
+    ?.closest(".readiness-component-row");
+
+  const progressionInfo = document.getElementById("schoolProgressionInfo");
+
+  if (progressionRow) {
+    progressionRow.hidden = hideProgression;
+    progressionRow.style.display = hideProgression ? "none" : "";
+  }
+
+  if (progressionInfo) {
+    progressionInfo.hidden = hideProgression;
+    progressionInfo.style.display = hideProgression ? "none" : "";
+  }
+
   const stateAverageScores = calculateSchoolTypeStateAverageReadinessScores(
     attributes,
     statewideFeatures,
@@ -5432,7 +5452,9 @@ function collectReportInfoItems(reportElement) {
   const infoItems = [];
 
   cards.forEach((card) => {
-    const popups = Array.from(card.querySelectorAll(".card-info-popup"));
+    const popups = Array.from(card.querySelectorAll(".card-info-popup")).filter(
+      (popup) => !popup.hidden,
+    );
 
     if (popups.length === 0) {
       return;
