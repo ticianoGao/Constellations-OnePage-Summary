@@ -5433,24 +5433,44 @@ function collectReportInfoItems(reportElement) {
   const infoItems = [];
 
   cards.forEach((card) => {
-    const popup = card.querySelector(".card-info-popup");
+    const popups = Array.from(card.querySelectorAll(".card-info-popup"));
 
-    if (!popup) {
+    if (popups.length === 0) {
       return;
     }
 
     const cardTitle =
       card.querySelector("h3")?.textContent.trim() || "Report Information";
 
-    const infoLines = getInfoLinesFromPopup(popup);
+    const sections = popups
+      .map((popup, popupIndex) => {
+        const infoLines = getInfoLinesFromPopup(popup);
 
-    if (infoLines.length === 0) {
+        if (infoLines.length === 0) {
+          return null;
+        }
+
+        // First popup = general card info.
+        // Additional popups use their h4 title as a subsection.
+        const subtitle =
+          popupIndex === 0
+            ? null
+            : cleanPdfText(popup.querySelector("h4")?.textContent);
+
+        return {
+          subtitle: subtitle || null,
+          lines: infoLines,
+        };
+      })
+      .filter(Boolean);
+
+    if (sections.length === 0) {
       return;
     }
 
     infoItems.push({
       title: cardTitle,
-      lines: infoLines,
+      sections,
     });
   });
 
@@ -5471,58 +5491,90 @@ function addInfoPageToPdf({
   }
 
   pdf.addPage([pageWidth, pageHeight], "portrait");
+  pdf.setLineHeightFactor(1.05);
 
-  const usableWidth = pageWidth - margin * 2;
-  const bottomMargin = margin;
-  let y = margin;
+  // Padding used only for Information Notes pages
+  const noteMargin = 30;
+
+  const usableWidth = pageWidth - noteMargin * 2;
+  const bottomMargin = noteMargin;
+  let y = noteMargin;
 
   function addPageIfNeeded(neededHeight) {
     if (y + neededHeight > pageHeight - bottomMargin) {
       pdf.addPage([pageWidth, pageHeight], "portrait");
-      y = margin;
+      y = noteMargin;
     }
   }
 
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
-  pdf.text("Information Notes", margin, y);
+  pdf.setFontSize(16);
+  pdf.text("Information Notes", noteMargin, y);
 
-  y += 30;
+  y += 24;
 
   infoItems.forEach((item, index) => {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(12);
+    pdf.setFontSize(10);
 
     const titleLines = pdf.splitTextToSize(
       `${index + 1}. ${item.title}`,
       usableWidth,
     );
 
-    addPageIfNeeded(titleLines.length * 15 + 10);
+    addPageIfNeeded(titleLines.length * 12 + 6);
 
-    pdf.text(titleLines, margin, y);
-    y += titleLines.length * 15 + 8;
+    pdf.text(titleLines, noteMargin, y);
+    y += titleLines.length * 12 + 5;
 
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(10);
+    item.sections.forEach((section) => {
+      // Component heading, e.g. "Course Access"
+      if (section.subtitle) {
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(9.5);
 
-    item.lines.forEach((lineItem) => {
-      const indent = lineItem.level === 0 ? 14 : 28;
-      const bullet = lineItem.level === 0 ? "• " : "– ";
+        const subtitleIndent = 14;
 
-      const bodyLines = pdf.splitTextToSize(
-        `${bullet}${lineItem.text}`,
-        usableWidth - indent,
-      );
+        const subtitleLines = pdf.splitTextToSize(
+          section.subtitle,
+          usableWidth - subtitleIndent,
+        );
 
-      addPageIfNeeded(bodyLines.length * 12 + 8);
+        addPageIfNeeded(subtitleLines.length * 11 + 5);
 
-      pdf.text(bodyLines, margin + indent, y);
-      y += bodyLines.length * 12 + 6;
+        pdf.text(subtitleLines, noteMargin + subtitleIndent, y);
+        y += subtitleLines.length * 11 + 3;
+      }
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+
+      section.lines.forEach((lineItem) => {
+        const baseIndent = section.subtitle ? 28 : 14;
+        const indent = lineItem.level === 0 ? baseIndent : baseIndent + 14;
+
+        const bullet = lineItem.level === 0 ? "• " : "- ";
+
+        const bodyLines = pdf.splitTextToSize(
+          `${bullet}${lineItem.text}`,
+          usableWidth - indent,
+        );
+
+        addPageIfNeeded(bodyLines.length * 10 + 5);
+
+        pdf.text(bodyLines, noteMargin + indent, y);
+        y += bodyLines.length * 10 + 3;
+      });
+
+      if (section.subtitle) {
+        y += 2;
+      }
     });
 
-    y += 14;
+    y += 8;
   });
+
+  pdf.setLineHeightFactor(1.15);
   return y;
 }
 
@@ -5596,14 +5648,15 @@ function addCitationPageToPdf({
   margin,
   startY = null,
 }) {
-  const usableWidth = pageWidth - margin * 2;
-  const bottomMargin = margin;
-  let y = startY === null ? margin : startY + 8;
+  const citationMargin = 30;
+  const usableWidth = pageWidth - citationMargin * 2;
+  const bottomMargin = citationMargin;
+  let y = startY === null ? citationMargin : startY + 8;
 
   function addPageIfNeeded(neededHeight) {
     if (y + neededHeight > pageHeight - bottomMargin) {
       pdf.addPage([pageWidth, pageHeight], "portrait");
-      y = margin;
+      y = citationMargin;
     }
   }
 
@@ -5614,26 +5667,26 @@ function addCitationPageToPdf({
   addPageIfNeeded(150);
 
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
-  pdf.text("Citation and Sources", margin, y);
+  pdf.setFontSize(16);
+  pdf.text("Citation and Sources", citationMargin, y);
 
-  y += 32;
+  y += 24;
 
   function addLabeledText(label, text) {
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(12);
-    pdf.text(label, margin, y);
+    pdf.setFontSize(10);
+    pdf.text(label, citationMargin, y);
 
     const labelWidth = pdf.getTextWidth(label) + 6;
 
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(11);
+    pdf.setFontSize(9);
 
     const lines = pdf.splitTextToSize(text, usableWidth - labelWidth);
 
-    pdf.text(lines, margin + labelWidth, y);
+    pdf.text(lines, citationMargin + labelWidth, y);
 
-    y += lines.length * 14 + 14;
+    y += lines.length * 10 + 8;
   }
 
   addLabeledText(
@@ -5646,6 +5699,7 @@ function addCitationPageToPdf({
   addLabeledText("Data Source:", "GADOE CS Dashboard, GOSA, US Census Bureau");
 
   addLabeledText("Homepage:", "Computing in the Community Dashboard");
+  pdf.setLineHeightFactor(1.15);
 }
 
 async function exportReportAsPdf({
