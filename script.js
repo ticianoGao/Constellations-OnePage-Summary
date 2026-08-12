@@ -1462,7 +1462,6 @@ function calculateSchoolReadinessC(attributes, statewideFeatures = []) {
       },
     ];
   } else if (schoolType === "M" || schoolType === "E") {
-  } else if (schoolType === "M" || schoolType === "E") {
     /*
       Elementary and middle school Course Progression is
       currently not scored because the available data do not
