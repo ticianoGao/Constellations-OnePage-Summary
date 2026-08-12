@@ -2479,3 +2479,28 @@ a:hover {
 .readiness-info-sublist li {
   margin-bottom: 6px;
 }
+
+.CSEnroll-definition-list {
+  margin-top: 8px;
+  padding-left: 22px;
+  list-style-type: disc;
+}
+
+.CSEnroll-definition-list li {
+  margin-bottom: 8px;
+  list-style-type: disc;
+}
+
+.CSEnroll-definition-list li::marker {
+  color: #222222;
+}
+
+.CSEnroll-definition-list li {
+  line-height: 1 !important;
+  margin-bottom: 6px !important;
+  margin-top: 0 !important;
+}
+
+.CSEnroll-definition-list {
+  margin-top: 4px !important;
+}
