@@ -2073,6 +2073,22 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
   const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
   const hideProgression = schoolType === "E" || schoolType === "M";
 
+  const highSchoolInfo = document.getElementById("schoolReadinessHighInfo");
+  const earlySchoolInfo = document.getElementById("schoolReadinessEarlyInfo");
+
+  const isEarlySchool = schoolType === "E" || schoolType === "M";
+  const isHighSchool = schoolType === "H" || schoolType === "K12";
+
+  if (highSchoolInfo) {
+    highSchoolInfo.hidden = !isHighSchool;
+    highSchoolInfo.style.display = isHighSchool ? "" : "none";
+  }
+
+  if (earlySchoolInfo) {
+    earlySchoolInfo.hidden = !isEarlySchool;
+    earlySchoolInfo.style.display = isEarlySchool ? "" : "none";
+  }
+
   const progressionRow = document
     .getElementById("schoolReadinessComponentC")
     ?.closest(".readiness-component-row");
@@ -5429,6 +5445,10 @@ function getInfoLinesFromPopup(popup) {
 
       Array.from(child.children).forEach((nestedItem) => {
         if (!nestedItem.matches("li")) {
+          return;
+        }
+
+        if (nestedItem.hidden || nestedItem.style.display === "none") {
           return;
         }
 
