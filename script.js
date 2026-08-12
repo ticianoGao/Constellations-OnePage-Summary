@@ -36,8 +36,8 @@ const districtRecommendations = document.getElementById(
 
 const reportSchoolYearLabel = "2024 - 2025";
 
-let selectedReportValue = "Georgia Statewide";
-let selectedReportType = "state";
+let selectedReportValue = "";
+let selectedReportType = null;
 let selectedSchoolId = null;
 let selectedDistrictName = null;
 let selectedSystemId = null;
@@ -711,8 +711,8 @@ function buildDropdownFromCsvRows(rows) {
     });
   });
 
-  selectedReportValue = "Georgia Statewide";
-  selectedReportType = "state";
+  selectedReportValue = "";
+  selectedReportType = null;
   selectedSchoolId = null;
   selectedDistrictName = null;
   selectedSystemId = null;
@@ -720,10 +720,10 @@ function buildDropdownFromCsvRows(rows) {
   selectedLatitude = null;
   selectedLongitude = null;
 
-  selectedValue.textContent = "Georgia Statewide";
-  showReportByType("state");
+  selectedValue.textContent = "Choose a School District, School, or Statewide";
+
+  hideAllReportGrids();
   updateCurrentReportSelection();
-  updateSnapshotTitles();
 
   console.log("School lookup loaded:", {
     schoolCount: schoolLookupData.length,
