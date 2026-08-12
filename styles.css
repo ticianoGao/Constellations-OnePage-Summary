@@ -2505,3 +2505,11 @@ a:hover {
 .CSEnroll-definition-list {
   margin-top: 4px !important;
 }
+
+.comparison-green-text {
+  color: #168038;
+}
+
+.comparison-red-text {
+  color: #b00020;
+}
