@@ -2165,8 +2165,8 @@ a:hover {
 .exporting-report .snapshot-title-image {
   width: 300px !important;
   height: 82px !important;
-  object-fit: contain !important;
-  padding: 5px 10px !important;
+  object-fit: cover !important;
+  padding: 5px 5px !important;
   background: #ffffff !important;
   border-radius: 8px !important;
   flex-shrink: 0 !important;
