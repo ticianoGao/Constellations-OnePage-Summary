@@ -5702,7 +5702,8 @@ async function exportReportAsPdf({
 
     const { jsPDF } = window.jspdf;
 
-    const margin = 24;
+    // change padding for the export as one page pdf
+    const margin = 0;
     const pageWidth = 595.28;
     const usableWidth = pageWidth - margin * 2;
     const imageHeight = (canvas.height * usableWidth) / canvas.width;
@@ -5809,7 +5810,8 @@ async function exportReportAsPrintPdf({
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const margin = 30;
+    // change the padding on printed pdf
+    const margin = 0;
     const usableWidth = pageWidth - margin * 2;
     const usableHeight = pageHeight - margin * 2;
 

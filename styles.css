@@ -1363,13 +1363,13 @@ a:hover {
 #districtReportGrid.show {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 20px;
+  gap: 5px;
   align-items: stretch;
 
   background: #eeeeee;
   border: 1px solid #dddddd;
   border-radius: 16px;
-  padding: 18px;
+  padding: 5px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
 
   min-height: 980px;
@@ -1998,17 +1998,20 @@ a:hover {
 /* Reduce horizontal and vertical gaps between report cards */
 #schoolGrid.show,
 #districtReportGrid.show {
-  gap: 12px !important;
-  padding: 12px !important;
+  gap: 5px !important;
+  padding: 5px !important;
 }
 
-#schoolGrid > .grid-column,
+#schoolGrid > .grid-column {
+  gap: 5px !important;
+}
+
 #districtReportGrid > .grid-column {
   gap: 12px !important;
 }
 
 .grid-column {
-  gap: 12px !important;
+  gap: 5px !important;
 }
 
 /* Reduce space between intro note and Step 1 section */
