@@ -479,6 +479,27 @@ function updateDistrictSummaryFromData(data) {
   requestAnimationFrame(fitSummaryMetricNumbers);
 }
 
+function updateStateSummaryFromData(data = {}) {
+  setTextById("stateSchoolCount", data.schoolCount ?? "--");
+  setTextById("stateDistrictCount", data.districtCount ?? "--");
+  setTextById("stateTotalStudents", data.totalStudents ?? "--");
+  setTextById("stateCsEnrollments", data.csEnrollments ?? "--");
+
+  setTextById("stateSchoolCountText", data.schoolCountExact ?? "--");
+  setTextById("stateDistrictCountText", data.districtCountExact ?? "--");
+  setTextById("stateTotalStudentsText", data.totalStudentsExact ?? "--");
+
+  setTextById("stateSchoolsWithCs", data.schoolsWithCs ?? "--");
+  setTextById("stateSchoolsWithCsPercent", data.schoolsWithCsPercent ?? "--");
+
+  setTextById("stateSchoolsWithApprovedCs", data.schoolsWithApprovedCs ?? "--");
+
+  setTextById("stateCsEnrollmentsText", data.csEnrollmentsExact ?? "--");
+  setTextById("stateCsEnrollmentPercent", data.csEnrollmentPercent ?? "--");
+
+  requestAnimationFrame(fitSummaryMetricNumbers);
+}
+
 function updateSummaryFromSampleData() {
   if (selectedReportType === "school") {
     const schoolData =
@@ -3422,6 +3443,83 @@ function getOtherCourses(attributes, targetId) {
   return "None reported";
 }
 
+function formatCompactWholeNumber(value) {
+  const number = toFiniteNumber(value);
+
+  if (number === null) {
+    return "--";
+  }
+
+  if (Math.abs(number) >= 1000000) {
+    return `${formatDecimal(number / 1000000, 2)}M`;
+  }
+
+  if (Math.abs(number) >= 1000) {
+    return `${formatDecimal(number / 1000, 1)}K`;
+  }
+
+  return formatWholeNumber(number);
+}
+
+function buildStateSummaryDataFromFeatures(features) {
+  const statewideFeatures = Array.isArray(features) ? features : [];
+
+  const schoolCount = statewideFeatures.length;
+
+  const districtNames = new Set(
+    statewideFeatures
+      .map((feature) => {
+        const attributes = getFeatureAttributes(feature);
+        return String(attributes.SystemName || "").trim();
+      })
+      .filter(Boolean),
+  );
+
+  const totalStudents = getSumFromFeatures(statewideFeatures, "StudentCou");
+
+  const totalCsEnrollments = getSumFromFeatures(
+    statewideFeatures,
+    "NumCSEnrol",
+  );
+
+  const schoolsWithCs = statewideFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+    return Number(attributes.NumCSCours) > 0;
+  }).length;
+
+  const schoolsWithApprovedCs = statewideFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+    return Number(attributes.NumApprove) > 0;
+  }).length;
+
+  const schoolsWithCsPercent =
+    schoolCount > 0
+      ? `${formatDecimal((schoolsWithCs / schoolCount) * 100, 1)}%`
+      : "--";
+
+  return {
+    schoolCount: formatCompactWholeNumber(schoolCount),
+    districtCount: formatCompactWholeNumber(districtNames.size),
+    totalStudents: formatCompactWholeNumber(totalStudents),
+    csEnrollments: formatCompactWholeNumber(totalCsEnrollments),
+
+    schoolCountExact: formatWholeNumber(schoolCount),
+    districtCountExact: formatWholeNumber(districtNames.size),
+    totalStudentsExact: formatWholeNumber(totalStudents),
+    csEnrollmentsExact: formatWholeNumber(totalCsEnrollments),
+
+    schoolsWithCs: formatWholeNumber(schoolsWithCs),
+    schoolsWithCsPercent,
+
+    schoolsWithApprovedCs: formatWholeNumber(schoolsWithApprovedCs),
+
+    csEnrollmentPercent: formatEnrollmentIntensity(
+      totalStudents,
+      totalCsEnrollments,
+    ),
+  };
+}
+
 function buildSchoolSummaryDataFromAttributes(
   attributes,
   statewideFeatures = [],
@@ -3504,6 +3602,33 @@ async function querySchoolSummaryByWhere(whereClause) {
   }
 
   return data.features[0];
+}
+
+async function loadStateSummaryFromArcGIS() {
+  try {
+    const statewideFeatures = await fetchAllComparisonFeaturesFromArcGIS();
+
+    if (!Array.isArray(statewideFeatures) || statewideFeatures.length === 0) {
+      console.warn("No statewide ArcGIS features were returned.");
+
+      updateStateSummaryFromData();
+      return;
+    }
+
+    const stateSummaryData =
+      buildStateSummaryDataFromFeatures(statewideFeatures);
+
+    updateStateSummaryFromData(stateSummaryData);
+
+    console.log("Loaded statewide summary from ArcGIS:", {
+      schoolCount: statewideFeatures.length,
+      stateSummaryData,
+    });
+  } catch (error) {
+    console.error("Could not load statewide summary from ArcGIS:", error);
+
+    updateStateSummaryFromData();
+  }
 }
 
 async function loadSchoolSummaryFromArcGIS() {
@@ -3817,6 +3942,11 @@ async function loadDistrictSummaryFromArcGIS() {
 }
 
 async function updateSummaryForSelection() {
+  if (selectedReportType === "state") {
+    await loadStateSummaryFromArcGIS();
+    return;
+  }
+
   if (selectedReportType === "school") {
     await loadSchoolSummaryFromArcGIS();
     return;

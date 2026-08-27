@@ -124,9 +124,84 @@
               </div>
 
               <div class="grid-column">
-                <article class="report-card school-summary-card">
+                <article
+                  class="report-card school-summary-card state-summary-card"
+                >
                   <h3>Statewide Summary</h3>
-                  <p>Statewide report content will go here.</p>
+
+                  <div class="summary-metrics">
+                    <div class="metric-box">
+                      <span class="metric-number" id="stateSchoolCount"
+                        >--</span
+                      >
+                      <span class="metric-label">Schools</span>
+                    </div>
+
+                    <div class="metric-box">
+                      <span class="metric-number" id="stateDistrictCount"
+                        >--</span
+                      >
+                      <span class="metric-label">School Districts</span>
+                    </div>
+
+                    <div class="metric-box">
+                      <span class="metric-number" id="stateTotalStudents"
+                        >--</span
+                      >
+                      <span class="metric-label">Total Students</span>
+                    </div>
+
+                    <div class="metric-box">
+                      <span class="metric-number" id="stateCsEnrollments"
+                        >--</span
+                      >
+                      <span class="metric-label">CS Enrollments</span>
+                    </div>
+                  </div>
+
+                  <div class="summary-text">
+                    <ul class="summary-list">
+                      <li>
+                        By the end of the 2024 - 2025 school year, the statewide
+                        dataset included
+                        <strong id="stateSchoolCountText">--</strong>
+                        schools across
+                        <strong id="stateDistrictCountText">--</strong>
+                        school districts, serving
+                        <strong id="stateTotalStudentsText">--</strong>
+                        students.
+                      </li>
+
+                      <li>
+                        <strong id="stateSchoolsWithCs">--</strong>
+                        schools (<strong id="stateSchoolsWithCsPercent"
+                          >--</strong
+                        >) reported at least one computer science course.
+                      </li>
+
+                      <li>
+                        <strong id="stateSchoolsWithApprovedCs">--</strong>
+                        schools reported at least one course from the GA DOE
+                        approved computer science course list.
+                      </li>
+
+                      <li>
+                        There were
+                        <strong id="stateCsEnrollmentsText">--</strong>
+                        CS course enrollments statewide, equal to
+                        <strong id="stateCsEnrollmentPercent">--</strong>
+                        of total student enrollment.
+
+                        <ul class="summary-sublist">
+                          <li>
+                            CS enrollment counts course enrollments rather than
+                            unique students, so students enrolled in multiple CS
+                            courses may be counted more than once.
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
                 </article>
               </div>
 
