@@ -1980,6 +1980,7 @@ a:hover {
 #stateReportGrid > .future-suggestion-card,
 #schoolGrid > .future-suggestion-card,
 #districtReportGrid > .future-suggestion-card,
+#stateReportGrid > .report-export-row,
 #schoolGrid > .report-export-row,
 #districtReportGrid > .report-export-row {
   grid-column: 1 / -1;

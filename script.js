@@ -6895,6 +6895,41 @@ function buildPrintReportFileName(reportType) {
   return buildReportFileName(reportType).replace(/\.pdf$/i, " - Print.pdf");
 }
 
+/* Statewide export */
+
+const exportStateReportButton = document.getElementById(
+  "exportStateReportButton",
+);
+
+if (exportStateReportButton) {
+  exportStateReportButton.addEventListener("click", () => {
+    exportReportAsPdf({
+      button: exportStateReportButton,
+      reportElementId: "stateReportGrid",
+      mapIds: [],
+      fileName: buildReportFileName("state"),
+    });
+  });
+}
+
+const printStateReportButton = document.getElementById(
+  "printStateReportButton",
+);
+
+if (printStateReportButton) {
+  printStateReportButton.addEventListener("click", () => {
+    exportReportAsPrintPdf({
+      button: printStateReportButton,
+      reportElementId: "stateReportGrid",
+      mapIds: [],
+      fileName: buildPrintReportFileName("state"),
+      paperFormat: "letter",
+    });
+  });
+}
+
+/* School export */
+
 /* School export */
 
 const exportReportButton = document.getElementById("exportReportButton");
