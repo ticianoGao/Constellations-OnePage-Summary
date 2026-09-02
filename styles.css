@@ -1977,6 +1977,7 @@ a:hover {
   margin-bottom: 0 !important;
 }
 
+#stateReportGrid > .future-suggestion-card,
 #schoolGrid > .future-suggestion-card,
 #districtReportGrid > .future-suggestion-card,
 #schoolGrid > .report-export-row,

@@ -34,6 +34,8 @@ const districtRecommendations = document.getElementById(
   "districtRecommendations",
 );
 
+const stateRecommendations = document.getElementById("stateRecommendations");
+
 const reportSchoolYearLabel = "2024 - 2025";
 
 let selectedReportValue = "";
@@ -3150,6 +3152,352 @@ function buildDistrictRecommendations(
   return recommendations;
 }
 
+const stateParticipationRecommendationFields = [
+  {
+    label: "Asian and Pacific Islander students",
+    schoolField: "PercentAsi",
+    csField: "CSPercen_1",
+  },
+  {
+    label: "Black students",
+    schoolField: "PercentBla",
+    csField: "CSPercentB",
+  },
+  {
+    label: "Hispanic students",
+    schoolField: "PercentHis",
+    csField: "CSPercentH",
+  },
+  {
+    label: "Native American students",
+    schoolField: "PercentAme",
+    csField: "CSPercentA",
+  },
+  {
+    label: "White students",
+    schoolField: "PercentWhi",
+    csField: "CSPercentW",
+  },
+  {
+    label: "students identifying with two or more races",
+    schoolField: "Percent2Or",
+    csField: "CSPercent2",
+  },
+  {
+    label: "male students",
+    schoolField: "PercentMale",
+    csField: "CSPercentM",
+  },
+  {
+    label: "female students",
+    schoolField: "PercentFemale",
+    csField: "CSPercentF",
+  },
+];
+
+function getStateRecommendationWeightedPercent(
+  features,
+  percentField,
+  weightField,
+) {
+  let weightedTotal = 0;
+  let totalWeight = 0;
+
+  features.forEach((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    const percent = toFiniteNumber(attributes[percentField]);
+
+    const weight = toFiniteNumber(attributes[weightField]);
+
+    if (percent !== null && weight !== null && weight > 0) {
+      weightedTotal += percent * weight;
+      totalWeight += weight;
+    }
+  });
+
+  if (totalWeight <= 0) {
+    return null;
+  }
+
+  return weightedTotal / totalWeight;
+}
+
+function buildStateRecommendations(
+  statewideFeatures = [],
+  stateAccessData = null,
+) {
+  const features = Array.isArray(statewideFeatures) ? statewideFeatures : [];
+
+  const recommendations = [];
+
+  if (features.length === 0) {
+    return recommendations;
+  }
+
+  const accessData =
+    stateAccessData || buildStateAccessDataFromFeatures(features);
+
+  /* 1. Overall statewide CS access */
+
+  const totalSchools = accessData.overall?.total ?? features.length;
+
+  const schoolsOfferingCs = accessData.overall?.offeringCs ?? 0;
+
+  const schoolsWithoutCs = Math.max(0, totalSchools - schoolsOfferingCs);
+
+  const statewideAccessPercent = safeDivide(schoolsOfferingCs, totalSchools);
+
+  if (statewideAccessPercent !== null) {
+    const formattedAccessPercent = formatDecimal(
+      statewideAccessPercent * 100,
+      1,
+    );
+
+    if (schoolsWithoutCs > 0) {
+      addRecommendation(
+        recommendations,
+        "Statewide Access",
+        `${formattedAccessPercent}% of schools in the statewide dataset reported at least one computer science course. ${formatWholeNumber(
+          schoolsWithoutCs,
+        )} schools did not report a CS course, indicating continued opportunities to broaden access across Georgia.`,
+      );
+    } else {
+      addRecommendation(
+        recommendations,
+        "Statewide Access",
+        `All ${formatWholeNumber(
+          totalSchools,
+        )} schools in the statewide dataset reported at least one computer science course. Continued attention can shift toward the depth, continuity, and participation of those opportunities.`,
+      );
+    }
+  }
+
+  /* 2. Access by school type */
+
+  const schoolTypeAccess = [
+    {
+      label: "Elementary",
+      data: accessData.elementary,
+    },
+    {
+      label: "Middle",
+      data: accessData.middle,
+    },
+    {
+      label: "High",
+      data: accessData.high,
+    },
+    {
+      label: "K-12",
+      data: accessData.k12,
+    },
+  ]
+    .map((group) => {
+      const total = group.data?.total ?? 0;
+      const offeringCs = group.data?.offeringCs ?? 0;
+
+      return {
+        label: group.label,
+        total,
+        offeringCs,
+        share: safeDivide(offeringCs, total),
+      };
+    })
+    .filter((group) => group.share !== null);
+
+  if (schoolTypeAccess.length > 0) {
+    const lowestAccessGroup = schoolTypeAccess.reduce((lowest, current) => {
+      if (!lowest || current.share < lowest.share) {
+        return current;
+      }
+
+      return lowest;
+    }, null);
+
+    if (lowestAccessGroup && lowestAccessGroup.share < 1) {
+      addRecommendation(
+        recommendations,
+        "Access Across School Types",
+        `${lowestAccessGroup.label} schools currently have the lowest reported CS availability among the school types shown, with ${formatDecimal(
+          lowestAccessGroup.share * 100,
+          1,
+        )}% (${formatWholeNumber(
+          lowestAccessGroup.offeringCs,
+        )} of ${formatWholeNumber(
+          lowestAccessGroup.total,
+        )}) reporting at least one CS course. Expanding opportunities at this level could help create more consistent CS pathways across grade levels.`,
+      );
+    }
+  }
+
+  /* 3. GA DOE-approved course access */
+
+  const approvedEligibleFeatures = features.filter((feature) => {
+    const schoolType = normalizeReadinessSchoolType(
+      getFeatureAttributes(feature).SchoolType,
+    );
+
+    return ["M", "H", "K12"].includes(schoolType);
+  });
+
+  const approvedSchoolCount = approvedEligibleFeatures.filter((feature) => {
+    const approvedCount = toFiniteNumber(
+      getFeatureAttributes(feature).NumApprove,
+    );
+
+    return approvedCount !== null && approvedCount > 0;
+  }).length;
+
+  const approvedShare = safeDivide(
+    approvedSchoolCount,
+    approvedEligibleFeatures.length,
+  );
+
+  if (approvedShare !== null) {
+    addRecommendation(
+      recommendations,
+      "Approved Course Pathways",
+      `${formatDecimal(
+        approvedShare * 100,
+        1,
+      )}% of Middle, High, and K-12 schools in the statewide dataset reported at least one GA DOE-approved computer science course. Strengthening approved-course availability can help more students access coursework aligned with Georgia's CS standards and legislative requirements.`,
+    );
+  }
+
+  /* 4. Advanced AP opportunities */
+
+  const apEligibleFeatures = features.filter((feature) => {
+    const schoolType = normalizeReadinessSchoolType(
+      getFeatureAttributes(feature).SchoolType,
+    );
+
+    return schoolType === "H" || schoolType === "K12";
+  });
+
+  const schoolsWithEitherAp = apEligibleFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    return isAvailable(attributes.APCSA) || isAvailable(attributes.APCSP);
+  }).length;
+
+  const apShare = safeDivide(schoolsWithEitherAp, apEligibleFeatures.length);
+
+  if (apShare !== null) {
+    const schoolsWithoutAp = apEligibleFeatures.length - schoolsWithEitherAp;
+
+    if (schoolsWithoutAp > 0) {
+      addRecommendation(
+        recommendations,
+        "Advanced Opportunities",
+        `${formatDecimal(
+          apShare * 100,
+          1,
+        )}% of High and K-12 schools reported AP Computer Science A or AP Computer Science Principles. ${formatWholeNumber(
+          schoolsWithoutAp,
+        )} applicable schools did not report either AP CS course, suggesting opportunities to expand advanced pathways for students ready to continue beyond introductory coursework.`,
+      );
+    } else {
+      addRecommendation(
+        recommendations,
+        "Advanced Opportunities",
+        "All High and K-12 schools in the statewide dataset reported at least one AP computer science course. Maintaining these opportunities while supporting broader participation can help strengthen advanced CS pathways statewide.",
+      );
+    }
+  }
+
+  /* 5. Demographic participation */
+
+  const participationComparisons = stateParticipationRecommendationFields
+    .map((field) => {
+      const studentPercent = getStateRecommendationWeightedPercent(
+        features,
+        field.schoolField,
+        "StudentCou",
+      );
+
+      const csPercent = getStateRecommendationWeightedPercent(
+        features,
+        field.csField,
+        "NumCSEnrol",
+      );
+
+      if (studentPercent === null || csPercent === null) {
+        return null;
+      }
+
+      return {
+        label: field.label,
+        studentPercent,
+        csPercent,
+        gap: csPercent - studentPercent,
+      };
+    })
+    .filter((comparison) => comparison !== null);
+
+  const underrepresentedGroups = participationComparisons
+    .filter((comparison) => comparison.gap < 0)
+    .sort((a, b) => a.gap - b.gap);
+
+  if (underrepresentedGroups.length > 0) {
+    const largestGap = underrepresentedGroups[0];
+
+    const gapSize = Math.abs(largestGap.gap);
+
+    if (gapSize >= 3) {
+      addRecommendation(
+        recommendations,
+        "Participation Equity",
+        `${largestGap.label} represent ${formatDecimal(
+          largestGap.studentPercent,
+          1,
+        )}% of Georgia's student population but ${formatDecimal(
+          largestGap.csPercent,
+          1,
+        )}% of statewide CS course enrollments, a difference of ${formatDecimal(
+          gapSize,
+          1,
+        )} percentage points. This pattern may warrant closer attention to recruitment, awareness, course access, scheduling, and other barriers to participation.`,
+      );
+    } else {
+      addRecommendation(
+        recommendations,
+        "Participation Equity",
+        `The largest negative demographic participation difference among the groups shown is ${formatDecimal(
+          gapSize,
+          1,
+        )} percentage points. Continued attention to inclusive recruitment and access can help maintain and strengthen equitable participation statewide.`,
+      );
+    }
+  }
+
+  return recommendations;
+}
+
+function updateStateRecommendations(
+  statewideFeatures = [],
+  stateAccessData = null,
+) {
+  const recommendations = buildStateRecommendations(
+    statewideFeatures,
+    stateAccessData,
+  );
+
+  renderRecommendations(
+    stateRecommendations,
+    recommendations,
+    "Statewide findings are unavailable.",
+  );
+}
+
+function resetStateRecommendations(message) {
+  renderRecommendations(
+    stateRecommendations,
+    [],
+    message || "Statewide findings are unavailable.",
+  );
+}
+
 function updateSchoolRecommendations(
   attributes,
   statewideFeatures = [],
@@ -3809,6 +4157,7 @@ async function loadStateSummaryFromArcGIS() {
       updateStateSummaryFromData();
       updateStateAccessFromData();
       updateStateDemographicChartsFromFeatures([]);
+      resetStateRecommendations();
       return;
     }
 
@@ -3822,6 +4171,8 @@ async function loadStateSummaryFromArcGIS() {
 
     updateStateDemographicChartsFromFeatures(statewideFeatures);
 
+    updateStateRecommendations(statewideFeatures, stateAccessData);
+
     console.log("Loaded statewide data from ArcGIS:", {
       schoolCount: statewideFeatures.length,
       stateSummaryData,
@@ -3833,6 +4184,7 @@ async function loadStateSummaryFromArcGIS() {
     updateStateSummaryFromData();
     updateStateAccessFromData();
     updateStateDemographicChartsFromFeatures([]);
+    resetStateRecommendations();
   }
 }
 
