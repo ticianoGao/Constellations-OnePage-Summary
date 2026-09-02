@@ -3300,8 +3300,11 @@ function buildDistrictComparisonValues(
 
 let raceEthnicityChart = null;
 let districtRaceEthnicityChart = null;
+let stateRaceEthnicityChart = null;
+
 let genderChart = null;
 let districtGenderChart = null;
+let stateGenderChart = null;
 
 const raceDemographicFields = [
   {
@@ -3446,6 +3449,32 @@ function updateDistrictDemographicChartsFromFeatures(features) {
 
   updateDoubleBarChart(
     districtGenderChart,
+    genderData.schoolData,
+    genderData.csData,
+  );
+}
+
+function updateStateDemographicChartsFromFeatures(features) {
+  const statewideFeatures = Array.isArray(features) ? features : [];
+
+  const raceData = getDistrictChartDataFromFeatures(
+    statewideFeatures,
+    raceDemographicFields,
+  );
+
+  const genderData = getDistrictChartDataFromFeatures(
+    statewideFeatures,
+    genderDemographicFields,
+  );
+
+  updateDoubleBarChart(
+    stateRaceEthnicityChart,
+    raceData.schoolData,
+    raceData.csData,
+  );
+
+  updateDoubleBarChart(
+    stateGenderChart,
     genderData.schoolData,
     genderData.csData,
   );
@@ -3779,6 +3808,7 @@ async function loadStateSummaryFromArcGIS() {
 
       updateStateSummaryFromData();
       updateStateAccessFromData();
+      updateStateDemographicChartsFromFeatures([]);
       return;
     }
 
@@ -3790,6 +3820,8 @@ async function loadStateSummaryFromArcGIS() {
     updateStateSummaryFromData(stateSummaryData);
     updateStateAccessFromData(stateAccessData);
 
+    updateStateDemographicChartsFromFeatures(statewideFeatures);
+
     console.log("Loaded statewide data from ArcGIS:", {
       schoolCount: statewideFeatures.length,
       stateSummaryData,
@@ -3800,6 +3832,7 @@ async function loadStateSummaryFromArcGIS() {
 
     updateStateSummaryFromData();
     updateStateAccessFromData();
+    updateStateDemographicChartsFromFeatures([]);
   }
 }
 
@@ -4577,6 +4610,133 @@ if (districtGenderChartCanvas && typeof Chart !== "undefined") {
     },
   });
 }
+/* Statewide demographic comparison charts */
+
+function createStateDemographicChart(
+  canvasId,
+  labels,
+  barThickness,
+  yTickSize,
+) {
+  const canvas = document.getElementById(canvasId);
+
+  if (!canvas || typeof Chart === "undefined") {
+    return null;
+  }
+
+  return new Chart(canvas, {
+    type: "bar",
+
+    data: {
+      labels,
+
+      datasets: [
+        {
+          label: "Georgia Students",
+          data: labels.map(() => 0),
+          backgroundColor: "#B3A369",
+          borderRadius: 8,
+          barThickness,
+        },
+        {
+          label: "Georgia CS Enrollments",
+          data: labels.map(() => 0),
+          backgroundColor: "#003057",
+          borderRadius: 8,
+          barThickness,
+        },
+      ],
+    },
+
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        legend: {
+          position: "bottom",
+
+          labels: {
+            boxWidth: 12,
+            boxHeight: 12,
+
+            font: {
+              family: "Arial",
+              size: 12,
+            },
+          },
+        },
+
+        tooltip: {
+          callbacks: {
+            title: function () {
+              return "";
+            },
+
+            label: function (context) {
+              return context.dataset.label + ": " + context.raw + "%";
+            },
+          },
+        },
+      },
+
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+
+          ticks: {
+            callback: function (value) {
+              return value + "%";
+            },
+          },
+
+          grid: {
+            color: "#eeeeee",
+          },
+        },
+
+        y: {
+          grid: {
+            display: false,
+          },
+
+          ticks: {
+            display: true,
+
+            font: {
+              family: "Arial",
+              size: yTickSize,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+stateRaceEthnicityChart = createStateDemographicChart(
+  "stateRaceEthnicityChart",
+  [
+    ["Asian and", "Pacific Islander"],
+    "Black",
+    "Hispanic",
+    ["Native", "American"],
+    "White",
+    ["Two or", "More Races"],
+  ],
+  10,
+  11,
+);
+
+stateGenderChart = createStateDemographicChart(
+  "stateGenderChart",
+  ["Male", "Female"],
+  12,
+  12,
+);
+
 /* ArcGIS maps inside report cards */
 
 if (typeof require !== "undefined") {
