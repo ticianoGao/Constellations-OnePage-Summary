@@ -2591,3 +2591,8 @@ a:hover {
   font-size: 0.78rem !important;
   font-style: italic;
 }
+
+.state-summary-card h3,
+.state-access-card h3 {
+  padding-right: 44px;
+}

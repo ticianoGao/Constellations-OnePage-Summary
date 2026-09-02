@@ -127,6 +127,79 @@
                 <article
                   class="report-card school-summary-card state-summary-card"
                 >
+                  <button
+                    class="info-button"
+                    type="button"
+                    aria-label="Open information"
+                  >
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
+                  </button>
+
+                  <div class="card-info-popup">
+                    <button class="card-info-close" type="button">x</button>
+
+                    <ul class="info-list">
+                      <li>
+                        School and student totals includes students from all
+                        schools in Georgia. School district count is based on
+                        the number of unique school districts in the data.
+                      </li>
+
+                      <li>
+                        A school is counted as offering computer science when it
+                        reports at least one CS course.
+                      </li>
+
+                      <li>
+                        The GA DOE-approved CS course count represents schools
+                        reporting at least one course from the approved computer
+                        science course list.
+                      </li>
+
+                      <li>
+                        <strong>CS Enrollment/Total Enrollment</strong> is
+                        calculated as total statewide CS course enrollments
+                        divided by total statewide student enrollment.
+                      </li>
+
+                      <li>
+                        CS enrollment counts course enrollments rather than
+                        unique students, so students enrolled in multiple CS
+                        courses may be counted more than once.
+                      </li>
+                    </ul>
+                  </div>
+
                   <h3>Statewide Summary</h3>
 
                   <div class="summary-metrics">
@@ -293,6 +366,84 @@
 
               <div class="grid-column">
                 <article class="report-card state-access-card">
+                  <button
+                    class="info-button"
+                    type="button"
+                    aria-label="Open information"
+                  >
+                    <svg
+                      class="info-icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      ></circle>
+
+                      <circle
+                        cx="12"
+                        cy="7"
+                        r="1.3"
+                        fill="currentColor"
+                      ></circle>
+
+                      <line
+                        x1="12"
+                        y1="10"
+                        x2="12"
+                        y2="16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      ></line>
+                    </svg>
+                  </button>
+
+                  <div class="card-info-popup">
+                    <button class="card-info-close" type="button">×</button>
+
+                    <ul class="info-list">
+                      <li>
+                        The table compares CS course availability across
+                        Elementary, Middle, High, and K-12 schools in Georgia.
+                      </li>
+
+                      <li>
+                        A school is counted as <strong>Offering CS</strong> when
+                        it reports at least one computer science course. The
+                        percentage is calculated as schools offering CS divided
+                        by the total number of schools in that school-type
+                        group.
+                      </li>
+
+                      <li>
+                        <strong>Georgia Overall</strong> is calculated using the
+                        full statewide school dataset rather than only the four
+                        displayed school-type groups.
+                      </li>
+
+                      <li>
+                        GA DOE-approved CS course access is calculated among
+                        Middle, High, and K-12 schools.
+                      </li>
+
+                      <li>
+                        AP Computer Science percentages are calculated among
+                        High and K-12 schools.
+                        <strong>Either AP CS course</strong> means the school
+                        reports AP Computer Science Principles or AP Computer
+                        Science A, while
+                        <strong>Both AP CS courses</strong> means it reports
+                        both.
+                      </li>
+                    </ul>
+                  </div>
+
                   <h3>CS Access Across Georgia</h3>
 
                   <p class="chart-note">
