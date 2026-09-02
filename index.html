@@ -206,9 +206,100 @@
               </div>
 
               <div class="grid-column">
-                <article class="report-card participation-card">
-                  <h3>Statewide Demographic Participation</h3>
-                  <p>Statewide chart content will go here.</p>
+                <article class="report-card state-access-card">
+                  <h3>CS Access Across Georgia</h3>
+
+                  <p class="chart-note">
+                    This section shows how widely computer science courses are
+                    available across Georgia schools.
+                  </p>
+
+                  <div class="state-access-table-wrap">
+                    <table class="state-access-table">
+                      <thead>
+                        <tr>
+                          <th>School Type</th>
+                          <th>Total Schools</th>
+                          <th>Offering CS</th>
+                          <th>% Offering CS</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <th>Elementary</th>
+                          <td id="stateAccessElementaryTotal">--</td>
+                          <td id="stateAccessElementaryCs">--</td>
+                          <td id="stateAccessElementaryPercent">--</td>
+                        </tr>
+
+                        <tr>
+                          <th>Middle</th>
+                          <td id="stateAccessMiddleTotal">--</td>
+                          <td id="stateAccessMiddleCs">--</td>
+                          <td id="stateAccessMiddlePercent">--</td>
+                        </tr>
+
+                        <tr>
+                          <th>High</th>
+                          <td id="stateAccessHighTotal">--</td>
+                          <td id="stateAccessHighCs">--</td>
+                          <td id="stateAccessHighPercent">--</td>
+                        </tr>
+
+                        <tr>
+                          <th>K-12</th>
+                          <td id="stateAccessK12Total">--</td>
+                          <td id="stateAccessK12Cs">--</td>
+                          <td id="stateAccessK12Percent">--</td>
+                        </tr>
+
+                        <tr class="state-access-total-row">
+                          <th>Georgia Overall</th>
+                          <td id="stateAccessOverallTotal">--</td>
+                          <td id="stateAccessOverallCs">--</td>
+                          <td id="stateAccessOverallPercent">--</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="state-access-advanced">
+                    <h4>Approved and Advanced Course Access</h4>
+
+                    <div class="state-access-stat-row">
+                      <span>GA DOE-approved CS course</span>
+                      <strong id="stateAccessApprovedPercent">--</strong>
+                    </div>
+
+                    <p class="state-access-denominator-note">
+                      Among Middle, High, and K-12 schools.
+                    </p>
+
+                    <div class="state-access-stat-row">
+                      <span>AP Computer Science Principles</span>
+                      <strong id="stateAccessApCspPercent">--</strong>
+                    </div>
+
+                    <div class="state-access-stat-row">
+                      <span>AP Computer Science A</span>
+                      <strong id="stateAccessApCsaPercent">--</strong>
+                    </div>
+
+                    <div class="state-access-stat-row">
+                      <span>Either AP CS course</span>
+                      <strong id="stateAccessEitherApPercent">--</strong>
+                    </div>
+
+                    <div class="state-access-stat-row">
+                      <span>Both AP CS courses</span>
+                      <strong id="stateAccessBothApPercent">--</strong>
+                    </div>
+
+                    <p class="state-access-denominator-note">
+                      AP percentages are calculated among High and K-12 schools.
+                    </p>
+                  </div>
                 </article>
               </div>
             </div>

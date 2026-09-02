@@ -500,6 +500,46 @@ function updateStateSummaryFromData(data = {}) {
   requestAnimationFrame(fitSummaryMetricNumbers);
 }
 
+function updateStateAccessFromData(data = {}) {
+  const elementary = data.elementary || {};
+  const middle = data.middle || {};
+  const high = data.high || {};
+  const k12 = data.k12 || {};
+  const overall = data.overall || {};
+
+  setTextById(
+    "stateAccessElementaryTotal",
+    formatWholeNumber(elementary.total),
+  );
+  setTextById(
+    "stateAccessElementaryCs",
+    formatWholeNumber(elementary.offeringCs),
+  );
+  setTextById("stateAccessElementaryPercent", elementary.percent ?? "--");
+
+  setTextById("stateAccessMiddleTotal", formatWholeNumber(middle.total));
+  setTextById("stateAccessMiddleCs", formatWholeNumber(middle.offeringCs));
+  setTextById("stateAccessMiddlePercent", middle.percent ?? "--");
+
+  setTextById("stateAccessHighTotal", formatWholeNumber(high.total));
+  setTextById("stateAccessHighCs", formatWholeNumber(high.offeringCs));
+  setTextById("stateAccessHighPercent", high.percent ?? "--");
+
+  setTextById("stateAccessK12Total", formatWholeNumber(k12.total));
+  setTextById("stateAccessK12Cs", formatWholeNumber(k12.offeringCs));
+  setTextById("stateAccessK12Percent", k12.percent ?? "--");
+
+  setTextById("stateAccessOverallTotal", formatWholeNumber(overall.total));
+  setTextById("stateAccessOverallCs", formatWholeNumber(overall.offeringCs));
+  setTextById("stateAccessOverallPercent", overall.percent ?? "--");
+
+  setTextById("stateAccessApprovedPercent", data.approvedPercent ?? "--");
+  setTextById("stateAccessApCspPercent", data.apCspPercent ?? "--");
+  setTextById("stateAccessApCsaPercent", data.apCsaPercent ?? "--");
+  setTextById("stateAccessEitherApPercent", data.eitherApPercent ?? "--");
+  setTextById("stateAccessBothApPercent", data.bothApPercent ?? "--");
+}
+
 function updateSummaryFromSampleData() {
   if (selectedReportType === "school") {
     const schoolData =
@@ -3520,6 +3560,132 @@ function buildStateSummaryDataFromFeatures(features) {
   };
 }
 
+function formatStateAccessPercent(numerator, denominator) {
+  if (!denominator || denominator <= 0) {
+    return "--";
+  }
+
+  return `${formatDecimal((numerator / denominator) * 100, 1)}%`;
+}
+
+function buildStateAccessDataFromFeatures(features) {
+  const statewideFeatures = Array.isArray(features) ? features : [];
+
+  const groups = {
+    E: [],
+    M: [],
+    H: [],
+    K12: [],
+  };
+
+  statewideFeatures.forEach((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
+
+    if (schoolType && groups[schoolType]) {
+      groups[schoolType].push(feature);
+    }
+  });
+
+  function buildAccess(groupFeatures) {
+    const total = groupFeatures.length;
+
+    const offeringCs = groupFeatures.filter((feature) => {
+      const attributes = getFeatureAttributes(feature);
+
+      const courseCount = toFiniteNumber(attributes.NumCSCours);
+
+      return courseCount !== null && courseCount > 0;
+    }).length;
+
+    return {
+      total,
+      offeringCs,
+      percent: formatStateAccessPercent(offeringCs, total),
+    };
+  }
+
+  const elementary = buildAccess(groups.E);
+  const middle = buildAccess(groups.M);
+  const high = buildAccess(groups.H);
+  const k12 = buildAccess(groups.K12);
+
+  // Use the complete statewide dataset so this matches
+  // the statewide school total shown in Step 1.
+  const overall = buildAccess(statewideFeatures);
+
+  // Approved Georgia CS courses apply to Middle,
+  // High, and K-12 schools.
+  const approvedEligibleFeatures = [...groups.M, ...groups.H, ...groups.K12];
+
+  const approvedSchoolCount = approvedEligibleFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    const approvedCount = toFiniteNumber(attributes.NumApprove);
+
+    return approvedCount !== null && approvedCount > 0;
+  }).length;
+
+  // AP courses apply to High and K-12 schools.
+  const apEligibleFeatures = [...groups.H, ...groups.K12];
+
+  const apCspCount = apEligibleFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+    return isAvailable(attributes.APCSP);
+  }).length;
+
+  const apCsaCount = apEligibleFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+    return isAvailable(attributes.APCSA);
+  }).length;
+
+  const eitherApCount = apEligibleFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    return isAvailable(attributes.APCSP) || isAvailable(attributes.APCSA);
+  }).length;
+
+  const bothApCount = apEligibleFeatures.filter((feature) => {
+    const attributes = getFeatureAttributes(feature);
+
+    return isAvailable(attributes.APCSP) && isAvailable(attributes.APCSA);
+  }).length;
+
+  return {
+    elementary,
+    middle,
+    high,
+    k12,
+    overall,
+
+    approvedPercent: formatStateAccessPercent(
+      approvedSchoolCount,
+      approvedEligibleFeatures.length,
+    ),
+
+    apCspPercent: formatStateAccessPercent(
+      apCspCount,
+      apEligibleFeatures.length,
+    ),
+
+    apCsaPercent: formatStateAccessPercent(
+      apCsaCount,
+      apEligibleFeatures.length,
+    ),
+
+    eitherApPercent: formatStateAccessPercent(
+      eitherApCount,
+      apEligibleFeatures.length,
+    ),
+
+    bothApPercent: formatStateAccessPercent(
+      bothApCount,
+      apEligibleFeatures.length,
+    ),
+  };
+}
+
 function buildSchoolSummaryDataFromAttributes(
   attributes,
   statewideFeatures = [],
@@ -3612,22 +3778,28 @@ async function loadStateSummaryFromArcGIS() {
       console.warn("No statewide ArcGIS features were returned.");
 
       updateStateSummaryFromData();
+      updateStateAccessFromData();
       return;
     }
 
     const stateSummaryData =
       buildStateSummaryDataFromFeatures(statewideFeatures);
 
-    updateStateSummaryFromData(stateSummaryData);
+    const stateAccessData = buildStateAccessDataFromFeatures(statewideFeatures);
 
-    console.log("Loaded statewide summary from ArcGIS:", {
+    updateStateSummaryFromData(stateSummaryData);
+    updateStateAccessFromData(stateAccessData);
+
+    console.log("Loaded statewide data from ArcGIS:", {
       schoolCount: statewideFeatures.length,
       stateSummaryData,
+      stateAccessData,
     });
   } catch (error) {
-    console.error("Could not load statewide summary from ArcGIS:", error);
+    console.error("Could not load statewide data from ArcGIS:", error);
 
     updateStateSummaryFromData();
+    updateStateAccessFromData();
   }
 }
 
