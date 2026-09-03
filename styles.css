@@ -1329,10 +1329,6 @@ a:hover {
 
 .participation-card .chart-js-section {
   border-top: none;
-}
-
-.participation-card .chart-js-section {
-  border-top: none;
   margin-top: 10px;
   padding-top: 6px;
 }
@@ -2484,28 +2480,19 @@ a:hover {
 }
 
 .CSEnroll-definition-list {
-  margin-top: 8px;
+  margin-top: 4px;
   padding-left: 22px;
   list-style-type: disc;
 }
 
 .CSEnroll-definition-list li {
-  margin-bottom: 8px;
+  margin: 0 0 6px;
+  line-height: 1;
   list-style-type: disc;
 }
 
 .CSEnroll-definition-list li::marker {
   color: #222222;
-}
-
-.CSEnroll-definition-list li {
-  line-height: 1 !important;
-  margin-bottom: 6px !important;
-  margin-top: 0 !important;
-}
-
-.CSEnroll-definition-list {
-  margin-top: 4px !important;
 }
 
 .comparison-green-text {

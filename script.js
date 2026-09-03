@@ -162,57 +162,11 @@ function updateSnapshotTitles() {
   }
 }
 
-const sampleSchoolSummaryData = {
-  default: {
-    totalStudents: "1049",
-    csCourses: "2",
-    approvedCsCourses: "1",
-    approvedCsCoursesVerb: "was",
-    csCourseAverageSentence:
-      "On average, high schools in Georgia had 3 computer science courses available.",
-    csTeachers: "1",
-    csEnrollments: "28",
-    csCoursesComparison: "NULL%",
-    apCsa: "Unavailable",
-    apCsp: "Available",
-    otherCourses: "Introduction to Digital Technology",
-    csEnrollmentPercent: "2.67%",
-    csEnrollmentComparison: "NULL%",
-    category1: "15",
-    category2: "0",
-    category3: "0",
-    category4: "13",
-    studentTeacherRatio: "28",
-    studentTeacherRatioComparison: "NULL",
-  },
-};
-
-const sampleDistrictSummaryData = {
-  default: {
-    totalStudents: "1049",
-    csCourses: "2",
-    csTeachers: "1",
-    csEnrollments: "28",
-    csCoursesComparison: "NULL%",
-    apCsa: "Unavailable",
-    apCsp: "Available",
-    otherCourses: "Introduction to Digital Technology",
-    csEnrollmentPercent: "2.67%",
-    csEnrollmentComparison: "NULL%",
-    category1: "15",
-    category2: "0",
-    category3: "0",
-    category4: "13",
-    studentTeacherRatio: "28",
-    studentTeacherRatioComparison: "NULL",
-  },
-};
-
 function setTextById(id, value) {
   const element = document.getElementById(id);
 
   if (element) {
-    element.textContent = value;
+    element.textContent = value ?? "--";
   }
 }
 
@@ -220,7 +174,7 @@ function setHtmlById(id, value) {
   const element = document.getElementById(id);
 
   if (element) {
-    element.innerHTML = value;
+    element.innerHTML = value ?? "--";
   }
 }
 
@@ -542,25 +496,6 @@ function updateStateAccessFromData(data = {}) {
   setTextById("stateAccessBothApPercent", data.bothApPercent ?? "--");
 }
 
-function updateSummaryFromSampleData() {
-  if (selectedReportType === "school") {
-    const schoolData =
-      sampleSchoolSummaryData[selectedReportValue] ||
-      sampleSchoolSummaryData.default;
-
-    updateSchoolSummaryFromData(schoolData);
-  }
-
-  if (selectedReportType === "district") {
-    const districtData =
-      sampleDistrictSummaryData[selectedDistrictName] ||
-      sampleDistrictSummaryData[selectedReportValue] ||
-      sampleDistrictSummaryData.default;
-
-    updateDistrictSummaryFromData(districtData);
-  }
-}
-
 function hideAllReportGrids() {
   if (stateReportGrid) {
     stateReportGrid.classList.remove("show");
@@ -633,8 +568,6 @@ function selectDropdownOption(option) {
   if (typeof window.updateReportMapsForSelection === "function") {
     window.updateReportMapsForSelection();
   }
-
-  console.log("Selected report option:", window.currentReportSelection);
 }
 
 function createDropdownOption({
@@ -787,11 +720,6 @@ function buildDropdownFromCsvRows(rows) {
 
   hideAllReportGrids();
   updateCurrentReportSelection();
-
-  console.log("School lookup loaded:", {
-    schoolCount: schoolLookupData.length,
-    districtCount: districts.length,
-  });
 }
 
 function loadSchoolLookupCsv() {
@@ -871,16 +799,12 @@ async function loadSchoolLookupFromArcGIS() {
     const rows = await fetchAllSchoolLookupRowsFromArcGIS();
 
     buildDropdownFromCsvRows(rows);
-
-    console.log("School lookup loaded from ArcGIS:", {
-      rowCount: rows.length,
-    });
   } catch (error) {
     console.error("Could not load school lookup from ArcGIS:", error);
 
     selectedValue.textContent = "Georgia Statewide";
 
-    // Fallback to CSV while testing.
+    // Fall back to the bundled school lookup if ArcGIS is unavailable.
     loadSchoolLookupCsv();
   } finally {
     if (selectTrigger) {
@@ -1004,20 +928,6 @@ function formatWholeNumber(value) {
   }
 
   return Math.round(number).toLocaleString();
-}
-
-function formatPercent(value) {
-  let number = Number(value);
-
-  if (!Number.isFinite(number)) {
-    return "--";
-  }
-
-  if (Math.abs(number) <= 1) {
-    number = number * 100;
-  }
-
-  return `${number.toFixed(2).replace(/\.?0+$/, "")}%`;
 }
 
 function formatDecimal(value, digits = 2) {
@@ -1188,28 +1098,6 @@ function averageAvailableReadinessValues(values) {
     }, 0) / availableValues.length
   );
 }
-
-/* taking away the size comparison part for component B of readiness score
-function getEnrollmentSizeGroup(totalEnrollment) {
-  const enrollment = toReadinessNumber(totalEnrollment);
-
-  if (enrollment === null || enrollment < 0) {
-    return null;
-  }
-
-  // This assigns exactly 500 students to the small group,
-  // avoiding a gap between the size categories.
-  if (enrollment <= 500) {
-    return "small";
-  }
-
-  if (enrollment <= 1000) {
-    return "medium";
-  }
-
-  return "large";
-}
-*/
 
 function calculatePercentile(values, percentile) {
   const sortedValues = values
@@ -2201,12 +2089,6 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
 
   const overallScore = updateReadinessScoreDisplay("school", scores);
 
-  console.log("School readiness scores:", {
-    ...scores,
-    stateAverageScores,
-    overallScore,
-  });
-
   return overallScore;
 }
 
@@ -2225,13 +2107,6 @@ function updateDistrictReadinessScores(
   updateDistrictStateAverageReadinessDisplay(stateAverageScores);
 
   const overallScore = updateReadinessScoreDisplay("district", districtScores);
-
-  console.log("District readiness scores:", {
-    ...districtScores,
-    stateAverageScores,
-    overallScore,
-    schoolCount: (districtFeatures || []).length,
-  });
 }
 
 function getFeatureAttributes(feature) {
@@ -2412,41 +2287,6 @@ function formatBenchmarkComparison(currentValue, benchmarkValue) {
   const direction = percentDifference > 0 ? "higher than" : "lower than";
 
   return `${formattedDifference}% ${direction}`;
-}
-
-function normalizeToPercentValue(value) {
-  const number = toFiniteNumber(value);
-
-  if (number === null) {
-    return null;
-  }
-
-  if (Math.abs(number) <= 1) {
-    return number * 100;
-  }
-
-  return number;
-}
-
-function formatPercentagePointComparison(currentValue, benchmarkValue) {
-  const currentPercent = normalizeToPercentValue(currentValue);
-  const benchmarkPercent = normalizeToPercentValue(benchmarkValue);
-
-  if (currentPercent === null || benchmarkPercent === null) {
-    return "--";
-  }
-
-  const pointDifference = currentPercent - benchmarkPercent;
-  const absoluteDifference = Math.abs(pointDifference);
-
-  if (absoluteDifference < 0.05) {
-    return "about the same as";
-  }
-
-  const formattedDifference = formatDecimal(absoluteDifference, 1);
-  const direction = pointDifference > 0 ? "higher than" : "lower than";
-
-  return `${formattedDifference} % ${direction}`;
 }
 
 function formatCountDifferenceComparison(
@@ -4172,12 +4012,6 @@ async function loadStateSummaryFromArcGIS() {
     updateStateDemographicChartsFromFeatures(statewideFeatures);
 
     updateStateRecommendations(statewideFeatures, stateAccessData);
-
-    console.log("Loaded statewide data from ArcGIS:", {
-      schoolCount: statewideFeatures.length,
-      stateSummaryData,
-      stateAccessData,
-    });
   } catch (error) {
     console.error("Could not load statewide data from ArcGIS:", error);
 
@@ -4190,7 +4024,7 @@ async function loadStateSummaryFromArcGIS() {
 
 async function loadSchoolSummaryFromArcGIS() {
   if (!selectedReportValue) {
-    updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+    updateSchoolSummaryFromData({});
     resetReadinessScores("school");
     resetSchoolRecommendations();
     return;
@@ -4214,13 +4048,11 @@ async function loadSchoolSummaryFromArcGIS() {
 
   try {
     let feature = null;
-    let successfulWhereClause = null;
 
     for (const whereClause of whereClauses) {
       feature = await querySchoolSummaryByWhere(whereClause);
 
       if (feature) {
-        successfulWhereClause = whereClause;
         break;
       }
     }
@@ -4233,7 +4065,7 @@ async function loadSchoolSummaryFromArcGIS() {
         whereClauses,
       });
 
-      updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+      updateSchoolSummaryFromData({});
       updateSchoolDemographicChartsFromAttributes({});
       resetReadinessScores("school");
       resetSchoolRecommendations(
@@ -4273,14 +4105,9 @@ async function loadSchoolSummaryFromArcGIS() {
       statewideFeatures,
       overallReadinessScore,
     );
-
-    console.log("Loaded school summary from ArcGIS:", {
-      successfulWhereClause,
-      attributes,
-    });
   } catch (error) {
     console.error("Could not load school summary from ArcGIS:", error);
-    updateSchoolSummaryFromData(sampleSchoolSummaryData.default);
+    updateSchoolSummaryFromData({});
     resetReadinessScores("school");
     resetSchoolRecommendations(
       "The selected school's recommendation data could not be loaded.",
@@ -4437,7 +4264,7 @@ function buildDistrictSummaryDataFromFeatures(
 
 async function loadDistrictSummaryFromArcGIS() {
   if (!selectedDistrictName) {
-    updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+    updateDistrictSummaryFromData({});
     updateDistrictDemographicChartsFromFeatures([]);
     resetReadinessScores("district");
     resetDistrictRecommendations();
@@ -4452,7 +4279,7 @@ async function loadDistrictSummaryFromArcGIS() {
         "No ArcGIS district schools found for:",
         selectedDistrictName,
       );
-      updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+      updateDistrictSummaryFromData({});
       updateDistrictDemographicChartsFromFeatures([]);
       resetReadinessScores("district");
       resetDistrictRecommendations(
@@ -4482,15 +4309,9 @@ async function loadDistrictSummaryFromArcGIS() {
 
     updateDistrictReadinessScores(features, statewideFeatures);
     updateDistrictRecommendations(features, statewideFeatures);
-
-    console.log("Loaded district summary from ArcGIS:", {
-      selectedDistrictName,
-      schoolCount: features.length,
-      districtSummaryData,
-    });
   } catch (error) {
     console.error("Could not load district summary from ArcGIS:", error);
-    updateDistrictSummaryFromData(sampleDistrictSummaryData.default);
+    updateDistrictSummaryFromData({});
     resetReadinessScores("district");
     resetDistrictRecommendations(
       "The selected district’s recommendation data could not be loaded.",
