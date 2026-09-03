@@ -2559,9 +2559,9 @@ a:hover {
 }
 
 .state-access-advanced {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid #d9d9d9;
+  margin-top: 6px;
+  padding-top: 0;
+  border-top: none;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -2595,4 +2595,108 @@ a:hover {
 .state-summary-card h3,
 .state-access-card h3 {
   padding-right: 44px;
+}
+
+/* Statewide school map */
+
+.state-school-map-card h3 {
+  padding-right: 44px;
+}
+
+.state-school-map-card .chart-note {
+  margin-bottom: 10px;
+}
+
+.state-school-map-wrap {
+  margin-top: 10px;
+}
+
+.state-school-map {
+  height: 360px;
+}
+
+/* Custom statewide school legend */
+
+#stateSchoolMap .state-school-legend {
+  position: relative;
+  width: 158px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #d6d6d6;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333333;
+}
+
+#stateSchoolMap .state-school-legend-title {
+  padding-right: 32px;
+  margin-bottom: 7px;
+  color: #333333;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+#stateSchoolMap .state-school-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 18px;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+#stateSchoolMap .state-school-legend-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border: 1px solid #777777;
+  border-radius: 50%;
+}
+
+#stateSchoolMap .state-school-legend-toggle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: 1px solid #d6d6d6;
+  background: #f5f7fa;
+  color: var(--blue);
+  padding: 1px 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+#stateSchoolMap .state-school-legend-toggle:hover {
+  background: #eeeeee;
+}
+
+#stateSchoolMap .state-school-legend.state-school-legend-collapsed {
+  width: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+#stateSchoolMap
+  .state-school-legend.state-school-legend-collapsed
+  .state-school-legend-toggle {
+  position: static;
+  padding: 2px 6px;
+}
+
+/* Reduce gap between demographic charts only in Statewide report */
+.state-participation-card .chart-js-section + .chart-js-section {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.state-access-table tbody tr:last-child th,
+.state-access-table tbody tr:last-child td {
+  border-bottom: none;
 }

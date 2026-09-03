@@ -5460,6 +5460,39 @@ if (typeof require !== "undefined") {
         view.resize();
       }
 
+      /*
+       * The statewide school map should always remain focused
+       * on the full state rather than following school/district
+       * selections elsewhere in the report generator.
+       */
+      if (containerId === "stateSchoolMap") {
+        if (selectedReportType === "state") {
+          const districtLayer = view.map.findLayerById(
+            "stateSchoolDistrictLayer",
+          );
+
+          if (districtLayer) {
+            try {
+              const query = districtLayer.createQuery();
+              query.where = "1=1";
+
+              const result = await districtLayer.queryExtent(query);
+
+              if (result?.extent) {
+                await view.goTo(result.extent.expand(1.04)).catch(() => {});
+              }
+            } catch (error) {
+              console.warn(
+                "Unable to fit statewide school map to Georgia extent:",
+                error,
+              );
+            }
+          }
+        }
+
+        return;
+      }
+
       selectionLayer.removeAll();
 
       const isDistrictReportMap = isDistrictReportMapContainer(containerId);
@@ -5686,6 +5719,344 @@ if (typeof require !== "undefined") {
       );
     }
 
+    function createStateSchoolMap() {
+      const containerId = "stateSchoolMap";
+      const container = document.getElementById(containerId);
+
+      if (!container) {
+        return null;
+      }
+
+      /* School district background */
+
+      const districtLayer = new FeatureLayer({
+        id: "stateSchoolDistrictLayer",
+        url: districtLayerUrl,
+        title: "School Districts",
+        outFields: ["*"],
+
+        popupEnabled: false,
+
+        renderer: {
+          type: "simple",
+
+          symbol: {
+            type: "simple-fill",
+            color: [238, 234, 214, 0.65],
+
+            outline: {
+              color: "#999999",
+              width: 0.6,
+            },
+          },
+        },
+      });
+
+      /* Schools */
+
+      const schoolLayer = new FeatureLayer({
+        id: "stateSchoolsLayer",
+        url: schoolLayerUrl,
+        title: "Schools",
+        outFields: ["*"],
+
+        /*
+         * Force the school layer to display at every zoom level.
+         * This overrides any scale range inherited from the
+         * hosted FeatureLayer.
+         */
+        visible: true,
+        minScale: 0,
+        maxScale: 0,
+
+        popupTemplate: {
+          title: "{SchoolName}",
+
+          content: [
+            {
+              type: "fields",
+
+              fieldInfos: [
+                {
+                  fieldName: "SystemName",
+                  label: "School District",
+                },
+                {
+                  fieldName: "SchoolType",
+                  label: "School Type",
+                },
+                {
+                  fieldName: "GradeRange",
+                  label: "Grade Range",
+                },
+                {
+                  fieldName: "NumCSCours",
+                  label: "Number of CS Courses",
+                },
+              ],
+            },
+          ],
+        },
+
+        renderer: {
+          type: "unique-value",
+          field: "SchoolType",
+
+          defaultSymbol: {
+            type: "simple-marker",
+            style: "circle",
+            size: 5,
+            color: "#999999",
+
+            outline: {
+              color: "#555555",
+              width: 0.4,
+            },
+          },
+
+          defaultLabel: "Other / Unknown",
+
+          uniqueValueInfos: [
+            {
+              value: "E",
+              label: "Elementary School",
+
+              symbol: {
+                type: "simple-marker",
+                style: "circle",
+                size: 6,
+                color: "#65c9b5",
+
+                outline: {
+                  color: "#555555",
+                  width: 0.4,
+                },
+              },
+            },
+
+            {
+              value: "M",
+              label: "Middle School",
+
+              symbol: {
+                type: "simple-marker",
+                style: "circle",
+                size: 6,
+                color: "#f1d84c",
+
+                outline: {
+                  color: "#555555",
+                  width: 0.4,
+                },
+              },
+            },
+
+            {
+              value: "H",
+              label: "High School",
+
+              symbol: {
+                type: "simple-marker",
+                style: "circle",
+                size: 6,
+                color: "#a97bc3",
+
+                outline: {
+                  color: "#555555",
+                  width: 0.4,
+                },
+              },
+            },
+
+            {
+              value: "K",
+              label: "K-12 School",
+
+              symbol: {
+                type: "simple-marker",
+                style: "circle",
+                size: 6,
+                color: "#c94b45",
+
+                outline: {
+                  color: "#555555",
+                  width: 0.4,
+                },
+              },
+            },
+
+            {
+              value: "K12",
+              label: "K-12 School",
+
+              symbol: {
+                type: "simple-marker",
+                style: "circle",
+                size: 6,
+                color: "#c94b45",
+
+                outline: {
+                  color: "#555555",
+                  width: 0.4,
+                },
+              },
+            },
+
+            {
+              value: "K-12",
+              label: "K-12 School",
+
+              symbol: {
+                type: "simple-marker",
+                style: "circle",
+                size: 6,
+                color: "#c94b45",
+
+                outline: {
+                  color: "#555555",
+                  width: 0.4,
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      schoolLayer
+        .load()
+        .then(async () => {
+          console.log("State school layer loaded:", {
+            geometryType: schoolLayer.geometryType,
+            minScale: schoolLayer.minScale,
+            maxScale: schoolLayer.maxScale,
+            fullExtent: schoolLayer.fullExtent,
+            renderer: schoolLayer.renderer,
+          });
+
+          const count = await schoolLayer.queryFeatureCount();
+
+          console.log("State school feature count:", count);
+        })
+        .catch((error) => {
+          console.error("State school layer failed to load:", error);
+        });
+
+      /*
+       * Empty selection layer keeps this map compatible with
+       * the existing report-map architecture.
+       */
+      const selectionLayer = new GraphicsLayer();
+
+      reportMapMarkerLayers[containerId] = selectionLayer;
+
+      const map = new Map({
+        basemap: "gray-vector",
+
+        layers: [districtLayer, schoolLayer, selectionLayer],
+      });
+
+      const view = new MapView({
+        container: containerId,
+        map: map,
+
+        // Fallback view before the statewide extent is applied.
+        center: [-83.5, 32.7],
+        zoom: 6,
+
+        constraints: {
+          rotationEnabled: false,
+        },
+
+        ui: {
+          components: ["zoom"],
+        },
+      });
+
+      /* Legend */
+
+      /* Custom statewide school legend */
+
+      const legendWrapper = document.createElement("div");
+      legendWrapper.className = "state-school-legend esri-widget";
+
+      legendWrapper.innerHTML = `
+  <button
+    type="button"
+    class="state-school-legend-toggle"
+    aria-expanded="true"
+  >
+    Hide
+  </button>
+
+  <div class="state-school-legend-content">
+    <div class="state-school-legend-title">
+      School Type
+    </div>
+
+    <div class="state-school-legend-item">
+      <span
+        class="state-school-legend-dot"
+        style="background: #65c9b5;"
+      ></span>
+      <span>Elementary School</span>
+    </div>
+
+    <div class="state-school-legend-item">
+      <span
+        class="state-school-legend-dot"
+        style="background: #f1d84c;"
+      ></span>
+      <span>Middle School</span>
+    </div>
+
+    <div class="state-school-legend-item">
+      <span
+        class="state-school-legend-dot"
+        style="background: #a97bc3;"
+      ></span>
+      <span>High School</span>
+    </div>
+
+    <div class="state-school-legend-item">
+      <span
+        class="state-school-legend-dot"
+        style="background: #c94b45;"
+      ></span>
+      <span>K-12 School</span>
+    </div>
+  </div>
+`;
+
+      const legendToggleButton = legendWrapper.querySelector(
+        ".state-school-legend-toggle",
+      );
+
+      const legendContent = legendWrapper.querySelector(
+        ".state-school-legend-content",
+      );
+
+      legendToggleButton.addEventListener("click", () => {
+        const isHidden = legendContent.hidden;
+
+        legendContent.hidden = !isHidden;
+
+        legendToggleButton.textContent = isHidden ? "Hide" : "Show";
+
+        legendToggleButton.setAttribute("aria-expanded", String(isHidden));
+
+        legendWrapper.classList.toggle(
+          "state-school-legend-collapsed",
+          !isHidden,
+        );
+      });
+
+      view.ui.add(legendWrapper, "bottom-right");
+
+      reportMapViews[containerId] = view;
+
+      return view;
+    }
+
     function createContextMap(
       containerId,
       layerUrl,
@@ -5822,6 +6193,8 @@ if (typeof require !== "undefined") {
     }
 
     getCurrentReportMapLocation().then((schoolLocation) => {
+      createStateSchoolMap();
+
       createMathProficiencyMap("mathProficiencyMap", schoolLocation);
 
       createEnglishProficiencyMap("englishProficiencyMap", schoolLocation);
@@ -6906,7 +7279,7 @@ if (exportStateReportButton) {
     exportReportAsPdf({
       button: exportStateReportButton,
       reportElementId: "stateReportGrid",
-      mapIds: [],
+      mapIds: ["stateSchoolMap"],
       fileName: buildReportFileName("state"),
     });
   });
@@ -6921,7 +7294,7 @@ if (printStateReportButton) {
     exportReportAsPrintPdf({
       button: printStateReportButton,
       reportElementId: "stateReportGrid",
-      mapIds: [],
+      mapIds: ["stateSchoolMap"],
       fileName: buildPrintReportFileName("state"),
       paperFormat: "letter",
     });
