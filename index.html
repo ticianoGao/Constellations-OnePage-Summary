@@ -481,10 +481,36 @@
                       </li>
                     </ul>
                   </div>
-
                   <h3>Statewide Demographic Participation</h3>
 
-                  <div class="chart-js-section">
+                  <div
+                    class="state-demographic-toggle"
+                    role="tablist"
+                    aria-label="Choose demographic comparison"
+                  >
+                    <button
+                      class="state-demographic-toggle-button active"
+                      type="button"
+                      data-state-demographic-view="race"
+                      aria-selected="true"
+                    >
+                      Race/Ethnicity
+                    </button>
+
+                    <button
+                      class="state-demographic-toggle-button"
+                      type="button"
+                      data-state-demographic-view="gender"
+                      aria-selected="false"
+                    >
+                      Gender
+                    </button>
+                  </div>
+
+                  <div
+                    class="chart-js-section state-demographic-chart-section"
+                    id="stateRaceSection"
+                  >
                     <h4>Race/Ethnicity Comparison</h4>
 
                     <div class="chart-box double-chart-box">
@@ -492,7 +518,11 @@
                     </div>
                   </div>
 
-                  <div class="chart-js-section">
+                  <div
+                    class="chart-js-section state-demographic-chart-section"
+                    id="stateGenderSection"
+                    hidden
+                  >
                     <h4>Gender Comparison</h4>
 
                     <div class="chart-box gender-chart-box">
@@ -545,19 +575,21 @@
 
                     <ul class="info-list">
                       <li>
-                        This map displays schools in the state of Georgia.
+                        This map displays Georgia schools that reported at least
+                        one computer science course.
                       </li>
 
                       <li>
                         Each point represents a school location from the
                         Computing in the Community ArcGIS school layer. With
                         different colors representing different school types
-                        (Elementary, Middle, High, K-12).
+                        (Elementary, Middle, High, K-12). The point can also be
+                        clicked to view school information.
                       </li>
                     </ul>
                   </div>
 
-                  <h3>Georgia Schools Map</h3>
+                  <h3>Georgia Schools Offering CS Course</h3>
 
                   <div class="card-map-wrap state-school-map-wrap">
                     <div
@@ -620,11 +652,6 @@
                 </div>
 
                 <h3>Building CS Opportunities Across Georgia</h3>
-
-                <p class="future-suggestion-subtitle">
-                  What the statewide data shows and where additional
-                  opportunities may exist.
-                </p>
 
                 <div
                   class="recommendation-list"

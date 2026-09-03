@@ -2700,3 +2700,56 @@ a:hover {
 .state-access-table tbody tr:last-child td {
   border-bottom: none;
 }
+
+/* Statewide demographic chart toggle */
+
+.state-participation-card .state-demographic-toggle {
+  display: flex;
+  width: 100%;
+  margin: 12px 0 6px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.state-participation-card .state-demographic-toggle-button {
+  flex: 1;
+  border: none;
+  border-right: 1px solid #d9d9d9;
+  background: #f5f7fa;
+  color: var(--blue);
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.state-participation-card .state-demographic-toggle-button:last-child {
+  border-right: none;
+}
+
+.state-participation-card .state-demographic-toggle-button:hover {
+  background: #eeeeee;
+}
+
+.state-participation-card .state-demographic-toggle-button.active {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.state-participation-card .state-demographic-chart-section {
+  margin-top: 6px !important;
+  padding-top: 0 !important;
+  border-top: none !important;
+}
+
+.state-participation-card .state-demographic-chart-section[hidden] {
+  display: none !important;
+}
+
+/* Reduce spacing between demographic charts in School report only */
+#schoolGrid .participation-card .chart-js-section + .chart-js-section {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

@@ -5089,6 +5089,56 @@ stateGenderChart = createStateDemographicChart(
   12,
 );
 
+/* Statewide demographic chart toggle */
+
+const stateDemographicToggleButtons = document.querySelectorAll(
+  ".state-demographic-toggle-button",
+);
+
+const stateRaceSection = document.getElementById("stateRaceSection");
+
+const stateGenderSection = document.getElementById("stateGenderSection");
+
+function setStateDemographicView(view) {
+  const showRace = view === "race";
+
+  if (stateRaceSection) {
+    stateRaceSection.hidden = !showRace;
+  }
+
+  if (stateGenderSection) {
+    stateGenderSection.hidden = showRace;
+  }
+
+  stateDemographicToggleButtons.forEach((button) => {
+    const isActive = button.dataset.stateDemographicView === view;
+
+    button.classList.toggle("active", isActive);
+
+    button.setAttribute("aria-selected", String(isActive));
+  });
+
+  /*
+   * Chart.js may need to recalculate its size after
+   * being changed from hidden to visible.
+   */
+  requestAnimationFrame(() => {
+    if (showRace && stateRaceEthnicityChart) {
+      stateRaceEthnicityChart.resize();
+    }
+
+    if (!showRace && stateGenderChart) {
+      stateGenderChart.resize();
+    }
+  });
+}
+
+stateDemographicToggleButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setStateDemographicView(button.dataset.stateDemographicView);
+  });
+});
+
 /* ArcGIS maps inside report cards */
 
 if (typeof require !== "undefined") {
@@ -5757,8 +5807,11 @@ if (typeof require !== "undefined") {
       const schoolLayer = new FeatureLayer({
         id: "stateSchoolsLayer",
         url: schoolLayerUrl,
-        title: "Schools",
+        title: "Schools Offering CS",
         outFields: ["*"],
+
+        // Show only schools reporting at least one CS course.
+        definitionExpression: "NumCSCours > 0",
 
         /*
          * Force the school layer to display at every zoom level.
@@ -7131,7 +7184,15 @@ async function exportReportAsPrintPdf({
   For the district report, prevent the Academic Proficiency
   card from starting at the very bottom of page 1.
 */
+    /*
+     * Prevent selected cards from being cut across page boundaries.
+     */
+
     let districtAcademicStartY = null;
+    let stateOpportunitiesStartY = null;
+
+    const reportRect = reportElement.getBoundingClientRect();
+    const canvasScaleY = canvas.height / reportRect.height;
 
     if (reportElementId === "districtReportGrid") {
       const academicCard = reportElement.querySelector(
@@ -7139,13 +7200,23 @@ async function exportReportAsPrintPdf({
       );
 
       if (academicCard) {
-        const reportRect = reportElement.getBoundingClientRect();
         const academicRect = academicCard.getBoundingClientRect();
-
-        const canvasScaleY = canvas.height / reportRect.height;
 
         districtAcademicStartY =
           (academicRect.top - reportRect.top) * canvasScaleY;
+      }
+    }
+
+    if (reportElementId === "stateReportGrid") {
+      const opportunitiesCard = reportElement.querySelector(
+        ".state-future-suggestion-card",
+      );
+
+      if (opportunitiesCard) {
+        const opportunitiesRect = opportunitiesCard.getBoundingClientRect();
+
+        stateOpportunitiesStartY =
+          (opportunitiesRect.top - reportRect.top) * canvasScaleY;
       }
     }
 
@@ -7164,6 +7235,19 @@ async function exportReportAsPrintPdf({
         districtAcademicStartY < sourcePageHeight
       ) {
         sliceHeight = Math.max(1, districtAcademicStartY - 2);
+      }
+
+      /*
+       * Statewide report:
+       * start the opportunities card on the next page rather
+       * than cutting through its heading.
+       */
+      if (
+        stateOpportunitiesStartY !== null &&
+        stateOpportunitiesStartY > sourceY &&
+        stateOpportunitiesStartY < sourceY + sliceHeight
+      ) {
+        sliceHeight = Math.max(1, stateOpportunitiesStartY - sourceY);
       }
 
       const pageCanvas = document.createElement("canvas");
