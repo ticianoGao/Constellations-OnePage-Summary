@@ -707,19 +707,7 @@ function buildDropdownFromCsvRows(rows) {
     });
   });
 
-  selectedReportValue = "";
-  selectedReportType = null;
-  selectedSchoolId = null;
-  selectedDistrictName = null;
-  selectedSystemId = null;
-  selectedGradeRange = null;
-  selectedLatitude = null;
-  selectedLongitude = null;
-
-  selectedValue.textContent = "Choose a School District, School, or Statewide";
-
-  hideAllReportGrids();
-  updateCurrentReportSelection();
+  selectDropdownOption(statewideOption);
 }
 
 function loadSchoolLookupCsv() {
