@@ -1567,6 +1567,10 @@ function toReadinessShare(value) {
   return number / 100;
 }
 
+/* Improved weighting for parity dimension calculation
+  using the product of the school share and the CS share as the weight for each group.
+  Score is calculated as the sum of the product of each group's CS share against its weight.
+*/
 function calculateParityDimension(attributes, fieldPairs) {
   const totalStudents = toReadinessNumber(attributes.StudentCou);
 
@@ -1586,6 +1590,7 @@ function calculateParityDimension(attributes, fieldPairs) {
       return {
         schoolShare: toReadinessShare(attributes[field.schoolField]),
         csShare: toReadinessShare(attributes[field.csField]),
+        groupWeight: toReadinessShare(attributes[field.schoolField]) * toReadinessShare(attributes[field.csField]),
       };
     })
     .filter((group) => {
@@ -1614,6 +1619,7 @@ function calculateParityDimension(attributes, fieldPairs) {
     return null;
   }
 
+
   const schoolShareTotal = groups.reduce(
     (sum, group) => sum + group.schoolShare,
     0,
@@ -1625,15 +1631,14 @@ function calculateParityDimension(attributes, fieldPairs) {
     return null;
   }
 
-  const distributionDifference = groups.reduce((sum, group) => {
-    const normalizedSchoolShare = group.schoolShare / schoolShareTotal;
+  const weightedScore = groups.reduce((sum, group) => {
 
-    const normalizedCsShare = group.csShare / csShareTotal;
+    const weightedGroupScore = group.csShare * group.groupWeight;
 
-    return sum + Math.abs(normalizedCsShare - normalizedSchoolShare);
+    return sum + weightedGroupScore;
   }, 0);
 
-  return clampReadinessScore(100 * (1 - 0.5 * distributionDifference));
+  return clampReadinessScore(100 * weightedScore);
 }
 
 function calculateSchoolReadinessE(attributes) {
