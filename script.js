@@ -13,7 +13,7 @@ if (menuButton && mainNav) {
   });
 }
 
-/* Step 1 searchable dropdown */
+/* Step 1 searchable dropdown test*/
 
 const stateReportGrid = document.getElementById("stateReportGrid");
 const schoolGrid = document.getElementById("schoolGrid");
