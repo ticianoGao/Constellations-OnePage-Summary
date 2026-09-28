@@ -1240,9 +1240,14 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
     Compare approved-course count with the 75th percentile
     among comparable schools.
   */
-  const schoolApprovedCourses = toReadinessNumber(attributes.NumApprove);
 
-  if (schoolApprovedCourses === null || schoolApprovedCourses < 0) {
+  /* New College and Career Preparation calculation:
+    Compare the number of students in Category 1 courses ONLY
+    with the 75th percentile among comparable schools. 
+  */
+  const schoolApprovedCat1Courses = toReadinessNumber(attributes.NumCategor);
+
+  if (schoolApprovedCat1Courses === null || schoolApprovedCat1Courses < 0) {
     return {
       score: 0,
       schoolValue: null,
@@ -1254,7 +1259,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
 
   const peerValues = getComparableReadinessPeers(attributes, statewideFeatures)
     .map((peerAttributes) => {
-      return toReadinessNumber(peerAttributes.NumApprove);
+      return toReadinessNumber(peerAttributes.NumCategor);
     })
     .filter((value) => {
       return value !== null && value >= 0;
@@ -1265,7 +1270,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   if (peerBenchmark === null) {
     return {
       score: 0,
-      schoolValue: schoolApprovedCourses,
+      schoolValue: schoolApprovedCat1Courses,
       peerBenchmark: null,
       peerCount: peerValues.length,
       method: "approvedCourseBenchmark",
@@ -1274,14 +1279,14 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
 
   const score =
     peerBenchmark === 0
-      ? schoolApprovedCourses > 0
+      ? schoolApprovedCat1Courses > 0
         ? 100
         : 0
-      : clampReadinessScore((schoolApprovedCourses / peerBenchmark) * 100);
+      : clampReadinessScore((schoolApprovedCat1Courses / peerBenchmark) * 100);
 
   return {
     score,
-    schoolValue: schoolApprovedCourses,
+    schoolValue: schoolApprovedCat1Courses,
     peerBenchmark,
     peerCount: peerValues.length,
     method: "approvedCourseBenchmark",
