@@ -2036,8 +2036,30 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
     "schoolCourseAccessOtherInfo",
   );
 
+  const courseAccessElementaryHeader = document.getElementById(
+    "schoolCourseAccessElementaryHeader",
+  );
+
+  const courseAccessHighSchoolInfo = document.getElementById(
+    "schoolCourseAccessHighSchoolHeader",
+  );
+
+  const isElementaryMiddleSchool = schoolType === "E" || schoolType === "M";
+  const isHighK12School = schoolType === "H" || schoolType === "K12";
+
+  if (courseAccessElementaryHeader) {
+    courseAccessElementaryHeader.hidden = !isElementaryMiddleSchool;
+    courseAccessElementaryHeader.style.display = isElementaryMiddleSchool ? "" : "none";
+  }
+
+  if (courseAccessHighSchoolInfo) {
+    courseAccessHighSchoolInfo.hidden = !isHighK12School;
+    courseAccessHighSchoolInfo.style.display = isHighK12School ? "" : "none";
+  }
+
   const isElementarySchool = schoolType === "E";
   const usesApprovedCourseBenchmark = ["M", "H", "K12"].includes(schoolType);
+
 
   if (courseAccessElementaryInfo) {
     courseAccessElementaryInfo.hidden = !isElementarySchool;
