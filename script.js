@@ -1490,6 +1490,8 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
 
   const totalStudents = toReadinessNumber(attributes.StudentCou);
 
+  const teachableSections = 7;
+
   // Missing data, zero enrollments, or no teacher receives 0.
   if (
     csEnrollments === null ||
@@ -1507,7 +1509,7 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
 
   // Declaring csTeachersCapacity as csTeachers * 7 * number of enrolled CS students
   // Using 7 for 7 teachable sections (6 instruction, 1 planning)
-  const csTeachersCapacity = csTeachers * 7 * csEnrollments;
+  const csTeachersCapacity = csTeachers * teachableSections * csEnrollments;
 
   const schoolRatio = csTeachersCapacity / totalStudents;
 
@@ -1519,7 +1521,7 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
 
       const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
 
-      const peerTeachersCapacity = peerTeachers * 7 * peerEnrollments;
+      const peerTeachersCapacity = peerTeachers * teachableSections * peerEnrollments;
 
       if (
         peerEnrollments === null ||
