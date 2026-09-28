@@ -1483,6 +1483,8 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
 
   const csTeachers = toReadinessNumber(attributes.NumCSTeach);
 
+  const totalStudents = toReadinessNumber(attributes.StudentCou);
+
   // Missing data, zero enrollments, or no teacher receives 0.
   if (
     csEnrollments === null ||
@@ -1498,13 +1500,21 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
     };
   }
 
-  const schoolRatio = csEnrollments / csTeachers;
+  // Declaring csTeachersCapacity as csTeachers * 7 * number of enrolled CS students
+  // Using 7 for 7 teachable sections (6 instruction, 1 planning)
+  const csTeachersCapacity = csTeachers * 7 * csEnrollments;
+
+  const schoolRatio = csTeachersCapacity / totalStudents;
 
   const peerRatios = getComparableReadinessPeers(attributes, statewideFeatures)
     .map((peerAttributes) => {
       const peerEnrollments = toReadinessNumber(peerAttributes.NumCSEnrol);
 
       const peerTeachers = toReadinessNumber(peerAttributes.NumCSTeach);
+
+      const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
+
+      const peerTeachersCapacity = peerTeachers * 7 * peerEnrollments;
 
       if (
         peerEnrollments === null ||
@@ -1515,7 +1525,7 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
         return null;
       }
 
-      return peerEnrollments / peerTeachers;
+      return peerTeachersCapacity / peerStudents;
     })
     .filter((value) => value !== null);
 
