@@ -1201,9 +1201,18 @@ function getComparableReadinessPeers(attributes, statewideFeatures = []) {
 }
 
 /* A — Course Access */
+/*
+  Course Access is calculated as the ratio of CS enrolled students to total students,
+  multiplied by the number of school years (determined to be 4).
+  
+  For high schools, only students enrolled in Category 1 courses are considered.
 
+  The resulting score represents the total ratio of students that may have access to CS courses over the school years.
+*/
 function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   const schoolType = normalizeReadinessSchoolType(attributes.SchoolType);
+
+  const schoolYears = 4;
 
   /*
   Elementary access:
@@ -1213,25 +1222,30 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   schools because the available data do not consistently
   measure course sequence or progression.
 */
-  if (schoolType === "E") {
+  if (schoolType === "E" || schoolType === "M") {
     const schoolCourseCount = toReadinessNumber(attributes.NumCSCours);
+    
+    const csStudents = toReadinessNumber(attributes.NumCSEnroll);
+    const totalStudents = toReadinessNumber(attributes.StudentCou);
 
-    if (schoolCourseCount === null || schoolCourseCount < 0) {
+    const courseAccessPotential = toReadinessNumber((csStudents / totalStudents) * schoolYears);
+
+    if (courseAccessPotential === null || courseAccessPotential < 0) {
       return {
         score: 0,
         schoolValue: null,
         peerBenchmark: null,
         peerCount: 0,
-        method: "elementaryCourseAccess",
+        method: "elementaryMiddleCourseAccess",
       };
     }
 
     return {
-      score: schoolCourseCount > 0 ? 100 : 0,
+      score: courseAccessPotential,
       schoolValue: schoolCourseCount,
       peerBenchmark: null,
       peerCount: 0,
-      method: "elementaryCourseAccess",
+      method: "elementaryMiddleCourseAccess",
     };
   }
 
@@ -1247,7 +1261,9 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   */
   const schoolApprovedCat1Courses = toReadinessNumber(attributes.NumCategor);
 
-  if (schoolApprovedCat1Courses === null || schoolApprovedCat1Courses < 0) {
+  const courseCategory1AccessPotential = toReadinessNumber((schoolApprovedCat1Courses / totalStudents) * schoolYears);
+
+  if (courseCategory1AccessPotential === null || courseCategory1AccessPotential < 0) {
     return {
       score: 0,
       schoolValue: null,
@@ -1259,7 +1275,12 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
 
   const peerValues = getComparableReadinessPeers(attributes, statewideFeatures)
     .map((peerAttributes) => {
-      return toReadinessNumber(peerAttributes.NumCategor);
+      const peerApprovedCat1Courses = toReadinessNumber(peerAttributes.NumCategor);
+      const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
+      
+      const peerCategory1AccessPotential = toReadinessNumber((peerApprovedCat1Courses / peerStudents) * schoolYears);
+      
+      return peerCategory1AccessPotential
     })
     .filter((value) => {
       return value !== null && value >= 0;
@@ -1282,14 +1303,14 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
       ? schoolApprovedCat1Courses > 0
         ? 100
         : 0
-      : clampReadinessScore((schoolApprovedCat1Courses / peerBenchmark) * 100);
+      : clampReadinessScore((courseCategory1AccessPotential / peerBenchmark) * 100);
 
   return {
     score,
     schoolValue: schoolApprovedCat1Courses,
     peerBenchmark,
     peerCount: peerValues.length,
-    method: "approvedCourseBenchmark",
+    method: "approvedCategory1CourseBenchmark",
   };
 }
 
