@@ -1643,7 +1643,7 @@ function calculateParityDimension(attributes, fieldPairs) {
   }
 
 
-  const schoolShareTotal = grouss.reduce(
+  const schoolShareTotal = groups.reduce(
     (sum, group) => sum + group.schoolShare,
     0,
   );
