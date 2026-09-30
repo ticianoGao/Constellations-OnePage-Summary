@@ -1570,7 +1570,7 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
   }
 
   return {
-    score: clampReadinessScore((peerBenchmark / schoolRatio) * 100),
+    score: clampReadinessScore((schoolRatio / peerBenchmark) * 100),
     schoolRatio,
     peerBenchmark,
     peerCount: peerRatios.length,
@@ -1643,7 +1643,7 @@ function calculateParityDimension(attributes, fieldPairs) {
   }
 
 
-  const schoolShareTotal = groups.reduce(
+  const schoolShareTotal = grouss.reduce(
     (sum, group) => sum + group.schoolShare,
     0,
   );
@@ -1661,7 +1661,12 @@ function calculateParityDimension(attributes, fieldPairs) {
     return sum + weightedGroupScore;
   }, 0);
 
-  return clampReadinessScore(100 * weightedScore);
+  const groupWeightTotal = groups.reduce((sum, group) => {
+    
+    return sum + group.groupWeight;
+  }, 0);
+
+  return clampReadinessScore((weightedScore / groupWeightTotal) * 100);
 }
 
 function calculateSchoolReadinessE(attributes) {
