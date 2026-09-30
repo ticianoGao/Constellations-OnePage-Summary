@@ -1124,7 +1124,7 @@
                             resources.
                           </li>
                           <li id="schoolReadinessHighInfo">
-                            For <strong>Middle, High and K-12 schools</strong>, the
+                            For <strong>High and K-12 schools</strong>, the
                             <strong>CS Readiness Score</strong> includes five
                             components: College and Career Preparation, CS Enrollment/Total
                             Enrollment, Course Progression, Instructional
@@ -1132,7 +1132,7 @@
                           </li>
 
                           <li id="schoolReadinessEarlyInfo">
-                            For <strong>Elementary  Schools</strong>,
+                            For <strong>Elementary and Middle Schools</strong>,
                             the <strong>CS Readiness Score</strong> uses four
                             components: Student Preparation, CS Enrollment/Total
                             Enrollment, Instructional Capacity, and
@@ -1276,16 +1276,25 @@
                       <li>
                         Instructional Capacity measures the school's CS teaching
                         capacity relative to the amount of CS course enrollment
-                        it serves.
+                        it serves and its total student population.
                       </li>
 
                       <li>
-                        It is calculated as total CS course enrollments divided
-                        by the number of CS teachers. Because a lower
-                        enrollment-to-teacher ratio represents greater
+                        Instructional Capacity uses two elements: 
+                        <br>
+                        <strong>(1)</strong> the number of CS teachers times 7 teachable sections 
+                        (6 instructional, 1 planning) times the number of CS enrollments.
+                        <strong>(2)</strong> the total number of students.
+                        <br><br>
+                        It is calculated by dividing the total capacity by the total number of students.
+                        Because a lower enrollment-to-teacher ratio represents greater
                         instructional capacity, the school is compared with the
                         25th percentile ratio among Georgia schools of the same
-                        school type. Score = (Peer benchmark ratio ÷ School
+                        school type. 
+                        <br><br>
+                        School score = (# of CS teachers x 7 sections x # of CS enrolled students) / total # of students
+                        <br><br>
+                        Readiness score = (Peer benchmark ratio ÷ School
                         ratio) x 100, capped at 100.
                       </li>
 
