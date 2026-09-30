@@ -1124,17 +1124,17 @@
                             resources.
                           </li>
                           <li id="schoolReadinessHighInfo">
-                            For <strong>High and K-12 schools</strong>, the
+                            For <strong>Middle, High and K-12 schools</strong>, the
                             <strong>CS Readiness Score</strong> includes five
-                            components: Course Access, CS Enrollment/Total
+                            components: College and Career Preparation, CS Enrollment/Total
                             Enrollment, Course Progression, Instructional
                             Capacity, and Participation Equity.
                           </li>
 
                           <li id="schoolReadinessEarlyInfo">
-                            For <strong>Elementary and Middle Schools</strong>,
+                            For <strong>Elementary  Schools</strong>,
                             the <strong>CS Readiness Score</strong> uses four
-                            components: Course Access, CS Enrollment/Total
+                            components: Student Preparation, CS Enrollment/Total
                             Enrollment, Instructional Capacity, and
                             Participation Equity. Course Progression is
                             currently not included because the available data do
@@ -1163,22 +1163,38 @@
                     <h4 id="schoolCourseAccessHighSchoolHeader">College and Career Preparation</h4>
 
                     <ul class="info-list">
-                      <li>
-                        Course Access measures the extent to which the school
+                      <li id="schoolCourseAccessElementaryExplain">
+                        Student Preparation measures the extent to which the school
                         provides students with access to computer science
                         coursework.
                       </li>
 
+
+                      <li id="schoolCourseAccessOtherHeaderExplain">
+                        College and Career Preparation measures the extent to which the school
+                        provides students with access to computer science
+                        coursework.
+                      </li>
+
+
                       <li id="schoolCourseAccessElementaryInfo">
-                        For elementary schools, the score is 100 if at least one
-                        CS course is offered and 0 if no CS course is offered.
+                        For elementary schools, the score is based on
+                        the number of Category 1 (SB108 approved) courses, the number
+                        of total students at the school, and the 4 years of school education.
+                        <br><br>
+                        School score = (Approved Category 1 courses ÷ Total students) x 4
                       </li>
 
                       <li id="schoolCourseAccessOtherInfo">
-                        For middle, high, and K-12 schools, the number of
-                        Georgia DOE-approved CS courses is compared with the
-                        75th percentile among Georgia schools of the same school
-                        type. Score = (Approved CS courses ÷ Peer benchmark) x
+                        For middle, high, and K-12 schools, the score is based on
+                        the number of Category 1 (SB108 approved) courses, the number
+                        of total students at the school, and the 4 years of school education.
+                        This score is compared with the 75th percentile among Georgia schools
+                        of the same school type, using the same calculation.
+                        <br><br>
+                        School score = (Approved Category 1 courses ÷ Total students) x 4
+                        <br><br>
+                        Readiness score = (School benchmark score ÷ Peer benchmark score) x
                         100, capped at 100.
                       </li>
                     </ul>
@@ -1341,8 +1357,18 @@
                             class="readiness-component-label readiness-component-info-link"
                             type="button"
                             data-readiness-info-target="schoolCourseAccessInfo"
+                            id="schoolCourseAccessEarlyInfo"
                           >
-                            Course Access
+                            Student Preparation
+                          </button>
+
+                          <button
+                            class="readiness-component-label readiness-component-info-link"
+                            type="button"
+                            data-readiness-info-target="schoolCourseAccessInfo"
+                            id="schoolCourseAccessHighInfo"
+                          >
+                            College and Career Preparation
                           </button>
 
                           <div class="readiness-component-track">

@@ -1260,7 +1260,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
     with the 75th percentile among comparable schools. 
   */
   const schoolApprovedCat1Courses = toReadinessNumber(attributes.NumCategor);
-
+  const totalStudents = toReadinessNumber(attributes.StudentCou);
   const courseCategory1AccessPotential = toReadinessNumber((schoolApprovedCat1Courses / totalStudents) * schoolYears);
 
   if (courseCategory1AccessPotential === null || courseCategory1AccessPotential < 0) {
@@ -2072,17 +2072,43 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
     "schoolCourseAccessHighSchoolHeader",
   );
 
+  const courseAccessElementaryExplain = document.getElementById(
+    "schoolCourseAccessElementaryExplain",
+  );
+
+  const courseAccessOtherHeaderExplain = document.getElementById(
+    "schoolCourseAccessOtherHeaderExplain",
+  );
+
+  const courseAccessElementaryButton = document.getElementById(
+    "schoolCourseAccessEarlyInfo",
+  );
+
+  const courseAccessHighButton = document.getElementById(
+    "schoolCourseAccessHighInfo",
+  );
+
   const isElementaryMiddleSchool = schoolType === "E" || schoolType === "M";
   const isHighK12School = schoolType === "H" || schoolType === "K12";
 
   if (courseAccessElementaryHeader) {
+    courseAccessElementaryButton.hidden = !isElementaryMiddleSchool;
     courseAccessElementaryHeader.hidden = !isElementaryMiddleSchool;
+    courseAccessElementaryExplain.hidden = !isElementaryMiddleSchool;
+
+    courseAccessElementaryButton.style.display = isElementaryMiddleSchool ? "" : "none";
     courseAccessElementaryHeader.style.display = isElementaryMiddleSchool ? "" : "none";
+    courseAccessElementaryExplain.style.display = isElementaryMiddleSchool ? "" : "none";
   }
 
   if (courseAccessHighSchoolInfo) {
+    courseAccessHighButton.hidden = !isHighK12School;
     courseAccessHighSchoolInfo.hidden = !isHighK12School;
+    courseAccessOtherHeaderExplain.hidden = !isHighK12School;
+
+    courseAccessHighButton.style.display = isHighK12School ? "" : "none";
     courseAccessHighSchoolInfo.style.display = isHighK12School ? "" : "none";
+    courseAccessOtherHeaderExplain.style.display = isHighK12School ? "" : "none";
   }
 
   const isElementarySchool = schoolType === "E";
