@@ -1225,10 +1225,10 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   if (schoolType === "E" || schoolType === "M") {
     const schoolCourseCount = toReadinessNumber(attributes.NumCSCours);
     
-    const csStudents = toReadinessNumber(attributes.NumCSEnroll);
+    const csStudents = toReadinessNumber(attributes.NumCSEnrol);
     const totalStudents = toReadinessNumber(attributes.StudentCou);
 
-    const courseAccessPotential = toReadinessNumber((csStudents / totalStudents) * schoolYears);
+    const courseAccessPotential = toReadinessNumber((csStudents / totalStudents));
 
     if (courseAccessPotential === null || courseAccessPotential < 0) {
       return {
@@ -1241,7 +1241,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
     }
 
     return {
-      score: courseAccessPotential,
+      score: courseAccessPotential * 100,
       schoolValue: schoolCourseCount,
       peerBenchmark: null,
       peerCount: 0,
