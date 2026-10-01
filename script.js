@@ -1267,49 +1267,50 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
     return {
       score: 0,
       schoolValue: null,
-      peerBenchmark: null,
-      peerCount: 0,
+      // peerBenchmark: null,
+      // peerCount: 0,
       method: "approvedCourseBenchmark",
     };
   }
 
-  const peerValues = getComparableReadinessPeers(attributes, statewideFeatures)
-    .map((peerAttributes) => {
-      const peerApprovedCat1Courses = toReadinessNumber(peerAttributes.NumCategor);
-      const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
+  // removing peer benchmark calculation
+  // const peerValues = getComparableReadinessPeers(attributes, statewideFeatures)
+  //   .map((peerAttributes) => {
+  //     const peerApprovedCat1Courses = toReadinessNumber(peerAttributes.NumCategor);
+  //     const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
       
-      const peerCategory1AccessPotential = toReadinessNumber((peerApprovedCat1Courses / peerStudents) * schoolYears);
+  //     const peerCategory1AccessPotential = toReadinessNumber((peerApprovedCat1Courses / peerStudents) * schoolYears);
       
-      return peerCategory1AccessPotential
-    })
-    .filter((value) => {
-      return value !== null && value >= 0;
-    });
+  //     return peerCategory1AccessPotential
+  //   })
+  //   .filter((value) => {
+  //     return value !== null && value >= 0;
+  //   });
 
-  const peerBenchmark = calculatePercentile(peerValues, 0.75);
+  // const peerBenchmark = calculatePercentile(peerValues, 0.75);
 
-  if (peerBenchmark === null) {
-    return {
-      score: 0,
-      schoolValue: schoolApprovedCat1Courses,
-      peerBenchmark: null,
-      peerCount: peerValues.length,
-      method: "approvedCourseBenchmark",
-    };
-  }
+  // if (peerBenchmark === null) {
+  //   return {
+  //     score: 0,
+  //     schoolValue: schoolApprovedCat1Courses,
+  //     peerBenchmark: null,
+  //     peerCount: peerValues.length,
+  //     method: "approvedCourseBenchmark",
+  //   };
+  // }
 
   const score =
     peerBenchmark === 0
       ? schoolApprovedCat1Courses > 0
         ? 100
         : 0
-      : clampReadinessScore((courseCategory1AccessPotential / peerBenchmark) * 100);
+      : clampReadinessScore((courseCategory1AccessPotential) * 100);
 
   return {
     score,
     schoolValue: schoolApprovedCat1Courses,
-    peerBenchmark,
-    peerCount: peerValues.length,
+    // peerBenchmark,
+    // peerCount: peerValues.length,
     method: "approvedCategory1CourseBenchmark",
   };
 }
