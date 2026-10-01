@@ -1511,7 +1511,7 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
 
   const totalStudents = toReadinessNumber(attributes.StudentCou);
 
-  const teachableSections = 7;
+  const teachableSections = 6;
 
   // Missing data, zero enrollments, or no teacher receives 0.
   if (
