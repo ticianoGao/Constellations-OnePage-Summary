@@ -1513,6 +1513,8 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
 
   const teachableSections = 6;
 
+  const idealStudentTeacherRatio = 30;
+
   // Missing data, zero enrollments, or no teacher receives 0.
   if (
     csEnrollments === null ||
@@ -1523,57 +1525,59 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
     return {
       score: 0,
       schoolRatio: null,
-      peerBenchmark: null,
-      peerCount: 0,
+      // peerBenchmark: null,
+      // peerCount: 0,
     };
   }
 
-  // Declaring csTeachersCapacity as csTeachers * 7 * number of enrolled CS students
-  // Using 7 for 7 teachable sections (6 instruction, 1 planning)
-  const csTeachersCapacity = csTeachers * teachableSections * csEnrollments;
+  // Declaring csTeachersCapacity as csTeachers * 6 * 30
+  // Using 6 out of 7 total sections (6 instruction, 1 planning)
+  // Using 30 as an ideal student-to-teacher classroom ratio
+  const csTeachersCapacity = csTeachers * teachableSections * idealStudentTeacherRatio;
 
   const schoolRatio = csTeachersCapacity / totalStudents;
 
-  const peerRatios = getComparableReadinessPeers(attributes, statewideFeatures)
-    .map((peerAttributes) => {
-      const peerEnrollments = toReadinessNumber(peerAttributes.NumCSEnrol);
+  // removing peer benchmark calculation
+  // const peerRatios = getComparableReadinessPeers(attributes, statewideFeatures)
+  //   .map((peerAttributes) => {
+  //     const peerEnrollments = toReadinessNumber(peerAttributes.NumCSEnrol);
 
-      const peerTeachers = toReadinessNumber(peerAttributes.NumCSTeach);
+  //     const peerTeachers = toReadinessNumber(peerAttributes.NumCSTeach);
 
-      const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
+  //     const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
 
-      const peerTeachersCapacity = peerTeachers * teachableSections * peerEnrollments;
+  //     const peerTeachersCapacity = peerTeachers * teachableSections * peerEnrollments;
 
-      if (
-        peerEnrollments === null ||
-        peerTeachers === null ||
-        peerEnrollments <= 0 ||
-        peerTeachers <= 0
-      ) {
-        return null;
-      }
+  //     if (
+  //       peerEnrollments === null ||
+  //       peerTeachers === null ||
+  //       peerEnrollments <= 0 ||
+  //       peerTeachers <= 0
+  //     ) {
+  //       return null;
+  //     }
 
-      return peerTeachersCapacity / peerStudents;
-    })
-    .filter((value) => value !== null);
+  //     return peerTeachersCapacity / peerStudents;
+  //   })
+  //   .filter((value) => value !== null);
 
-  // A lower ratio is better, so use the 25th percentile.
-  const peerBenchmark = calculatePercentile(peerRatios, 0.25);
+  // // A lower ratio is better, so use the 25th percentile.
+  // const peerBenchmark = calculatePercentile(peerRatios, 0.25);
 
-  if (peerBenchmark === null || peerBenchmark <= 0) {
-    return {
-      score: 0,
-      schoolRatio,
-      peerBenchmark: null,
-      peerCount: peerRatios.length,
-    };
-  }
+  // if (peerBenchmark === null || peerBenchmark <= 0) {
+  //   return {
+  //     score: 0,
+  //     schoolRatio,
+  //     peerBenchmark: null,
+  //     peerCount: peerRatios.length,
+  //   };
+  // }
 
   return {
-    score: clampReadinessScore((schoolRatio / peerBenchmark) * 100),
+    score: clampReadinessScore(schoolRatio * 100),
     schoolRatio,
-    peerBenchmark,
-    peerCount: peerRatios.length,
+    // peerBenchmark,
+    // peerCount: peerRatios.length,
   };
 }
 
