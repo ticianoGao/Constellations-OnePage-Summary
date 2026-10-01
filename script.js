@@ -1234,8 +1234,8 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
       return {
         score: 0,
         schoolValue: null,
-        peerBenchmark: null,
-        peerCount: 0,
+        // peerBenchmark: null,
+        // peerCount: 0,
         method: "elementaryMiddleCourseAccess",
       };
     }
@@ -1243,8 +1243,8 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
     return {
       score: courseAccessPotential * 100,
       schoolValue: schoolCourseCount,
-      peerBenchmark: null,
-      peerCount: 0,
+      // peerBenchmark: null,
+      // peerCount: 0,
       method: "elementaryMiddleCourseAccess",
     };
   }
@@ -1299,12 +1299,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   //   };
   // }
 
-  const score =
-    peerBenchmark === 0
-      ? schoolApprovedCat1Courses > 0
-        ? 100
-        : 0
-      : clampReadinessScore((courseCategory1AccessPotential) * 100);
+  const score = clampReadinessScore((courseCategory1AccessPotential) * 100);
 
   return {
     score,
