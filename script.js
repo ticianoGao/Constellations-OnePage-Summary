@@ -1591,8 +1591,9 @@ function toReadinessShare(value) {
 }
 
 /* Improved weighting for parity dimension calculation
-  using the product of the school share and the CS share as the weight for each group.
-  Score is calculated as the sum of the product of each group's CS share against its weight.
+  Using the CS share to calculate estimated group counts as represenations of the total student population.
+  Score is calculated using a summation of weighted group counts divided by the total student population to
+  create a weighted % ratio of the CS enrollment relative to the total student population.
 */
 function calculateParityDimension(attributes, fieldPairs) {
   const totalStudents = toReadinessNumber(attributes.StudentCou);
@@ -1613,7 +1614,7 @@ function calculateParityDimension(attributes, fieldPairs) {
       return {
         schoolShare: toReadinessShare(attributes[field.schoolField]),
         csShare: toReadinessShare(attributes[field.csField]),
-        groupWeight: toReadinessShare(attributes[field.schoolField]) * toReadinessShare(attributes[field.csField]),
+        csSharePercent: (toReadinessShare(attributes[field.csField]) / 100),
       };
     })
     .filter((group) => {
@@ -1654,19 +1655,18 @@ function calculateParityDimension(attributes, fieldPairs) {
     return null;
   }
 
-  const weightedScore = groups.reduce((sum, group) => {
+  const csWeightedPopCount = groups.reduce((sum, group) => {
 
-    const weightedGroupScore = group.csShare * group.groupWeight;
-
-    return sum + weightedGroupScore;
-  }, 0);
-
-  const groupWeightTotal = groups.reduce((sum, group) => {
+    const csWeightedGroupCount = Math.ceil(group.csSharePercent * totalStudents);
     
-    return sum + group.groupWeight;
+    return sum + csWeightedGroupCount;
   }, 0);
 
-  return clampReadinessScore((weightedScore / groupWeightTotal) * 100);
+  // Compare the weighted population against the total student population to get the weighted %
+  const csWeightedMeanPopRatio = csWeightedPopCount / totalStudents;
+
+  // Multiply by 10000 to convert the ratio to a scale of 0-100 for the readiness score.
+  return clampReadinessScore(csWeightedMeanPopRatio * 10000);
 }
 
 function calculateSchoolReadinessE(attributes) {
