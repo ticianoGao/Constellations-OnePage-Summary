@@ -2116,13 +2116,12 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
     courseAccessOtherHeaderExplain.style.display = isHighK12School ? "" : "none";
   }
 
-  const isElementarySchool = schoolType === "E";
-  const usesApprovedCourseBenchmark = ["M", "H", "K12"].includes(schoolType);
+  const usesApprovedCourseBenchmark = ["H", "K12"].includes(schoolType);
 
 
   if (courseAccessElementaryInfo) {
-    courseAccessElementaryInfo.hidden = !isElementarySchool;
-    courseAccessElementaryInfo.style.display = isElementarySchool ? "" : "none";
+    courseAccessElementaryInfo.hidden = !isElementaryMiddleSchool;
+    courseAccessElementaryInfo.style.display = isElementaryMiddleSchool ? "" : "none";
   }
 
   if (courseAccessOtherInfo) {
