@@ -1125,17 +1125,16 @@
                           </li>
                           <li id="schoolReadinessHighInfo">
                             For <strong>High and K-12 schools</strong>, the
-                            <strong>CS Readiness Score</strong> includes five
-                            components: College and Career Preparation, CS Enrollment/Total
-                            Enrollment, Course Progression, Instructional
-                            Capacity, and Participation Equity.
+                            <strong>CS Readiness Score</strong> includes four
+                            components: College and Career Preparation, Mathematics 
+                            Proficiency, Instructional Capacity, and Participation Equity.
                           </li>
 
                           <li id="schoolReadinessEarlyInfo">
                             For <strong>Elementary and Middle Schools</strong>,
                             the <strong>CS Readiness Score</strong> uses four
-                            components: Student Preparation, CS Enrollment/Total
-                            Enrollment, Instructional Capacity, and
+                            components: Student Preparation, Mathematics
+                            Proficiency, Instructional Capacity, and
                             Participation Equity. Course Progression is
                             currently not included because the available data do
                             not measure course sequence or progression at these
@@ -1178,90 +1177,38 @@
 
 
                       <li id="schoolCourseAccessElementaryInfo">
-                        For elementary schools, the score is based on
-                        the number of Category 1 (SB108 approved) courses, the number
-                        of total students at the school, and the 4 years of school education.
+                        For elementary and middle schools, the score is based on
+                        the ratio of CS enrolled students to the total enrolled students.
                         <br><br>
-                        School score = (Approved Category 1 courses ÷ Total students) x 4
+                        Readiness score = (CS enrolled students ÷ Total enrolled students)
                       </li>
 
                       <li id="schoolCourseAccessOtherInfo">
-                        For middle, high, and K-12 schools, the score is based on
+                        For high and K-12 schools, the score is based on
                         the number of Category 1 (SB108 approved) courses, the number
                         of total students at the school, and 4 years of school education.
-                        This score is compared with the 75th percentile among Georgia schools
-                        of the same school type, using the same calculation.
+
                         <br><br>
-                        School score = (Approved Category 1 courses ÷ Total students) x 4
-                        <br><br>
-                        Readiness score = (School benchmark score ÷ Peer benchmark score) x
-                        100, capped at 100.
+                        Readiness score = (Approved Category 1 courses ÷ Total students) x 4, capped at 100.
                       </li>
                     </ul>
                   </div>
 
                   <div
                     class="card-info-popup readiness-component-popup"
-                    id="schoolEnrollmentInfo"
+                    id="schoolMathProficiencyInfo"
                   >
                     <button class="card-info-close" type="button">×</button>
-                    <h4>CS Enrollment/Total Enrollment</h4>
+                    <h4>Mathematics Proficiency</h4>
 
                     <ul class="info-list">
-                      <li>
-                        CS Enrollment/Total Enrollment measures the level of CS
-                        course enrollment relative to the size of the school's
-                        student population.
-                      </li>
+                      <li id="">
+                        Mathematics Proficiency measures the total % of students marked as Distinguished
+                        or Proficient Learners per the Georgia Milestones End-of-Grade assessments.
 
-                      <li>
-                        It is calculated as total CS course enrollments divided
-                        by total student enrollment. This rate is compared with
-                        the 75th percentile among Georgia schools of the same
-                        school type. Score = (School enrollment rate ÷ Peer
-                        benchmark) x 100, capped at 100.
+                        <br><br>
+                        Readiness score = Distinguished Learner % + Proficient Learner %
                       </li>
-
-                      <li>
-                        CS enrollment counts course enrollments rather than
-                        unique students, so students enrolled in multiple CS
-                        courses may be counted more than once.
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div
-                    class="card-info-popup readiness-component-popup"
-                    id="schoolProgressionInfo"
-                  >
-                    <button class="card-info-close" type="button">×</button>
-                    <h4>Course Progression</h4>
-
-                    <ul class="info-list">
-                      <li>
-                        Course Progression measures whether students have
-                        opportunities to progress from introductory CS
-                        experiences to broader or more advanced coursework.
-                      </li>
-
-                      <li>
-                        For <strong>High and K-12 schools</strong>, The score is
-                        based on four milestones worth 25 points each: at least
-                        one foundational course, at least one intermediate or
-                        programming course, at least one advanced course, and at
-                        least three Georgia DOE-approved CS courses.
-                      </li>
-
-                      <!--
-                      <li>
-                        For <strong>Elementary and middle schools</strong>,
-                        Course Progression is currently not scored because the
-                        available data do not consistently measure course
-                        sequence or progression at these school levels. It is
-                        not shown and is excluded from the calculation of
-                        overall CS Readiness Score.
-                      </li>
-                      -->
                     </ul>
                   </div>
 
@@ -1410,7 +1357,38 @@
                       </div>
 
                       <!-- Component B -->
+                      <div class="readiness-component-row">
+                        <div class="readiness-component-main">
+                          <button
+                            class="readiness-component-label readiness-component-info-link"
+                            type="button"
+                            data-readiness-info-target="schoolMathProficiencyInfo"
+                          >
+                            Mathematics Proficiency
+                          </button>
 
+                          <div class="readiness-component-track">
+                            <span
+                              class="readiness-component-fill"
+                              id="schoolReadinessComponentBBar"
+                            ></span>
+                          </div>
+                        </div>
+
+                        <strong
+                          class="readiness-component-score"
+                          id="schoolReadinessComponentB"
+                        >
+                          --
+                        </strong>
+
+                        <strong
+                          class="readiness-component-state-average"
+                          id="schoolReadinessStateAverageB"
+                        >
+                          --
+                        </strong>
+                      </div>
                       <!-- Component C -->
 
                       <!-- Component D -->
