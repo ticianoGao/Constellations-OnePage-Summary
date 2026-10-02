@@ -1614,7 +1614,6 @@ function calculateParityDimension(attributes, fieldPairs) {
       return {
         schoolShare: toReadinessShare(attributes[field.schoolField]),
         csShare: toReadinessShare(attributes[field.csField]),
-        csSharePercent: (toReadinessShare(attributes[field.csField]) / 100),
       };
     })
     .filter((group) => {
@@ -1657,16 +1656,24 @@ function calculateParityDimension(attributes, fieldPairs) {
 
   const csWeightedPopCount = groups.reduce((sum, group) => {
 
-    const csWeightedGroupCount = Math.ceil(group.csSharePercent * totalStudents);
-    
+    const csWeightedGroupCount = Math.ceil(totalStudents * group.csShare * group.schoolShare);
+    console.log("cs share percent", group.csShare);
+    console.log(csWeightedGroupCount);
+
     return sum + csWeightedGroupCount;
   }, 0);
 
   // Compare the weighted population against the total student population to get the weighted %
   const csWeightedMeanPopRatio = csWeightedPopCount / totalStudents;
+  console.log("cs weighted population count", csWeightedPopCount);
+  console.log(totalStudents);
 
-  // Multiply by 10000 to convert the ratio to a scale of 0-100 for the readiness score.
-  return clampReadinessScore(csWeightedMeanPopRatio * 10000);
+  console.log("cs weighted mean population ratio:", csWeightedMeanPopRatio);
+
+  // Multiply by 100 to convert the ratio to a scale of 0-100 for the readiness score.
+  // Adding a 0.5 offset to the weighted mean population ratio before scaling to 0-100.
+  // This offset ensures that even schools with very low CS participation have a non-zero readiness score.
+  return clampReadinessScore((csWeightedMeanPopRatio + 0.5) * 100);
 }
 
 function calculateSchoolReadinessE(attributes) {
