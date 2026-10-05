@@ -1725,11 +1725,29 @@ function setReadinessComponentScore(reportPrefix, componentLetter, score) {
   }
 }
 */
+
+function calculateSchoolReadinessF(attributes, statewideFeatures = []) {
+  // Mathematics Proficiency
+  // Mathematics Proficiency is calculated by using the sum of the school's
+  // Proficient Learner and Distinguished Leaner percentages.
+  const profLearnerPct = toReadinessNumber(attributes.ProfLearnerPct);
+
+  const distLearnerPct = toReadinessNumber(attributes.DistLearnerPct);
+
+  const score = profLearnerPct + distLearnerPct;
+
+
+
+  return {
+    score: clampReadinessScore(score)
+  }
+}
+
 function calculateSchoolReadinessScores(attributes, statewideFeatures = []) {
   return {
     A: calculateSchoolReadinessA(attributes, statewideFeatures).score,
 
-    B: calculateSchoolReadinessB(attributes, statewideFeatures).score,
+    B: calculateSchoolReadinessF(attributes, statewideFeatures).score,
 
     C: calculateSchoolReadinessC(attributes, statewideFeatures).score,
 
@@ -2100,13 +2118,45 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
     "schoolCourseAccessHighInfo",
   );
 
+  const mathProficiencyElementaryInfo = document.getElementById(
+    "mathProficiencyElementaryInfo",
+  );
+
+  const mathProficiencyMiddleInfo = document.getElementById(
+    "mathProficiencyMiddleInfo",
+  );
+
+  const mathProficiencyHighInfo = document.getElementById(
+    "mathProficiencyHighInfo",
+  );
+
   const isElementaryMiddleSchool = schoolType === "E" || schoolType === "M";
   const isHighK12School = schoolType === "H" || schoolType === "K12";
+  const isMiddleSchool = schoolType === "M";
+
+  if(mathProficiencyElementaryInfo) {
+    mathProficiencyElementaryInfo.hidden = !isElementaryMiddleSchool;
+    mathProficiencyElementaryInfo.style.display = isElementaryMiddleSchool ? "" : "none";
+  }
+
+  if(mathProficiencyHighInfo) {
+    mathProficiencyHighInfo.hidden = !isHighK12School;
+    mathProficiencyHighInfo.style.display = isHighK12School ? "" : "none";
+  }
+  if(mathProficiencyMiddleInfo) {
+    mathProficiencyMiddleInfo.hidden = !isMiddleSchool;
+    mathProficiencyMiddleInfo.style.display = isMiddleSchool ? "" : "none";
+
+    courseAccessElementaryButton.hidden = !isElementaryMiddleSchool;
+    courseAccessElementaryHeader.hidden = !isElementaryMiddleSchool;
+    courseAccessElementaryExplain.hidden = !isElementaryMiddleSchool;
+  }
 
   if (courseAccessElementaryHeader) {
     courseAccessElementaryButton.hidden = !isElementaryMiddleSchool;
     courseAccessElementaryHeader.hidden = !isElementaryMiddleSchool;
     courseAccessElementaryExplain.hidden = !isElementaryMiddleSchool;
+
 
     courseAccessElementaryButton.style.display = isElementaryMiddleSchool ? "" : "none";
     courseAccessElementaryHeader.style.display = isElementaryMiddleSchool ? "" : "none";
