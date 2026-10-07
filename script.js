@@ -732,7 +732,7 @@ function loadSchoolLookupCsv() {
 }
 
 const schoolLookupLayerQueryUrl =
-  "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/All_GA_2_18/FeatureServer/0/query";
+  "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/CiC_Dashboard_All_Georgia_Schools/FeatureServer/0/query";
 
 async function fetchAllSchoolLookupRowsFromArcGIS() {
   const pageSize = 2000;
@@ -1224,11 +1224,11 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
 */
   if (schoolType === "E" || schoolType === "M") {
     const schoolCourseCount = toReadinessNumber(attributes.NumCSCours);
-    
+
     const csStudents = toReadinessNumber(attributes.NumCSEnrol);
     const totalStudents = toReadinessNumber(attributes.StudentCou);
 
-    const courseAccessPotential = toReadinessNumber((csStudents / totalStudents));
+    const courseAccessPotential = toReadinessNumber(csStudents / totalStudents);
 
     if (courseAccessPotential === null || courseAccessPotential < 0) {
       return {
@@ -1261,9 +1261,14 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   */
   const schoolApprovedCat1Courses = toReadinessNumber(attributes.NumCategor);
   const totalStudents = toReadinessNumber(attributes.StudentCou);
-  const courseCategory1AccessPotential = toReadinessNumber((schoolApprovedCat1Courses / totalStudents) * schoolYears);
+  const courseCategory1AccessPotential = toReadinessNumber(
+    (schoolApprovedCat1Courses / totalStudents) * schoolYears,
+  );
 
-  if (courseCategory1AccessPotential === null || courseCategory1AccessPotential < 0) {
+  if (
+    courseCategory1AccessPotential === null ||
+    courseCategory1AccessPotential < 0
+  ) {
     return {
       score: 0,
       schoolValue: null,
@@ -1278,9 +1283,9 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   //   .map((peerAttributes) => {
   //     const peerApprovedCat1Courses = toReadinessNumber(peerAttributes.NumCategor);
   //     const peerStudents = toReadinessNumber(peerAttributes.StudentCou);
-      
+
   //     const peerCategory1AccessPotential = toReadinessNumber((peerApprovedCat1Courses / peerStudents) * schoolYears);
-      
+
   //     return peerCategory1AccessPotential
   //   })
   //   .filter((value) => {
@@ -1299,7 +1304,7 @@ function calculateSchoolReadinessA(attributes, statewideFeatures = []) {
   //   };
   // }
 
-  const score = clampReadinessScore((courseCategory1AccessPotential) * 100);
+  const score = clampReadinessScore(courseCategory1AccessPotential * 100);
 
   return {
     score,
@@ -1529,7 +1534,8 @@ function calculateSchoolReadinessD(attributes, statewideFeatures = []) {
   // Declaring csTeachersCapacity as csTeachers * 6 * 30
   // Using 6 out of 7 total sections (6 instruction, 1 planning)
   // Using 30 as an ideal student-to-teacher classroom ratio
-  const csTeachersCapacity = csTeachers * teachableSections * idealStudentTeacherRatio;
+  const csTeachersCapacity =
+    csTeachers * teachableSections * idealStudentTeacherRatio;
 
   const schoolRatio = csTeachersCapacity / totalStudents;
 
@@ -1642,7 +1648,6 @@ function calculateParityDimension(attributes, fieldPairs) {
     return null;
   }
 
-
   const schoolShareTotal = groups.reduce(
     (sum, group) => sum + group.schoolShare,
     0,
@@ -1655,8 +1660,9 @@ function calculateParityDimension(attributes, fieldPairs) {
   }
 
   const csWeightedPopCount = groups.reduce((sum, group) => {
-
-    const csWeightedGroupCount = Math.ceil(totalStudents * group.csShare * group.schoolShare);
+    const csWeightedGroupCount = Math.ceil(
+      totalStudents * group.csShare * group.schoolShare,
+    );
     console.log("cs share percent", group.csShare);
     console.log(csWeightedGroupCount);
 
@@ -1736,11 +1742,9 @@ function calculateSchoolReadinessF(attributes, statewideFeatures = []) {
 
   const score = profLearnerPct + distLearnerPct;
 
-
-
   return {
-    score: clampReadinessScore(score)
-  }
+    score: clampReadinessScore(score),
+  };
 }
 
 function calculateSchoolReadinessScores(attributes, statewideFeatures = []) {
@@ -2134,16 +2138,18 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
   const isHighK12School = schoolType === "H" || schoolType === "K12";
   const isMiddleSchool = schoolType === "M";
 
-  if(mathProficiencyElementaryInfo) {
+  if (mathProficiencyElementaryInfo) {
     mathProficiencyElementaryInfo.hidden = !isElementaryMiddleSchool;
-    mathProficiencyElementaryInfo.style.display = isElementaryMiddleSchool ? "" : "none";
+    mathProficiencyElementaryInfo.style.display = isElementaryMiddleSchool
+      ? ""
+      : "none";
   }
 
-  if(mathProficiencyHighInfo) {
+  if (mathProficiencyHighInfo) {
     mathProficiencyHighInfo.hidden = !isHighK12School;
     mathProficiencyHighInfo.style.display = isHighK12School ? "" : "none";
   }
-  if(mathProficiencyMiddleInfo) {
+  if (mathProficiencyMiddleInfo) {
     mathProficiencyMiddleInfo.hidden = !isMiddleSchool;
     mathProficiencyMiddleInfo.style.display = isMiddleSchool ? "" : "none";
 
@@ -2157,10 +2163,15 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
     courseAccessElementaryHeader.hidden = !isElementaryMiddleSchool;
     courseAccessElementaryExplain.hidden = !isElementaryMiddleSchool;
 
-
-    courseAccessElementaryButton.style.display = isElementaryMiddleSchool ? "" : "none";
-    courseAccessElementaryHeader.style.display = isElementaryMiddleSchool ? "" : "none";
-    courseAccessElementaryExplain.style.display = isElementaryMiddleSchool ? "" : "none";
+    courseAccessElementaryButton.style.display = isElementaryMiddleSchool
+      ? ""
+      : "none";
+    courseAccessElementaryHeader.style.display = isElementaryMiddleSchool
+      ? ""
+      : "none";
+    courseAccessElementaryExplain.style.display = isElementaryMiddleSchool
+      ? ""
+      : "none";
   }
 
   if (courseAccessHighSchoolInfo) {
@@ -2170,15 +2181,18 @@ function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
 
     courseAccessHighButton.style.display = isHighK12School ? "" : "none";
     courseAccessHighSchoolInfo.style.display = isHighK12School ? "" : "none";
-    courseAccessOtherHeaderExplain.style.display = isHighK12School ? "" : "none";
+    courseAccessOtherHeaderExplain.style.display = isHighK12School
+      ? ""
+      : "none";
   }
 
   const usesApprovedCourseBenchmark = ["H", "K12"].includes(schoolType);
 
-
   if (courseAccessElementaryInfo) {
     courseAccessElementaryInfo.hidden = !isElementaryMiddleSchool;
-    courseAccessElementaryInfo.style.display = isElementaryMiddleSchool ? "" : "none";
+    courseAccessElementaryInfo.style.display = isElementaryMiddleSchool
+      ? ""
+      : "none";
   }
 
   if (courseAccessOtherInfo) {
@@ -5123,13 +5137,13 @@ if (typeof require !== "undefined") {
     Legend,
   ) {
     const districtLayerUrl =
-      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/GADistrictSum/FeatureServer/6";
+      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/CiC_Dashboard_All_Georgia_Districts/FeatureServer/0";
 
     const schoolLayerUrl =
-      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/All_GA_2_18/FeatureServer/0";
+      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/CiC_Dashboard_All_Georgia_Schools/FeatureServer/0";
 
     const censusLayerUrl =
-      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/Georgia_Census_Tracts_CIC/FeatureServer/9";
+      "https://services2.arcgis.com/I9cUOJUZvdGAJncI/arcgis/rest/services/CiC_Dashboard_All_Georgia_Census_Tracts/FeatureServer/0";
 
     const internetAccessField = "percent_broadband";
     const incomeField = "median_hh_income";
