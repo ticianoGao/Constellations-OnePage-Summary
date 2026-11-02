@@ -2722,3 +2722,13 @@ a:hover {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
+
+.state-summary-card > .state-access-card {
+  margin-top: 0px;
+  padding: 0;
+}
+
+/* The access heading no longer needs room for its own info button. */
+.state-summary-card > .state-access-card h3 {
+  padding-right: 0;
+}
