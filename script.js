@@ -3975,6 +3975,54 @@ async function querySchoolSummaryByWhere(whereClause) {
   return data.features[0];
 }
 
+function updateStateReadinessFromFeatures(statewideFeatures = []) {
+  const groups = {
+    E: [],
+    M: [],
+    H: [],
+    K12: [],
+  };
+
+  statewideFeatures.forEach((feature) => {
+    const attributes = getFeatureAttributes(feature);
+    const type = normalizeReadinessSchoolType(attributes.SchoolType);
+
+    if (!groups[type]) return;
+
+    const scores = calculateSchoolReadinessScores(
+      attributes,
+      statewideFeatures,
+    );
+
+    // Match the overall score calculation used in school reports.
+    const overallScore =
+      averageAvailableReadinessValues(
+        readinessComponentLetters.map((letter) => scores[letter]),
+      ) ?? 0;
+
+    groups[type].push(overallScore);
+  });
+
+  const rows = [
+    ["E", "Elementary"],
+    ["M", "Middle"],
+    ["H", "High"],
+    ["K12", "K12"],
+  ];
+
+  rows.forEach(([type, suffix]) => {
+    const values = groups[type];
+    const average = values.length
+      ? values.reduce((sum, value) => sum + value, 0) / values.length
+      : null;
+
+    setTextById(
+      `stateReadiness${suffix}`,
+      average === null ? "N/A" : formatDecimal(average, 1),
+    );
+  });
+}
+
 async function loadStateSummaryFromArcGIS() {
   try {
     const statewideFeatures = await fetchAllComparisonFeaturesFromArcGIS();
@@ -3984,6 +4032,7 @@ async function loadStateSummaryFromArcGIS() {
 
       updateStateSummaryFromData();
       updateStateAccessFromData();
+      updateStateReadinessFromFeatures([]);
       updateStateDemographicChartsFromFeatures([]);
       resetStateRecommendations();
       return;
@@ -3996,6 +4045,7 @@ async function loadStateSummaryFromArcGIS() {
 
     updateStateSummaryFromData(stateSummaryData);
     updateStateAccessFromData(stateAccessData);
+    updateStateReadinessFromFeatures(statewideFeatures);
 
     updateStateDemographicChartsFromFeatures(statewideFeatures);
 
@@ -4005,6 +4055,7 @@ async function loadStateSummaryFromArcGIS() {
 
     updateStateSummaryFromData();
     updateStateAccessFromData();
+    updateStateReadinessFromFeatures([]);
     updateStateDemographicChartsFromFeatures([]);
     resetStateRecommendations();
   }
