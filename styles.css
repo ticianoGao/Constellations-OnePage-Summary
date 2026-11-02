@@ -2581,7 +2581,7 @@ a:hover {
 }
 
 .state-school-map {
-  height: 360px;
+  height: 290px;
 }
 
 /* Custom statewide school legend */
@@ -2735,4 +2735,17 @@ a:hover {
 
 .state-participation-card #stateGenderSection {
   margin-top: 16px !important;
+}
+
+#stateReportGrid.show {
+  row-gap: 10px;
+}
+
+#stateReportGrid.show {
+  gap: 5px;
+  padding: 5px;
+}
+
+#stateReportGrid > .grid-column {
+  gap: 20px;
 }
