@@ -4949,56 +4949,6 @@ stateGenderChart = createStateDemographicChart(
   12,
 );
 
-/* Statewide demographic chart toggle */
-
-const stateDemographicToggleButtons = document.querySelectorAll(
-  ".state-demographic-toggle-button",
-);
-
-const stateRaceSection = document.getElementById("stateRaceSection");
-
-const stateGenderSection = document.getElementById("stateGenderSection");
-
-function setStateDemographicView(view) {
-  const showRace = view === "race";
-
-  if (stateRaceSection) {
-    stateRaceSection.hidden = !showRace;
-  }
-
-  if (stateGenderSection) {
-    stateGenderSection.hidden = showRace;
-  }
-
-  stateDemographicToggleButtons.forEach((button) => {
-    const isActive = button.dataset.stateDemographicView === view;
-
-    button.classList.toggle("active", isActive);
-
-    button.setAttribute("aria-selected", String(isActive));
-  });
-
-  /*
-   * Chart.js may need to recalculate its size after
-   * being changed from hidden to visible.
-   */
-  requestAnimationFrame(() => {
-    if (showRace && stateRaceEthnicityChart) {
-      stateRaceEthnicityChart.resize();
-    }
-
-    if (!showRace && stateGenderChart) {
-      stateGenderChart.resize();
-    }
-  });
-}
-
-stateDemographicToggleButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    setStateDemographicView(button.dataset.stateDemographicView);
-  });
-});
-
 /* ArcGIS maps inside report cards */
 
 if (typeof require !== "undefined") {

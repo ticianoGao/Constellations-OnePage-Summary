@@ -2732,3 +2732,7 @@ a:hover {
 .state-summary-card > .state-access-card h3 {
   padding-right: 0;
 }
+
+.state-participation-card #stateGenderSection {
+  margin-top: 16px !important;
+}
