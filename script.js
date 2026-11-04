@@ -2510,28 +2510,122 @@ function updateReadinessScoreDisplay(prefix, scores) {
 /* Update existing labels and component info popups.
    Preserve the popup elements and their close-button listeners.
 */
-function configureReadinessDisplay(prefix, schoolType = null) {
-  const early = schoolType === "E" || schoolType === "M";
 
-  const preparationLabel =
-    prefix === "district" || !schoolType
-      ? "Student / College and Career Preparation"
-      : early
-        ? "Student Preparation"
-        : "College and Career Preparation";
+function configureReadinessDisplay(prefix, schoolType = null) {
+  const type = normalizeReadinessSchoolType(schoolType);
+  const isDistrict = prefix === "district";
+  const isEarlySchool = type === "E" || type === "M";
+  const isSecondarySchool = type === "H" || type === "K12";
+
+  const preparationLabel = isDistrict
+    ? "Student / College and Career Preparation"
+    : isEarlySchool
+      ? "Student Preparation"
+      : isSecondarySchool
+        ? "College and Career Preparation"
+        : "Preparation";
+
+  // Preparation: show only the applicable school explanation.
+  const preparationBullets = [
+    "<strong>What it measures:</strong> Participation in computer science coursework, adjusted for the number of grade levels served. It indicates exposure to CS rather than mastery of course content."
+  ];
+
+  if (isDistrict || isEarlySchool) {
+    preparationBullets.push(
+      "<strong>Student Preparation — elementary and middle schools:</strong> Uses enrollments in all computer science courses."
+    );
+  }
+
+  if (isDistrict || isSecondarySchool) {
+    preparationBullets.push(
+      "<strong>College and Career Preparation — high and K–12 schools:</strong> Uses enrollments in Georgia DOE-approved computer science courses."
+    );
+  }
+
+  const preparationEnrollmentText =
+    !isDistrict && isEarlySchool
+      ? "enrollments in all CS courses"
+      : !isDistrict && isSecondarySchool
+        ? "enrollments in Georgia DOE-approved CS courses"
+        : "applicable CS course enrollments";
+
+  preparationBullets.push(
+    `<strong>Calculation:</strong> Score = (${preparationEnrollmentText} ÷ total students) × grade-span years × 100, capped at 100.`,
+
+    "<strong>Grade-span years:</strong> Counts each grade served, including both endpoints. For example, grades 6–8 count as 3 years and grades 9–12 count as 4. Kindergarten and pre-K each count as one year.",
+
+    "<strong>How to interpret it:</strong> Higher scores indicate greater participation relative to school size and grade span. Students taking multiple CS courses may be counted more than once, so this is not the percentage of unique students reached."
+  );
+
+  // Mathematics: show the matching assessment.
+  const mathematicsBullets = [
+    "<strong>What it measures:</strong> The percentage of students classified as Proficient or Distinguished Learners on the applicable Georgia Milestones mathematics assessment."
+  ];
+
+  if (isDistrict || type === "E") {
+    mathematicsBullets.push(
+      "<strong>Elementary schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Grade 5 Mathematics."
+    );
+  }
+
+  if (isDistrict || type === "M") {
+    mathematicsBullets.push(
+      "<strong>Middle schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Grade 8 Mathematics."
+    );
+  }
+
+  if (isDistrict || type === "H") {
+    mathematicsBullets.push(
+      "<strong>High schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Algebra: Concepts and Connections."
+    );
+  }
+
+  if (isDistrict || type === "K12") {
+    mathematicsBullets.push(
+      "<strong>K–12 schools:</strong> Uses the mathematics assessment for the highest school level served. Schools serving high school grades use Algebra: Concepts and Connections. Otherwise, schools serving middle school grades use Grade 8 Mathematics; schools serving only elementary grades use Grade 5 Mathematics."
+    );
+  }
+
+  mathematicsBullets.push(
+    "<strong>Calculation:</strong> Score = Proficient Learner percentage + Distinguished Learner percentage. The reported combined percentage is used directly on a 0–100 scale.",
+
+    "<strong>How to interpret it:</strong> A combined proficiency rate of 65% produces a score of 65. Mathematics supports the reasoning and problem-solving skills used in CS; this score measures mathematics achievement rather than CS achievement. Missing proficiency data are shown as N/A."
+  );
+
+  const capacityBullets = [
+    "<strong>What it measures:</strong> Estimated CS teaching capacity relative to the school's student population and grade span, using common scheduling assumptions.",
+
+    "<strong>Calculation:</strong> Score = (CS teachers × 6 teaching sessions × 30 students × grade-span years ÷ total students) × 100, capped at 100.",
+
+    "<strong>Scheduling assumptions:</strong> Each teacher has 7 sessions per day, with 1 reserved for planning, leaving 6 teaching sessions. Each session is assumed to serve 30 students.",
+
+    "<strong>Grade-span years:</strong> Counts each grade served, including both endpoints. Kindergarten and pre-K each count as one year.",
+
+    "<strong>How to interpret it:</strong> A score of 100 means estimated capacity meets or exceeds the model's benchmark. Actual capacity depends on teaching assignments, class sizes, and schedules; the score does not confirm that every student receives CS instruction."
+  ];
+
+  const equityBullets = [
+    "<strong>What it measures:</strong> How closely the race/ethnicity and gender composition of CS enrollments reflects the school's overall student population. Race/ethnicity and gender are evaluated separately.",
+
+    "<strong>Comparing groups:</strong> Each demographic distribution is adjusted proportionally to total 100%. Percentages reported as less than 1% are treated as zero.",
+
+    "<strong>Small differences:</strong> Each group's representation gap receives a one-percentage-point allowance. A gap of 1 point or less receives no penalty; a 5-point gap counts as 4 points.",
+
+    "<strong>Calculation:</strong> Each race or gender alignment score equals 100 minus half the sum of the adjusted percentage-point gaps. Participation Equity = √(race/ethnicity score × gender score). Both dimensions have equal weight.",
+
+    "<strong>How to interpret it:</strong> A score of 100 indicates alignment within the allowance. Lower scores indicate larger differences in representation. A 49%/51% CS gender distribution compared with a 50%/50% school distribution receives a gender score of 100.",
+
+    "<strong>Data availability:</strong> Both race/ethnicity and gender scores are required. With no CS enrollments or insufficient demographic data, equity is N/A. Students taking multiple CS courses may be counted more than once."
+  ];
 
   const components = [
-    ["A", preparationLabel, "CourseAccessInfo",
-      "Preparation = CS enrollments ÷ total students × grade-span years × 100, capped at 100. Elementary and middle schools use all CS enrollments (NumCSEnrol). High and K–12 schools use Category 1 enrollments (NumCategor). Counts may include multiple course enrollments per student."],
-    ["B", "Mathematics Proficiency", "EnrollmentInfo",
-      "Mathematics Proficiency uses MathProficiencyPct directly from ArcGIS on a 0–100 scale."],
-    ["D", "Instructional Capacity", "CapacityInfo",
-      "Capacity = CS teachers × (7 − 1) sessions × 30 students × grade-span years ÷ total students × 100, capped at 100. Grade spans include both endpoints and count PK as one year."],
-    ["E", "Participation Equity", "EquityInfo",
-      "Participation Equity compares the race/ethnicity and gender distributions of CS enrollments with the school's student population. Each distribution is normalized to total 100%, and values reported as less than 1% (-1) are treated as 0%. For each group, the adjusted gap is the absolute percentage-point difference minus 1, with a minimum of 0. Race and gender parity are calculated separately as 100 − half the sum of adjusted gaps. Equity = √(race parity × gender parity). A score of 100 indicates alignment within the one-percentage-point allowance. Both dimensions must be available. With no CS enrollments or insufficient demographic data, equity is N/A."],
-    ];
+    ["A", preparationLabel, "CourseAccessInfo", preparationBullets],
+    ["B", "Mathematics Proficiency", "EnrollmentInfo", mathematicsBullets],
+    ["D", "Instructional Capacity", "CapacityInfo", capacityBullets],
+    ["E", "Participation Equity", "EquityInfo", equityBullets],
+  ];
 
-  components.forEach(([letter, label, popupSuffix, explanation]) => {
+  components.forEach(([letter, label, popupSuffix, bullets]) => {
     const row = document
       .getElementById(`${prefix}ReadinessComponent${letter}`)
       ?.closest(".readiness-component-row");
@@ -2540,32 +2634,52 @@ function configureReadinessDisplay(prefix, schoolType = null) {
       row.hidden = false;
       row.style.display = "";
 
-      const labelElement = row.querySelector(".readiness-component-label");
-      if (labelElement) labelElement.textContent = label;
+      const labelElement = row.querySelector(
+        ".readiness-component-label"
+      );
+
+      if (labelElement) {
+        labelElement.textContent = label;
+      }
     }
 
     const popup = document.getElementById(`${prefix}${popupSuffix}`);
     if (!popup) return;
 
     const title = popup.querySelector("h4");
-    if (title) title.textContent = label;
+
+    if (title) {
+      title.textContent = label;
+    }
 
     const list = popup.querySelector(".info-list");
-    if (list) {
-      const item = document.createElement("li");
-      item.textContent = explanation;
-      list.replaceChildren(item);
+    if (!list) return;
 
-      if (prefix === "district") {
-        const districtNote = document.createElement("li");
-        districtNote.textContent =
-          "The district component score is the unweighted mean of available school component scores.";
-        list.append(districtNote);
-      }
+    const items = bullets.map((bullet) => {
+      const item = document.createElement("li");
+
+      // Fixed explanatory text; supports bold formatting.
+      item.innerHTML = bullet;
+
+      return item;
+    });
+
+    list.replaceChildren(...items);
+
+    if (isDistrict) {
+      const districtNote = document.createElement("li");
+
+      districtNote.innerHTML =
+        "<strong>District score:</strong> The average of available " +
+        "school scores for this component. Each school receives equal " +
+        "weight, regardless of enrollment. Schools without a score " +
+        "for this component are excluded.";
+
+      list.append(districtNote);
     }
   });
 
-  // Remove Course Progression from both report displays.
+  // Hide the former Course Progression component.
   const oldRow = document
     .getElementById(`${prefix}ReadinessComponentC`)
     ?.closest(".readiness-component-row");
@@ -2576,6 +2690,7 @@ function configureReadinessDisplay(prefix, schoolType = null) {
   }
 
   const oldPopup = document.getElementById(`${prefix}ProgressionInfo`);
+
   if (oldPopup) {
     oldPopup.hidden = true;
     oldPopup.style.display = "none";
