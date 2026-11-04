@@ -2722,3 +2722,30 @@ a:hover {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
+
+/* Statewide report layout */
+#stateReportGrid .state-school-map {
+  height: 290px;
+}
+
+#stateReportGrid .state-summary-card > .state-access-card {
+  margin-top: 0;
+  padding: 0;
+}
+
+#stateReportGrid .state-summary-card > .state-access-card h3 {
+  padding-right: 0;
+}
+
+#stateReportGrid .state-participation-card #stateGenderSection {
+  margin-top: 16px !important;
+}
+
+#stateReportGrid.show {
+  gap: 5px;
+  padding: 5px;
+}
+
+#stateReportGrid > .grid-column {
+  gap: 20px;
+}

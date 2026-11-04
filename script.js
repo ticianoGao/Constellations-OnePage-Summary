@@ -4691,13 +4691,18 @@ function updateStateReadinessFromFeatures(statewideFeatures = []) {
 
 async function loadStateSummaryFromArcGIS() {
   try {
-    const statewideFeatures = await fetchAllComparisonFeaturesFromArcGIS();
+    const statewideFeatures =
+      await fetchAllComparisonFeaturesFromArcGIS();
 
-    if (!Array.isArray(statewideFeatures) || statewideFeatures.length === 0) {
+    if (
+      !Array.isArray(statewideFeatures) ||
+      statewideFeatures.length === 0
+    ) {
       console.warn("No statewide ArcGIS features were returned.");
 
       updateStateSummaryFromData();
       updateStateAccessFromData();
+      updateStateReadinessFromFeatures([]);
       updateStateDemographicChartsFromFeatures([]);
       resetStateRecommendations();
       return;
@@ -4706,19 +4711,20 @@ async function loadStateSummaryFromArcGIS() {
     const stateSummaryData =
       buildStateSummaryDataFromFeatures(statewideFeatures);
 
-    const stateAccessData = buildStateAccessDataFromFeatures(statewideFeatures);
+    const stateAccessData =
+      buildStateAccessDataFromFeatures(statewideFeatures);
 
     updateStateSummaryFromData(stateSummaryData);
     updateStateAccessFromData(stateAccessData);
-
+    updateStateReadinessFromFeatures(statewideFeatures);
     updateStateDemographicChartsFromFeatures(statewideFeatures);
-
     updateStateRecommendations(statewideFeatures, stateAccessData);
   } catch (error) {
     console.error("Could not load statewide data from ArcGIS:", error);
 
     updateStateSummaryFromData();
     updateStateAccessFromData();
+    updateStateReadinessFromFeatures([]);
     updateStateDemographicChartsFromFeatures([]);
     resetStateRecommendations();
   }
@@ -5612,55 +5618,55 @@ stateGenderChart = createStateDemographicChart(
   12,
 );
 
-/* Statewide demographic chart toggle */
+// /* Statewide demographic chart toggle */
 
-const stateDemographicToggleButtons = document.querySelectorAll(
-  ".state-demographic-toggle-button",
-);
+// const stateDemographicToggleButtons = document.querySelectorAll(
+//   ".state-demographic-toggle-button",
+// );
 
-const stateRaceSection = document.getElementById("stateRaceSection");
+// const stateRaceSection = document.getElementById("stateRaceSection");
 
-const stateGenderSection = document.getElementById("stateGenderSection");
+// const stateGenderSection = document.getElementById("stateGenderSection");
 
-function setStateDemographicView(view) {
-  const showRace = view === "race";
+// function setStateDemographicView(view) {
+//   const showRace = view === "race";
 
-  if (stateRaceSection) {
-    stateRaceSection.hidden = !showRace;
-  }
+//   if (stateRaceSection) {
+//     stateRaceSection.hidden = !showRace;
+//   }
 
-  if (stateGenderSection) {
-    stateGenderSection.hidden = showRace;
-  }
+//   if (stateGenderSection) {
+//     stateGenderSection.hidden = showRace;
+//   }
 
-  stateDemographicToggleButtons.forEach((button) => {
-    const isActive = button.dataset.stateDemographicView === view;
+//   stateDemographicToggleButtons.forEach((button) => {
+//     const isActive = button.dataset.stateDemographicView === view;
 
-    button.classList.toggle("active", isActive);
+//     button.classList.toggle("active", isActive);
 
-    button.setAttribute("aria-selected", String(isActive));
-  });
+//     button.setAttribute("aria-selected", String(isActive));
+//   });
 
-  /*
-   * Chart.js may need to recalculate its size after
-   * being changed from hidden to visible.
-   */
-  requestAnimationFrame(() => {
-    if (showRace && stateRaceEthnicityChart) {
-      stateRaceEthnicityChart.resize();
-    }
+//   /*
+//    * Chart.js may need to recalculate its size after
+//    * being changed from hidden to visible.
+//    */
+//   requestAnimationFrame(() => {
+//     if (showRace && stateRaceEthnicityChart) {
+//       stateRaceEthnicityChart.resize();
+//     }
 
-    if (!showRace && stateGenderChart) {
-      stateGenderChart.resize();
-    }
-  });
-}
+//     if (!showRace && stateGenderChart) {
+//       stateGenderChart.resize();
+//     }
+//   });
+// }
 
-stateDemographicToggleButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    setStateDemographicView(button.dataset.stateDemographicView);
-  });
-});
+// stateDemographicToggleButtons.forEach((button) => {
+//   button.addEventListener("click", () => {
+//     setStateDemographicView(button.dataset.stateDemographicView);
+//   });
+// });
 
 /* ArcGIS maps inside report cards */
 
