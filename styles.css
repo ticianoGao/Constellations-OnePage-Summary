@@ -2772,3 +2772,34 @@ a:hover {
   th:last-child {
   padding-right: 0;
 }
+
+#districtReportGrid .readiness-score-card .readiness-overall-section {
+  border-bottom: none;
+}
+
+#districtReportGrid .readiness-score-card .readiness-breakdown-heading {
+  border-bottom: 1px solid #d9d9d9;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+#districtReportGrid .readiness-score-card .readiness-overall-section {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+#districtReportGrid .readiness-score-card .readiness-breakdown-section {
+  padding-top: 0;
+}
+
+#districtReportGrid .readiness-score-card .state-access-table thead th {
+  padding-top: 2px;
+}
+
+#districtReportGrid .readiness-score-card .state-access-table th,
+#districtReportGrid .readiness-score-card .state-access-table td {
+  font-size: 0.7rem;
+  line-height: 1.2;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
