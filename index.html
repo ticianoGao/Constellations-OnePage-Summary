@@ -69,9 +69,8 @@
             <div class="step-title">
               <span class="step-icon">★</span>
               <h2>
-                <strong>Step 1:</strong>
-                Choose a <strong>School district</strong>,
-                <strong>School</strong>, or <strong>Statewide</strong> to
+                Choose a <strong>School district</strong> or a
+                <strong>School</strong> to
                 explore:
               </h2>
             </div>
@@ -169,39 +168,19 @@
                     <button class="card-info-close" type="button">x</button>
 
                     <ul class="info-list">
-                      <li>
-                        School and student totals includes students from all
-                        schools in Georgia. School district count is based on
-                        the number of unique school districts in the data.
-                      </li>
 
                       <li>
                         CS enrollment counts course enrollments rather than
                         unique students, so students enrolled in multiple CS
                         courses may be counted more than once.
                       </li>
-                      <li>
-                        This section shows how widely computer science courses
-                        are available across Georgia schools.
-                      </li>
 
-                      <li>
-                        The table compares CS course availability across
-                        Elementary, Middle, High, and K-12 schools in Georgia.
-                      </li>
 
                       <li>
                         A school is counted as offering CS when it reports at
-                        least one computer science course. The percentage is
-                        calculated as schools offering CS divided by the total
-                        number of schools in that school-type group.
+                        least one computer science course.
                       </li>
 
-                      <li>
-                        <strong>Georgia Overall</strong> is calculated using the
-                        full statewide school dataset rather than only the four
-                        displayed school-type groups.
-                      </li>
                     </ul>
                   </div>
 
@@ -368,40 +347,39 @@
 
                   <div class="card-info-popup">
                     <button class="card-info-close" type="button">x</button>
+
                     <ul class="info-list">
                       <li>
-                        <strong>What it measures:</strong>
-                        Average CS readiness among Georgia schools, grouped by
-                        elementary, middle, high, and K–12 school type.
+                        <strong>CS readiness:</strong>
+                        Each school's score combines four equally weighted components:
+                        <strong>Preparation</strong>, <strong>Mathematics Proficiency</strong>, <strong>Instructional Capacity</strong>,
+                        and <strong>Participation Equity</strong>.
+
+                        <ul>
+                          <li>
+                            Preparation:
+                            Elementary and middle schools' <strong>Student Preparation</strong> uses participation in all CS
+                            courses. High and K-12 schools' <strong>College and Career Preparation</strong> uses participation in Georgia
+                            DOE-approved CS courses.
+                          </li>
+                          <li>
+                            Mathematics proficiency:
+                            Uses 5th-grade mathematics proficiency for elementary schools, 8th-grade mathematics proficiency for middle schools, and Algebra proficiency for high schools. K-12 schools use the measure for the highest school level they serve.
+                          </li>
+                        </ul>
                       </li>
-                      <li>
-                        <strong>School readiness:</strong>
-                        Each school's score combines four equally weighted
-                        components: preparation, mathematics proficiency,
-                        instructional capacity, and participation equity.
-                      </li>
-                      <li>
-                        <strong>Preparation:</strong>
-                        Elementary and middle schools use participation in all
-                        CS courses. High and K–12 schools use participation in
-                        Georgia DOE-approved CS courses.
-                      </li>
+
                       <li>
                         <strong>Calculation:</strong>
-                        Each row is the average of complete school readiness
-                        scores for that school type. Each school receives equal
-                        weight, regardless of enrollment.
-                      </li>
-                      <li>
-                        <strong>Missing data:</strong>
-                        Schools missing any readiness component are excluded
-                        from the overall average. N/A means no complete scores
-                        are available for that school type.
+                        Each row is the average of complete school CS readiness scores
+                        for that school type. Each school receives equal weight,
+                        regardless of enrollment. Schools missing any readiness component are excluded from the
+                        overall average. N/A means no complete scores are available
+                        for that school type.
                       </li>
                     </ul>
                   </div>
-
-                  <h3>CS Readiness</h3>
+                  <h3>CS Readiness Score</h3>
 
                   <div class="state-access-table-wrap">
                     <table class="state-access-table">
@@ -478,7 +456,7 @@
                   </button>
 
                   <div class="card-info-popup">
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
 
                     <ul class="info-list">
                       <li>
@@ -623,7 +601,7 @@
                 </button>
 
                 <div class="card-info-popup">
-                  <button class="card-info-close" type="button">×</button>
+                  <button class="card-info-close" type="button">x</button>
 
                   <ul class="info-list">
                     <li>
@@ -796,22 +774,10 @@
                         <strong>Category Definition</strong>
 
                         <ul class="category-definition-list">
-                          <li>
-                            <strong>Category 1:</strong> College level CS
-                            courses, including AP and IB classes.
-                          </li>
-                          <li>
-                            <strong>Category 2:</strong> CTAE IT Pathway
-                            Capstone courses, excluding APs.
-                          </li>
-                          <li>
-                            <strong>Category 3:</strong> All high school CS
-                            courses excluding Category 1 and Category 2.
-                          </li>
-                          <li>
-                            <strong>Category 4:</strong> All CS courses
-                            excluding Category 1, Category 2, and Category 3.
-                          </li>
+                          <li><strong>Category 1:</strong> Approved CS courses (SB108)</li>
+                          <li><strong>Category 2:</strong> College-level CS courses (AP and IB courses)</li>
+                          <li><strong>Category 3:</strong> CTAE Digital Technology Pathway courses</li>
+                          <li><strong>Category 4:</strong> All CS courses excluding Categories 1, 2, and 3</li>
                         </ul>
                       </li>
                     </ul>
@@ -844,10 +810,11 @@
                   <div class="summary-text">
                     <ul class="summary-list">
                       <li>
-                        By the end of the 2024 - 2025 school year, this school
-                        had
-                        <strong id="schoolTotalStudentsText">1049</strong> total
-                        students.
+                        By the end of the 2024-2025 school year, this school had
+                        <strong id="schoolTotalStudentsText">--</strong> total students.
+                        There were <strong id="schoolCsEnrollmentsText">--</strong> CS course
+                        enrollments, equal to <strong id="schoolCsEnrollmentPercent">--</strong>
+                        of total student enrollment.
                       </li>
 
                       <li>
@@ -1000,7 +967,7 @@
                     </svg>
                   </button>
                   <div class="card-info-popup">
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
 
                     <ul class="info-list">
                       <li>
@@ -1136,12 +1103,7 @@
                         <strong>CS Readiness Score</strong> uses four equally
                         weighted components:
                         <ul class="readiness-info-sublist">
-                          <li>
-                            <strong>Preparation:</strong>
-                            Student Preparation for elementary and middle
-                            schools; College and Career Preparation for high and
-                            K–12 schools.
-                          </li>
+                          <li><strong>Preparation</strong></li>
                           <li><strong>Mathematics Proficiency</strong></li>
                           <li><strong>Instructional Capacity</strong></li>
                           <li><strong>Participation Equity</strong></li>
@@ -1152,29 +1114,23 @@
                         overall score is the average of all four components. If
                         any component is unavailable, its overall score is N/A.
                       </li>
-                      <li>
-                        District overall scores and statewide school-type scores
-                        are unweighted averages of complete school readiness
-                        scores. Schools with incomplete overall scores are
-                        excluded. Component averages use schools with that
-                        component available.
-                      </li>
 
                       <li>
                         <strong>State average:</strong>
                         The state average for each applicable component is
                         calculated using all Georgia schools of the same school
-                        type as the selected school.
+                        type as the selected school. Schools with incomplete overall scores are
+                        excluded.
                       </li>
                     </ul>
                   </div>
-                  <!-- School readiness component info popups -->
+                  <!-- School CS readiness component info popups -->
 
                   <div
                     class="card-info-popup readiness-component-popup"
                     id="schoolCourseAccessInfo"
                   >
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
                     <h4>Course Access</h4>
 
                     <ul class="info-list">
@@ -1203,7 +1159,7 @@
                     class="card-info-popup readiness-component-popup"
                     id="schoolEnrollmentInfo"
                   >
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
                     <h4>CS Enrollment/Total Enrollment</h4>
 
                     <ul class="info-list">
@@ -1233,7 +1189,7 @@
                     class="card-info-popup readiness-component-popup"
                     id="schoolProgressionInfo"
                   >
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
                     <h4>Course Progression</h4>
 
                     <ul class="info-list">
@@ -1300,7 +1256,7 @@
                     class="card-info-popup readiness-component-popup"
                     id="schoolEquityInfo"
                   >
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
                     <h4>Participation Equity</h4>
 
                     <ul class="info-list">
@@ -1888,10 +1844,11 @@
                   <div class="summary-text">
                     <ul class="summary-list">
                       <li>
-                        By the end of the 2024 - 2025 school year, this district
-                        had
-                        <strong id="districtTotalStudentsText">1049</strong>
-                        total students.
+                        By the end of the 2024-2025 school year, this district had
+                        <strong id="districtTotalStudentsText">--</strong> total students.
+                        There were <strong id="districtCsEnrollmentsText">--</strong> CS course
+                        enrollments, equal to <strong id="districtCsEnrollmentPercent">--</strong>
+                        of total student enrollment.
                       </li>
 
                       <li>
@@ -2101,12 +2058,7 @@
                         <strong>CS Readiness Score</strong> uses four
                         components:
                         <ul class="readiness-info-sublist">
-                          <li>
-                            <strong>Preparation:</strong>
-                            Student Preparation for elementary and middle
-                            schools; College and Career Preparation for high and
-                            K–12 schools.
-                          </li>
+                          <li><strong>Preparation</strong></li>
                           <li><strong>Mathematics Proficiency</strong></li>
                           <li><strong>Instructional Capacity</strong></li>
                           <li><strong>Participation Equity</strong></li>
@@ -2120,7 +2072,7 @@
                       </li>
                       <li>
                         The district's overall score is the unweighted average
-                        of complete school readiness scores. Schools with
+                        of complete school CS readiness scores. Schools with
                         incomplete overall scores are excluded. Each district
                         component score averages the schools with that component
                         available.
@@ -2139,7 +2091,7 @@
                     class="card-info-popup readiness-component-popup"
                     id="districtCourseAccessInfo"
                   >
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
                     <h4>Course Access</h4>
 
                     <ul class="info-list">
@@ -2244,7 +2196,7 @@
                     class="card-info-popup readiness-component-popup"
                     id="districtEquityInfo"
                   >
-                    <button class="card-info-close" type="button">×</button>
+                    <button class="card-info-close" type="button">x</button>
                     <h4>Participation Equity</h4>
 
                     <ul class="info-list">
@@ -2277,7 +2229,7 @@
 
                   <!-- Readiness score components -->
                   <div class="readiness-breakdown-section">
-                    <div class="readiness-breakdown-heading">
+                    <!-- <div class="readiness-breakdown-heading">
                       <div class="state-access-table-wrap">
                         <table class="state-access-table">
                           <thead>
@@ -2306,6 +2258,28 @@
                           </tbody>
                         </table>
                       </div>
+                    </div> -->
+                    <div class="readiness-breakdown-heading">
+                      <table class="state-access-table district-readiness-type-table">
+                        <thead>
+                          <tr>
+                            <th scope="col">School Type</th>
+                            <th scope="col">Elementary</th>
+                            <th scope="col">Middle</th>
+                            <th scope="col">High</th>
+                            <th scope="col">K-12</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">Average Readiness</th>
+                            <td id="districtReadinessElementary">--</td>
+                            <td id="districtReadinessMiddle">--</td>
+                            <td id="districtReadinessHigh">--</td>
+                            <td id="districtReadinessK12">--</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                     <div class="readiness-component-column-headings">
                       <span></span>

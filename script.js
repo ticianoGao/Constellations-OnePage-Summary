@@ -82,7 +82,7 @@ function formatGradeRange(gradeRange) {
     .replaceAll("PK", "Pre-K")
     .replaceAll("KK", "Kindergarten")
     .replace(/\b0(\d)\b/g, "$1")
-    .replaceAll("-", "–")
+    .replaceAll("-", "-")
     .replaceAll(",", ", ");
 
   return `Grades ${formatted}`;
@@ -805,8 +805,6 @@ const approvedCourseLabels = new Set([
   "AP Computer Science A",
   "AP Computer Science Principles",
 
-  "IB Computer Science Year 1",
-  "IB Computer Science Year 2",
   "IB Computer Science, Year One",
   "IB Computer Science, Year Two",
 
@@ -1325,7 +1323,7 @@ function formatEnrollmentIntensity(totalEnrollment, csEnrollments) {
 //     return "H";
 //   }
 
-//   if (["K12", "K-12", "K–12"].includes(schoolType)) {
+//   if (["K12", "K-12", "K-12"].includes(schoolType)) {
 //     return "K12";
 //   }
 
@@ -1550,7 +1548,7 @@ function formatEnrollmentIntensity(totalEnrollment, csEnrollments) {
 //     return null;
 //   }
 
-//   // Current demographic fields are percentages from 0–100.
+//   // Current demographic fields are percentages from 0-100.
 //   return number / 100;
 // }
 
@@ -2147,7 +2145,7 @@ function normalizeReadinessSchoolType(value) {
   const type = String(value || "")
     .trim()
     .toUpperCase()
-    .replace(/[–—]/g, "-");
+    .replace(/[-—]/g, "-");
 
   if (["E", "ELEMENTARY", "ELEMENTARY SCHOOL"].includes(type)) {
     return "E";
@@ -2169,14 +2167,14 @@ function normalizeReadinessSchoolType(value) {
 }
 
 /* Inclusive grade span:
-   PK = -1, kindergarten = 0, grades 1–12 = 1–12.
+   PK = -1, kindergarten = 0, grades 1-12 = 1-12.
    PK-05 => 7; KK-05 => 6; 06-08 => 3; 09-12 => 4.
 */
 function getReadinessGradeYears(value) {
   const text = String(value ?? "")
     .trim()
     .toUpperCase()
-    .replace(/[–—]/g, "-")
+    .replace(/[-—]/g, "-")
     .replace(/\s+/g, "");
 
   function parseGrade(token) {
@@ -2224,7 +2222,7 @@ function calculateReadinessPreparation(attributes) {
 function calculateReadinessMath(attributes) {
   const score = toReadinessNumber(attributes.MathProficiencyPct);
 
-  // ArcGIS field is a percentage, already on a 0–100 scale.
+  // ArcGIS field is a percentage, already on a 0-100 scale.
   // Invalid values are unavailable rather than silently corrected.
   return score !== null && score >= 0 && score <= 100 ? score : null;
 }
@@ -2295,7 +2293,7 @@ function calculateReadinessParity(attributes, fieldPairs) {
     return null;
   }
 
-  // Shares use a 0–1 scale: 0.01 equals one percentage point.
+  // Shares use a 0-1 scale: 0.01 equals one percentage point.
   const parityTolerance = 0.01;
 
   const difference = school.reduce((sum, share, index) => {
@@ -2503,13 +2501,13 @@ function configureReadinessDisplay(prefix, schoolType = null) {
 
   if (isDistrict || isEarlySchool) {
     preparationBullets.push(
-      "<strong>Student Preparation — elementary and middle schools:</strong> Uses enrollments in all computer science courses.",
+      "<strong>Elementary and middle schools:</strong> Uses enrollments in all computer science courses.",
     );
   }
 
   if (isDistrict || isSecondarySchool) {
     preparationBullets.push(
-      "<strong>College and Career Preparation — high and K–12 schools:</strong> Uses enrollments in Georgia DOE-approved computer science courses.",
+      "<strong>High and K-12 schools:</strong> Uses enrollments in Georgia DOE-approved computer science courses.",
     );
   }
 
@@ -2521,9 +2519,17 @@ function configureReadinessDisplay(prefix, schoolType = null) {
         : "applicable CS course enrollments";
 
   preparationBullets.push(
-    `<strong>Calculation:</strong> Score = (${preparationEnrollmentText} ÷ total students) × grade-span years × 100, capped at 100.`,
-
-    "<strong>Grade-span years:</strong> Counts each grade served, including both endpoints. For example, grades 6–8 count as 3 years and grades 9–12 count as 4. Kindergarten and pre-K each count as one year.",
+    `<strong>Calculation:</strong>
+    Score = (${preparationEnrollmentText} ÷ total students)
+    x grade-span years x 100, capped at 100.
+    <ul>
+      <li>
+        <strong>Grade-span years:</strong>
+        Counts each grade served, including both endpoints.
+        For example, grades 6-8 count as 3 years and grades 9-12
+        count as 4. Kindergarten and pre-K each count as one year.
+      </li>
+    </ul>`,
 
     "<strong>How to interpret it:</strong> Higher scores indicate greater participation relative to school size and grade span. Students taking multiple CS courses may be counted more than once, so this is not the percentage of unique students reached.",
   );
@@ -2553,12 +2559,12 @@ function configureReadinessDisplay(prefix, schoolType = null) {
 
   if (isDistrict || type === "K12") {
     mathematicsBullets.push(
-      "<strong>K–12 schools:</strong> Uses the mathematics assessment for the highest school level served. Schools serving high school grades use Algebra: Concepts and Connections. Otherwise, schools serving middle school grades use Grade 8 Mathematics; schools serving only elementary grades use Grade 5 Mathematics.",
+      "<strong>K-12 schools:</strong> Uses the mathematics assessment for the highest school level served. Schools serving high school grades use Algebra: Concepts and Connections. Otherwise, schools serving middle school grades use Grade 8 Mathematics; schools serving only elementary grades use Grade 5 Mathematics.",
     );
   }
 
   mathematicsBullets.push(
-    "<strong>Calculation:</strong> Score = Proficient Learner percentage + Distinguished Learner percentage. The reported combined percentage is used directly on a 0–100 scale.",
+    "<strong>Calculation:</strong> Score = Proficient Learner percentage + Distinguished Learner percentage. The reported combined percentage is used directly on a 0-100 scale.",
 
     "<strong>How to interpret it:</strong> A combined proficiency rate of 65% produces a score of 65. Mathematics supports the reasoning and problem-solving skills used in CS; this score measures mathematics achievement rather than CS achievement. Missing proficiency data are shown as N/A.",
   );
@@ -2566,11 +2572,22 @@ function configureReadinessDisplay(prefix, schoolType = null) {
   const capacityBullets = [
     "<strong>What it measures:</strong> Estimated CS teaching capacity relative to the school's student population and grade span, using common scheduling assumptions.",
 
-    "<strong>Calculation:</strong> Score = (CS teachers × 6 teaching sessions × 30 students × grade-span years ÷ total students) × 100, capped at 100.",
-
-    "<strong>Scheduling assumptions:</strong> Each teacher has 7 sessions per day, with 1 reserved for planning, leaving 6 teaching sessions. Each session is assumed to serve 30 students.",
-
-    "<strong>Grade-span years:</strong> Counts each grade served, including both endpoints. Kindergarten and pre-K each count as one year.",
+    `<strong>Calculation:</strong>
+    Score = (CS teachers × 6 teaching sessions × 30 students
+    × grade-span years ÷ total students) × 100, capped at 100.
+    <ul>
+      <li>
+        <strong>Scheduling assumptions:</strong>
+        Each teacher has 7 sessions per day, with 1 reserved for
+        planning, leaving 6 teaching sessions. Each session is
+        assumed to serve 30 students.
+      </li>
+      <li>
+        <strong>Grade-span years:</strong>
+        Counts each grade served, including both endpoints.
+        Kindergarten and pre-K each count as one year.
+      </li>
+    </ul>`,
 
     "<strong>How to interpret it:</strong> A score of 100 means estimated capacity meets or exceeds the model's benchmark. Actual capacity depends on teaching assignments, class sizes, and schedules; the score does not confirm that every student receives CS instruction.",
   ];
@@ -2582,7 +2599,7 @@ function configureReadinessDisplay(prefix, schoolType = null) {
 
     "<strong>Small differences:</strong> Each group's representation gap receives a one-percentage-point allowance. A gap of 1 point or less receives no penalty; a 5-point gap counts as 4 points.",
 
-    "<strong>Calculation:</strong> Each race or gender alignment score equals 100 minus half the sum of the adjusted percentage-point gaps. Participation Equity = √(race/ethnicity score × gender score). Both dimensions have equal weight.",
+    "<strong>Calculation:</strong> Each race or gender alignment score equals 100 minus half the sum of the adjusted percentage-point gaps. Participation Equity = √(race/ethnicity score x gender score). Both dimensions have equal weight.",
 
     "<strong>How to interpret it:</strong> A score of 100 indicates alignment within the allowance. Lower scores indicate larger differences in representation. A 49%/51% CS gender distribution compared with a 50%/50% school distribution receives a gender score of 100.",
 
@@ -3286,7 +3303,7 @@ function buildSchoolRecommendations(
     addRecommendation(
       recommendations,
       "Local Opportunity",
-      "Some of your students may benefit from opportunities such as BridgeUP STEM at the Constellations. BridgeUP is designed for eligible Atlanta-area students in grades 10–12 who are first-generation or low-income and have had limited access to coding. It can help families explore current or future program cycles and determine whether the opportunity matches their interests and eligibility.",
+      "Some of your students may benefit from opportunities such as BridgeUP STEM at the Constellations. BridgeUP is designed for eligible Atlanta-area students in grades 10-12 who are first-generation or low-income and have had limited access to coding. It can help families explore current or future program cycles and determine whether the opportunity matches their interests and eligibility.",
     );
   }
 
@@ -4289,7 +4306,7 @@ function getOtherCourses(attributes, targetId) {
   if (reportedCourseCount !== null && reportedCourseCount > 0) {
     return `${formatWholeNumber(
       reportedCourseCount,
-    )} courses reported; course names unavailable in the current dataset`;
+    )} courses reported; course names unavailable`;
   }
 
   return "None reported";
@@ -7174,8 +7191,15 @@ document.addEventListener("click", (event) => {
 
 /* Export report as PDF */
 
+// function cleanPdfText(value) {
+//   return String(value || "")
+//     .replace(/\s+/g, " ")
+//     .trim();
+// }
 function cleanPdfText(value) {
   return String(value || "")
+    .replace(/√\s*\(/g, "sqrt(")
+    .replace(/\s*×\s*/g, " x ")
     .replace(/\s+/g, " ")
     .trim();
 }
