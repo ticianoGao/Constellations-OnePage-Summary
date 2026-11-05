@@ -2749,3 +2749,26 @@ a:hover {
 #stateReportGrid > .grid-column {
   gap: 20px;
 }
+
+/* District readiness table */
+#districtReportGrid .readiness-score-card .readiness-breakdown-section {
+  padding-top: 6px;
+}
+
+#districtReportGrid .readiness-score-card .state-access-table-wrap {
+  margin-top: 0;
+}
+
+#districtReportGrid .readiness-score-card .state-access-table tr > :last-child {
+  /* Reserve the 72px State average column and its 10px gap. */
+  padding-right: 50px;
+  text-align: right;
+}
+
+#districtReportGrid
+  .readiness-score-card
+  .state-access-table
+  thead
+  th:last-child {
+  padding-right: 0;
+}

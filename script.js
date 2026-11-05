@@ -2099,7 +2099,6 @@ function formatEnrollmentIntensity(totalEnrollment, csEnrollments) {
 //   const overallScore = updateReadinessScoreDisplay("district", districtScores);
 // }
 
-
 /* Four-component CS readiness:
    A: Preparation
    B: Mathematics Proficiency
@@ -2131,9 +2130,7 @@ function nonnegativeReadinessNumber(value) {
 function clampReadinessScore(value) {
   const number = toReadinessNumber(value);
 
-  return number === null
-    ? null
-    : Math.max(0, Math.min(100, number));
+  return number === null ? null : Math.max(0, Math.min(100, number));
 }
 
 function averageAvailableReadinessValues(values) {
@@ -2142,8 +2139,7 @@ function averageAvailableReadinessValues(values) {
     .filter((value) => value !== null);
 
   return available.length
-    ? available.reduce((sum, value) => sum + value, 0) /
-        available.length
+    ? available.reduce((sum, value) => sum + value, 0) / available.length
     : null;
 }
 
@@ -2218,9 +2214,7 @@ function calculateReadinessPreparation(attributes) {
   const enrollmentField =
     type === "H" || type === "K12" ? "NumCategor" : "NumCSEnrol";
 
-  const enrollments = nonnegativeReadinessNumber(
-    attributes[enrollmentField],
-  );
+  const enrollments = nonnegativeReadinessNumber(attributes[enrollmentField]);
 
   if (enrollments === null) return null;
 
@@ -2232,9 +2226,7 @@ function calculateReadinessMath(attributes) {
 
   // ArcGIS field is a percentage, already on a 0–100 scale.
   // Invalid values are unavailable rather than silently corrected.
-  return score !== null && score >= 0 && score <= 100
-    ? score
-    : null;
+  return score !== null && score >= 0 && score <= 100 ? score : null;
 }
 
 function calculateReadinessCapacity(attributes) {
@@ -2242,18 +2234,11 @@ function calculateReadinessCapacity(attributes) {
   const total = nonnegativeReadinessNumber(attributes.StudentCou);
   const years = getReadinessGradeYears(attributes.GradeRange);
 
-  if (
-    teachers === null ||
-    total === null ||
-    total <= 0 ||
-    years === null
-  ) {
+  if (teachers === null || total === null || total <= 0 || years === null) {
     return null;
   }
 
-  return clampReadinessScore(
-    ((teachers * (7 - 1) * 30 * years) / total) * 100,
-  );
+  return clampReadinessScore(((teachers * (7 - 1) * 30 * years) / total) * 100);
 }
 
 /* Field values are percentages from 0 to 100.
@@ -2322,8 +2307,8 @@ function calculateReadinessParity(attributes, fieldPairs) {
     return sum + Math.max(0, gap - parityTolerance);
   }, 0);
 
-    return clampReadinessScore(100 * (1 - difference / 2));
-  }
+  return clampReadinessScore(100 * (1 - difference / 2));
+}
 
 function calculateReadinessEquity(attributes) {
   const total = nonnegativeReadinessNumber(attributes.StudentCou);
@@ -2339,15 +2324,9 @@ function calculateReadinessEquity(attributes) {
   }
 
   // Reuse the existing six race and two gender field mappings.
-  const race = calculateReadinessParity(
-    attributes,
-    raceDemographicFields,
-  );
+  const race = calculateReadinessParity(attributes, raceDemographicFields);
 
-  const gender = calculateReadinessParity(
-    attributes,
-    genderDemographicFields,
-  );
+  const gender = calculateReadinessParity(attributes, genderDemographicFields);
 
   if (race === null || gender === null) return null;
 
@@ -2364,8 +2343,8 @@ function calculateSchoolReadinessScores(attributes) {
 }
 
 function calculateOverallReadiness(scores) {
-  const values = readinessComponentLetters.map(
-    (letter) => toReadinessNumber(scores?.[letter]),
+  const values = readinessComponentLetters.map((letter) =>
+    toReadinessNumber(scores?.[letter]),
   );
 
   // Do not change component weights when data are missing.
@@ -2406,9 +2385,8 @@ function calculateSchoolTypeStateAverageReadinessScores(
 
   const peers = statewideFeatures.filter(
     (feature) =>
-      normalizeReadinessSchoolType(
-        getFeatureAttributes(feature).SchoolType,
-      ) === type,
+      normalizeReadinessSchoolType(getFeatureAttributes(feature).SchoolType) ===
+      type,
   );
 
   return peers.length ? aggregateReadinessSchools(peers) : null;
@@ -2418,15 +2396,11 @@ function calculateDistrictReadinessScores(districtFeatures = []) {
   return aggregateReadinessSchools(districtFeatures);
 }
 
-function calculateStateAverageDistrictReadinessScores(
-  statewideFeatures = [],
-) {
+function calculateStateAverageDistrictReadinessScores(statewideFeatures = []) {
   const districts = new Map();
 
   statewideFeatures.forEach((feature) => {
-    const name = String(
-      getFeatureAttributes(feature).SystemName || "",
-    ).trim();
+    const name = String(getFeatureAttributes(feature).SystemName || "").trim();
 
     if (!name) return;
 
@@ -2434,8 +2408,8 @@ function calculateStateAverageDistrictReadinessScores(
     districts.get(name).push(feature);
   });
 
-  const districtScores = Array.from(districts.values()).map(
-    (features) => calculateDistrictReadinessScores(features),
+  const districtScores = Array.from(districts.values()).map((features) =>
+    calculateDistrictReadinessScores(features),
   );
 
   if (!districtScores.length) return null;
@@ -2499,10 +2473,7 @@ function updateReadinessScoreDisplay(prefix, scores) {
       ? scores.overall
       : calculateOverallReadiness(scores);
 
-  setTextById(
-    `${prefix}ReadinessScore`,
-    readinessDisplayValue(overall),
-  );
+  setTextById(`${prefix}ReadinessScore`, readinessDisplayValue(overall));
 
   return overall;
 }
@@ -2527,18 +2498,18 @@ function configureReadinessDisplay(prefix, schoolType = null) {
 
   // Preparation: show only the applicable school explanation.
   const preparationBullets = [
-    "<strong>What it measures:</strong> Participation in computer science coursework, adjusted for the number of grade levels served. It indicates exposure to CS rather than mastery of course content."
+    "<strong>What it measures:</strong> Participation in computer science coursework, adjusted for the number of grade levels served. It indicates exposure to CS rather than mastery of course content.",
   ];
 
   if (isDistrict || isEarlySchool) {
     preparationBullets.push(
-      "<strong>Student Preparation — elementary and middle schools:</strong> Uses enrollments in all computer science courses."
+      "<strong>Student Preparation — elementary and middle schools:</strong> Uses enrollments in all computer science courses.",
     );
   }
 
   if (isDistrict || isSecondarySchool) {
     preparationBullets.push(
-      "<strong>College and Career Preparation — high and K–12 schools:</strong> Uses enrollments in Georgia DOE-approved computer science courses."
+      "<strong>College and Career Preparation — high and K–12 schools:</strong> Uses enrollments in Georgia DOE-approved computer science courses.",
     );
   }
 
@@ -2554,42 +2525,42 @@ function configureReadinessDisplay(prefix, schoolType = null) {
 
     "<strong>Grade-span years:</strong> Counts each grade served, including both endpoints. For example, grades 6–8 count as 3 years and grades 9–12 count as 4. Kindergarten and pre-K each count as one year.",
 
-    "<strong>How to interpret it:</strong> Higher scores indicate greater participation relative to school size and grade span. Students taking multiple CS courses may be counted more than once, so this is not the percentage of unique students reached."
+    "<strong>How to interpret it:</strong> Higher scores indicate greater participation relative to school size and grade span. Students taking multiple CS courses may be counted more than once, so this is not the percentage of unique students reached.",
   );
 
   // Mathematics: show the matching assessment.
   const mathematicsBullets = [
-    "<strong>What it measures:</strong> The percentage of students classified as Proficient or Distinguished Learners on the applicable Georgia Milestones mathematics assessment."
+    "<strong>What it measures:</strong> The percentage of students classified as Proficient or Distinguished Learners on the applicable Georgia Milestones mathematics assessment.",
   ];
 
   if (isDistrict || type === "E") {
     mathematicsBullets.push(
-      "<strong>Elementary schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Grade 5 Mathematics."
+      "<strong>Elementary schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Grade 5 Mathematics.",
     );
   }
 
   if (isDistrict || type === "M") {
     mathematicsBullets.push(
-      "<strong>Middle schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Grade 8 Mathematics."
+      "<strong>Middle schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Grade 8 Mathematics.",
     );
   }
 
   if (isDistrict || type === "H") {
     mathematicsBullets.push(
-      "<strong>High schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Algebra: Concepts and Connections."
+      "<strong>High schools:</strong> Uses the school's percentages of Proficient and Distinguished Learners for Algebra: Concepts and Connections.",
     );
   }
 
   if (isDistrict || type === "K12") {
     mathematicsBullets.push(
-      "<strong>K–12 schools:</strong> Uses the mathematics assessment for the highest school level served. Schools serving high school grades use Algebra: Concepts and Connections. Otherwise, schools serving middle school grades use Grade 8 Mathematics; schools serving only elementary grades use Grade 5 Mathematics."
+      "<strong>K–12 schools:</strong> Uses the mathematics assessment for the highest school level served. Schools serving high school grades use Algebra: Concepts and Connections. Otherwise, schools serving middle school grades use Grade 8 Mathematics; schools serving only elementary grades use Grade 5 Mathematics.",
     );
   }
 
   mathematicsBullets.push(
     "<strong>Calculation:</strong> Score = Proficient Learner percentage + Distinguished Learner percentage. The reported combined percentage is used directly on a 0–100 scale.",
 
-    "<strong>How to interpret it:</strong> A combined proficiency rate of 65% produces a score of 65. Mathematics supports the reasoning and problem-solving skills used in CS; this score measures mathematics achievement rather than CS achievement. Missing proficiency data are shown as N/A."
+    "<strong>How to interpret it:</strong> A combined proficiency rate of 65% produces a score of 65. Mathematics supports the reasoning and problem-solving skills used in CS; this score measures mathematics achievement rather than CS achievement. Missing proficiency data are shown as N/A.",
   );
 
   const capacityBullets = [
@@ -2601,7 +2572,7 @@ function configureReadinessDisplay(prefix, schoolType = null) {
 
     "<strong>Grade-span years:</strong> Counts each grade served, including both endpoints. Kindergarten and pre-K each count as one year.",
 
-    "<strong>How to interpret it:</strong> A score of 100 means estimated capacity meets or exceeds the model's benchmark. Actual capacity depends on teaching assignments, class sizes, and schedules; the score does not confirm that every student receives CS instruction."
+    "<strong>How to interpret it:</strong> A score of 100 means estimated capacity meets or exceeds the model's benchmark. Actual capacity depends on teaching assignments, class sizes, and schedules; the score does not confirm that every student receives CS instruction.",
   ];
 
   const equityBullets = [
@@ -2615,7 +2586,7 @@ function configureReadinessDisplay(prefix, schoolType = null) {
 
     "<strong>How to interpret it:</strong> A score of 100 indicates alignment within the allowance. Lower scores indicate larger differences in representation. A 49%/51% CS gender distribution compared with a 50%/50% school distribution receives a gender score of 100.",
 
-    "<strong>Data availability:</strong> Both race/ethnicity and gender scores are required. With no CS enrollments or insufficient demographic data, equity is N/A. Students taking multiple CS courses may be counted more than once."
+    "<strong>Data availability:</strong> Both race/ethnicity and gender scores are required. With no CS enrollments or insufficient demographic data, equity is N/A. Students taking multiple CS courses may be counted more than once.",
   ];
 
   const components = [
@@ -2634,9 +2605,7 @@ function configureReadinessDisplay(prefix, schoolType = null) {
       row.hidden = false;
       row.style.display = "";
 
-      const labelElement = row.querySelector(
-        ".readiness-component-label"
-      );
+      const labelElement = row.querySelector(".readiness-component-label");
 
       if (labelElement) {
         labelElement.textContent = label;
@@ -2701,12 +2670,10 @@ function resetReadinessScores(prefix) {
   configureReadinessDisplay(prefix);
   updateReadinessScoreDisplay(prefix, {});
   updateReadinessStateAverageDisplay(prefix, null);
+  if (prefix === "district") updateReadinessBySchoolType("district", []);
 }
 
-function updateSchoolReadinessScores(
-  attributes,
-  statewideFeatures = [],
-) {
+function updateSchoolReadinessScores(attributes, statewideFeatures = []) {
   configureReadinessDisplay(
     "school",
     normalizeReadinessSchoolType(attributes.SchoolType),
@@ -2733,9 +2700,9 @@ function updateDistrictReadinessScores(
     calculateStateAverageDistrictReadinessScores(statewideFeatures);
 
   updateDistrictStateAverageReadinessDisplay(stateAverage);
+  updateReadinessBySchoolType("district", districtFeatures);
   return updateReadinessScoreDisplay("district", scores);
 }
-
 
 function getFeatureAttributes(feature) {
   return feature && feature.attributes ? feature.attributes : {};
@@ -4663,8 +4630,32 @@ async function querySchoolSummaryByWhere(whereClause) {
 //   });
 // }
 
+// function updateStateReadinessFromFeatures(statewideFeatures = []) {
+//   const rows = [
+//     ["E", "Elementary"],
+//     ["M", "Middle"],
+//     ["H", "High"],
+//     ["K12", "K12"],
+//   ];
 
-function updateStateReadinessFromFeatures(statewideFeatures = []) {
+//   rows.forEach(([type, suffix]) => {
+//     const schools = statewideFeatures.filter(
+//       (feature) =>
+//         normalizeReadinessSchoolType(
+//           getFeatureAttributes(feature).SchoolType,
+//         ) === type,
+//     );
+
+//     const scores = aggregateReadinessSchools(schools);
+
+//     setTextById(
+//       `stateReadiness${suffix}`,
+//       readinessDisplayValue(scores.overall),
+//     );
+//   });
+// }
+
+function updateReadinessBySchoolType(prefix, features) {
   const rows = [
     ["E", "Elementary"],
     ["M", "Middle"],
@@ -4673,7 +4664,7 @@ function updateStateReadinessFromFeatures(statewideFeatures = []) {
   ];
 
   rows.forEach(([type, suffix]) => {
-    const schools = statewideFeatures.filter(
+    const schools = features.filter(
       (feature) =>
         normalizeReadinessSchoolType(
           getFeatureAttributes(feature).SchoolType,
@@ -4683,7 +4674,7 @@ function updateStateReadinessFromFeatures(statewideFeatures = []) {
     const scores = aggregateReadinessSchools(schools);
 
     setTextById(
-      `stateReadiness${suffix}`,
+      `${prefix}Readiness${suffix}`,
       readinessDisplayValue(scores.overall),
     );
   });
@@ -4691,18 +4682,14 @@ function updateStateReadinessFromFeatures(statewideFeatures = []) {
 
 async function loadStateSummaryFromArcGIS() {
   try {
-    const statewideFeatures =
-      await fetchAllComparisonFeaturesFromArcGIS();
+    const statewideFeatures = await fetchAllComparisonFeaturesFromArcGIS();
 
-    if (
-      !Array.isArray(statewideFeatures) ||
-      statewideFeatures.length === 0
-    ) {
+    if (!Array.isArray(statewideFeatures) || statewideFeatures.length === 0) {
       console.warn("No statewide ArcGIS features were returned.");
 
       updateStateSummaryFromData();
       updateStateAccessFromData();
-      updateStateReadinessFromFeatures([]);
+      updateReadinessBySchoolType("state", []);
       updateStateDemographicChartsFromFeatures([]);
       resetStateRecommendations();
       return;
@@ -4711,12 +4698,11 @@ async function loadStateSummaryFromArcGIS() {
     const stateSummaryData =
       buildStateSummaryDataFromFeatures(statewideFeatures);
 
-    const stateAccessData =
-      buildStateAccessDataFromFeatures(statewideFeatures);
+    const stateAccessData = buildStateAccessDataFromFeatures(statewideFeatures);
 
     updateStateSummaryFromData(stateSummaryData);
     updateStateAccessFromData(stateAccessData);
-    updateStateReadinessFromFeatures(statewideFeatures);
+    updateReadinessBySchoolType("state", statewideFeatures);
     updateStateDemographicChartsFromFeatures(statewideFeatures);
     updateStateRecommendations(statewideFeatures, stateAccessData);
   } catch (error) {
@@ -4724,7 +4710,7 @@ async function loadStateSummaryFromArcGIS() {
 
     updateStateSummaryFromData();
     updateStateAccessFromData();
-    updateStateReadinessFromFeatures([]);
+    updateReadinessBySchoolType("state", []);
     updateStateDemographicChartsFromFeatures([]);
     resetStateRecommendations();
   }
