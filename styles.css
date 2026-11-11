@@ -2847,3 +2847,110 @@ a:hover {
   padding-left: 24px;
   margin-top: 6px;
 }
+
+#schoolGrid .summary-comparison-table th,
+#schoolGrid .summary-comparison-table td,
+#districtReportGrid .summary-comparison-table th,
+#districtReportGrid .summary-comparison-table td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  line-height: 1.2;
+}
+
+#districtReportGrid .readiness-score-card .district-readiness-type-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+#districtReportGrid .readiness-score-card .district-readiness-type-table th,
+#districtReportGrid .readiness-score-card .district-readiness-type-table td {
+  font-size: 0.85rem;
+  line-height: 1.2;
+  padding: 4px 8px;
+}
+
+#districtReportGrid .readiness-score-card .district-readiness-type-table thead th:first-child {
+  width: 50%;
+}
+
+#districtReportGrid .readiness-score-card .district-readiness-type-table tr > :last-child {
+  position: static;
+  padding-right: 8px;
+  text-align: center;
+}
+
+.district-type-details {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+#districtTypeReadinessDialog {
+  box-sizing: border-box;
+  width: min(480px, calc(100vw - 32px));
+  max-height: 85vh;
+  margin: auto;
+  padding: 20px;
+  overflow-y: auto;
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #051e39;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#districtTypeReadinessDialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+
+.district-type-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+}
+
+.district-type-dialog-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.district-type-dialog-header button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+#districtTypeReadinessDialog p {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.district-type-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.district-type-breakdown-table th,
+.district-type-breakdown-table td {
+  padding: 9px 4px;
+  border-bottom: 1px solid #dddddd;
+  text-align: left;
+}
+
+.district-type-breakdown-table tr > :last-child {
+  text-align: right;
+}
+
+.district-type-breakdown-table td {
+  font-weight: 700;
+}

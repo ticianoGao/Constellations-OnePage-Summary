@@ -4680,6 +4680,11 @@ function updateReadinessBySchoolType(prefix, features) {
     ["K12", "K12"],
   ];
 
+  if (prefix === "district") {
+    const dialog = document.getElementById("districtTypeReadinessDialog");
+    if (dialog?.open) dialog.close();
+  }
+
   rows.forEach(([type, suffix]) => {
     const schools = features.filter(
       (feature) =>
@@ -4694,6 +4699,16 @@ function updateReadinessBySchoolType(prefix, features) {
       `${prefix}Readiness${suffix}`,
       readinessDisplayValue(scores.overall),
     );
+
+    if (prefix === "district") {
+      const button = document.querySelector(
+        `.district-type-details[data-school-type="${suffix}"]`,
+      );
+
+      if (button) {
+        button.dataset.scores = JSON.stringify(scores);
+      }
+    }
   });
 }
 
@@ -8018,3 +8033,39 @@ if (printDistrictReportButton) {
     });
   });
 }
+
+document.querySelectorAll(".district-type-details").forEach((button) => {
+  button.addEventListener("click", () => {
+    const dialog = document.getElementById("districtTypeReadinessDialog");
+    const type = button.dataset.schoolType;
+    const scores = JSON.parse(button.dataset.scores || "{}");
+
+    const labels = {
+      Elementary: "Elementary Schools",
+      Middle: "Middle Schools",
+      High: "High Schools",
+      K12: "K-12 Schools",
+    };
+
+    setTextById(
+      "districtTypeReadinessTitle",
+      `${labels[type]} — Readiness Breakdown`,
+    );
+
+    setTextById(
+      "districtTypePreparationLabel",
+      type === "Elementary" || type === "Middle"
+        ? "Student Preparation"
+        : "College and Career Preparation",
+    );
+
+    ["A", "B", "D", "E"].forEach((letter) => {
+      setTextById(
+        `districtTypeScore${letter}`,
+        readinessDisplayValue(scores[letter]),
+      );
+    });
+
+    dialog.showModal();
+  });
+});

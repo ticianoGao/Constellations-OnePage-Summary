@@ -2227,60 +2227,66 @@
                     </strong>
                   </div>
 
+
                   <!-- Readiness score components -->
                   <div class="readiness-breakdown-section">
-                    <!-- <div class="readiness-breakdown-heading">
+                    <div class="readiness-breakdown-heading">
                       <div class="state-access-table-wrap">
-                        <table class="state-access-table">
+                        <table class="state-access-table district-readiness-type-table">
                           <thead>
                             <tr>
                               <th scope="col">School Type</th>
                               <th scope="col">Average Readiness</th>
                             </tr>
                           </thead>
-                          <tbody>
-                            <tr>
-                              <th scope="row">Elementary</th>
-                              <td id="districtReadinessElementary">--</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">Middle</th>
-                              <td id="districtReadinessMiddle">--</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">High</th>
-                              <td id="districtReadinessHigh">--</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">K-12</th>
-                              <td id="districtReadinessK12">--</td>
-                            </tr>
-                          </tbody>
+                            <tbody>
+                              <tr>
+                                <th scope="row">Elementary</th>
+                                <td>
+                                  <button type="button" class="district-type-details"
+                                          data-school-type="Elementary" aria-haspopup="dialog"
+                                          aria-label="View elementary readiness breakdown">
+                                    <span id="districtReadinessElementary">--</span>
+                                  </button>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th scope="row">Middle</th>
+                                <td>
+                                  <button type="button" class="district-type-details"
+                                          data-school-type="Middle" aria-haspopup="dialog"
+                                          aria-label="View middle school readiness breakdown">
+                                    <span id="districtReadinessMiddle">--</span>
+                                  </button>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th scope="row">High</th>
+                                <td>
+                                  <button type="button" class="district-type-details"
+                                          data-school-type="High" aria-haspopup="dialog"
+                                          aria-label="View high school readiness breakdown">
+                                    <span id="districtReadinessHigh">--</span>
+                                  </button>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th scope="row">K-12</th>
+                                <td>
+                                  <button type="button" class="district-type-details"
+                                          data-school-type="K12" aria-haspopup="dialog"
+                                          aria-label="View K-12 readiness breakdown">
+                                    <span id="districtReadinessK12">--</span>
+                                  </button>
+                                </td>
+                              </tr>
+                            </tbody>
                         </table>
                       </div>
-                    </div> -->
-                    <div class="readiness-breakdown-heading">
-                      <table class="state-access-table district-readiness-type-table">
-                        <thead>
-                          <tr>
-                            <th scope="col">School Type</th>
-                            <th scope="col">Elementary</th>
-                            <th scope="col">Middle</th>
-                            <th scope="col">High</th>
-                            <th scope="col">K-12</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <th scope="row">Average Readiness</th>
-                            <td id="districtReadinessElementary">--</td>
-                            <td id="districtReadinessMiddle">--</td>
-                            <td id="districtReadinessHigh">--</td>
-                            <td id="districtReadinessK12">--</td>
-                          </tr>
-                        </tbody>
-                      </table>
                     </div>
+
+
+
                     <div class="readiness-component-column-headings">
                       <span></span>
                       <span>District</span>
@@ -2784,6 +2790,51 @@
 
       <div class="footer-bottom-bar"></div>
     </footer>
+
+
+    <dialog id="districtTypeReadinessDialog"
+            aria-labelledby="districtTypeReadinessTitle">
+      <form method="dialog" class="district-type-dialog-header">
+        <h3 id="districtTypeReadinessTitle">Readiness breakdown</h3>
+        <button type="submit" aria-label="Close readiness breakdown">×</button>
+      </form>
+
+      <p>Average scores for this school type in the selected district.</p>
+
+      <table class="district-type-breakdown-table">
+        <thead>
+          <tr>
+            <th scope="col">Component</th>
+            <th scope="col">Average score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" id="districtTypePreparationLabel">Preparation</th>
+            <td id="districtTypeScoreA">--</td>
+          </tr>
+          <tr>
+            <th scope="row">Mathematics Proficiency</th>
+            <td id="districtTypeScoreB">--</td>
+          </tr>
+          <tr>
+            <th scope="row">Instructional Capacity</th>
+            <td id="districtTypeScoreD">--</td>
+          </tr>
+          <tr>
+            <th scope="row">Participation Equity</th>
+            <td id="districtTypeScoreE">--</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="district-type-dialog-note">
+        Each component averages schools with a score for that component.
+        Each school receives equal weight. N/A means no scores are available.
+        The overall average uses only schools with all four components,
+        so it may differ from the average of the values shown here.
+      </p>
+    </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
