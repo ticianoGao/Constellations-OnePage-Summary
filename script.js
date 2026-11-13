@@ -132,15 +132,21 @@ function updateSnapshotTitles() {
       const safeSchoolName = escapeHtml(selectedReportValue);
       const safeGradeRange = escapeHtml(formatGradeRange(selectedGradeRange));
 
+      const districtLabel = isStateSpecialtyDistrict(selectedDistrictName)
+        ? `<span style="color: #fff;">${safeDistrictName}</span>`
+        : `
+          <button
+            class="snapshot-district-link"
+            type="button"
+            data-district-name="${safeDistrictName}"
+            aria-label="Open ${safeDistrictName} district report"
+          >
+            ${safeDistrictName}
+          </button>
+        `;
+
       schoolSnapshotSubtitle.innerHTML = `
-        <button
-          class="snapshot-district-link"
-          type="button"
-          data-district-name="${safeDistrictName}"
-          aria-label="Open ${safeDistrictName} district report"
-        >
-          ${safeDistrictName}
-        </button>
+        ${districtLabel}
         <span>•</span>
         ${safeSchoolName}
         <span>•</span>
@@ -620,6 +626,13 @@ function cleanSchoolRows(rows) {
     .filter((row) => row.schoolName.trim() !== "");
 }
 
+// Check if the district name indicates a state specialty school district
+function isStateSpecialtyDistrict(name) {
+  return /^state\s+special(?:ty|ity)\s+schools\b/i.test(
+    String(name || "").trim()
+  );
+}
+
 function makeGroupId(value) {
   return String(value || "")
     .toLowerCase()
@@ -648,7 +661,9 @@ function buildDropdownFromCsvRows(rows) {
   const districtMap = new Map();
 
   schoolLookupData.forEach((school) => {
-    const districtName = school.districtName || "District unavailable";
+    const districtName = isStateSpecialtyDistrict(school.districtName)
+      ? "State Specialty Schools"
+      : school.districtName || "District unavailable";
 
     if (!districtMap.has(districtName)) {
       districtMap.set(districtName, {
@@ -667,15 +682,48 @@ function buildDropdownFromCsvRows(rows) {
 
   districts.forEach((district) => {
     const groupId = makeGroupId(district.districtName);
+    const isSpecialtyGroup =
+      district.districtName === "State Specialty Schools";
 
-    const districtOption = createDropdownOption({
-      label: district.districtName,
-      displayText: `${district.districtName} — ${district.schools.length} schools`,
-      value: district.districtName,
-      type: "district",
-      district: district.districtName,
-      systemId: district.systemId,
-    });
+    let districtOption;
+
+    if (isSpecialtyGroup) {
+      // A grouping heading, not a selectable district report.
+      districtOption = document.createElement("li");
+      const heading = document.createElement("div");
+      heading.textContent =
+        `State Specialty Schools — ${district.schools.length} schools`;
+
+      const description = document.createElement("div");
+      description.textContent =
+        "These schools operate independently of local school districts and are " +
+        "grouped here for browsing. Their separate systems are excluded from " +
+        "the statewide district count.";
+
+      description.style.cssText = `
+        margin-top: 6px;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 1.4;
+        color: #555;
+      `;
+
+      districtOption.append(heading, description);
+
+      districtOption.dataset.type = "group";
+      districtOption.dataset.label = "State Specialty Schools";
+      districtOption.style.cursor = "default";
+    } else {
+      districtOption = createDropdownOption({
+        label: district.districtName,
+        displayText:
+          `${district.districtName} — ${district.schools.length} schools`,
+        value: district.districtName,
+        type: "district",
+        district: district.districtName,
+        systemId: district.systemId,
+      });
+    }
 
     districtOption.classList.add("district-group-option");
     districtOption.dataset.groupId = groupId;
@@ -4341,7 +4389,7 @@ function buildStateSummaryDataFromFeatures(features) {
         const attributes = getFeatureAttributes(feature);
         return String(attributes.SystemName || "").trim();
       })
-      .filter(Boolean),
+      .filter((name) => name && !isStateSpecialtyDistrict(name)),
   );
 
   const totalStudents = getSumFromFeatures(statewideFeatures, "StudentCou");
